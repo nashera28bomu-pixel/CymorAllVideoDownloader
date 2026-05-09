@@ -4,9 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CymorAllVideo Downloader</title>
-
     <script src="https://cdn.tailwindcss.com"></script>
-
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Rajdhani:wght@400;600;700&display=swap');
 
@@ -15,24 +13,26 @@
             color: white;
             font-family: 'Rajdhani', sans-serif;
             margin: 0;
-            overflow-x: hidden;
+            overflow: hidden; /* Essential for the slide effect */
             height: 100vh;
         }
 
-        /* Page Transition Logic */
-        #page-container {
+        #page-wrapper {
             display: flex;
             flex-direction: column;
-            height: 200vh; /* Two pages tall */
-            transition: transform 0.8s cubic-bezier(0.65, 0, 0.35, 1);
+            height: 200vh;
+            transition: transform 0.8s cubic-bezier(0.85, 0, 0.15, 1);
         }
 
-        .page {
+        .section-page {
             height: 100vh;
             width: 100%;
             flex-shrink: 0;
             overflow-y: auto;
-            padding: 2rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 2rem 1rem;
         }
 
         .glass {
@@ -49,140 +49,139 @@
         }
 
         .card-glass:hover {
-            border-color: rgba(255,0,0,0.4);
+            border-color: rgba(255,0,0,0.5);
             transform: translateY(-5px);
+            background: rgba(255,0,0,0.05);
         }
 
         .glow { text-shadow: 0 0 10px red, 0 0 20px darkred; }
         .brand { font-family: 'Orbitron', sans-serif; letter-spacing: 2px; }
-        .pulse-red { animation: pulse 2s infinite; }
-        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+        .pulse-red { animation: pulse 1.5s infinite; }
+        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
     </style>
 </head>
-
 <body>
 
-    <div id="page-container">
+    <div id="page-wrapper">
         
-        <section id="landingPage" class="page flex flex-col items-center justify-center">
-            <header class="text-center mb-12">
-                <p class="brand text-red-500 font-bold tracking-widest text-sm mb-2">
-                    CYMOR TECH SERVICES PRESENT
+        <section class="section-page justify-center">
+            <header class="text-center mb-10">
+                <p class="brand text-red-500 font-bold tracking-widest text-sm mb-2 uppercase">
+                    Cymor Tech Services Present
                 </p>
-                <h1 class="text-5xl md:text-8xl font-bold glow brand uppercase italic">
-                    Download Anything.
+                <h1 class="text-5xl md:text-8xl font-bold glow brand uppercase italic leading-none">
+                    CymorAll<br>Video Downloader.
                 </h1>
-                <p class="text-gray-400 mt-4 text-lg tracking-wide">
-                    YouTube • Facebook • TikTok — Fast, free, no watermark
+                <p class="text-gray-400 mt-6 text-lg tracking-wide max-w-xl">
+                    High-speed downloads for YouTube, TikTok, and Facebook. No watermarks. No limits.
                 </p>
             </header>
 
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 w-full max-w-5xl px-4">
-                <div class="card-glass p-8 rounded-2xl text-center">
-                    <div class="text-red-600 text-4xl mb-4">▶</div>
-                    <h3 class="text-2xl font-bold brand mb-2 uppercase">YouTube</h3>
-                    <p class="text-gray-400 text-sm">HD Videos & MP3 conversion.</p>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 w-full max-w-5xl px-4 mb-10">
+                <div class="card-glass p-6 rounded-2xl text-center">
+                    <span class="text-red-600 text-3xl">▶</span>
+                    <h3 class="text-xl font-bold brand mt-2">YOUTUBE</h3>
+                    <p class="text-gray-500 text-xs mt-1">Shorts & 4K Video</p>
                 </div>
-                <div class="card-glass p-8 rounded-2xl text-center">
-                    <div class="text-blue-500 text-4xl mb-4">f</div>
-                    <h3 class="text-2xl font-bold brand mb-2 uppercase">Facebook</h3>
-                    <p class="text-gray-400 text-sm">Save Reels & high-quality posts.</p>
+                <div class="card-glass p-6 rounded-2xl text-center border-red-900/50">
+                    <span class="text-blue-500 text-3xl">f</span>
+                    <h3 class="text-xl font-bold brand mt-2">FACEBOOK</h3>
+                    <p class="text-gray-500 text-xs mt-1">Reels & Watch</p>
                 </div>
-                <div class="card-glass p-8 rounded-2xl text-center">
-                    <div class="text-green-400 text-4xl mb-4">♪</div>
-                    <h3 class="text-2xl font-bold brand mb-2 uppercase">TikTok</h3>
-                    <p class="text-gray-400 text-sm">No watermark, instant fetching.</p>
+                <div class="card-glass p-6 rounded-2xl text-center">
+                    <span class="text-green-400 text-3xl">♪</span>
+                    <h3 class="text-xl font-bold brand mt-2">TIKTOK</h3>
+                    <p class="text-gray-500 text-xs mt-1">No Watermark MP4</p>
                 </div>
             </div>
 
-            <button onclick="goToDownloader()" class="mt-12 bg-red-700 hover:bg-red-600 px-10 py-4 rounded-full font-bold text-xl uppercase tracking-widest shadow-2xl shadow-red-900/40 transition-all transform hover:scale-105">
+            <button onclick="slideDown()" class="bg-red-700 hover:bg-red-600 px-12 py-5 rounded-full font-bold text-xl uppercase tracking-tighter shadow-2xl shadow-red-900/40 transition-all transform hover:scale-105 active:scale-95">
                 Download Now
             </button>
         </section>
 
-        <section id="downloaderPage" class="page flex flex-col items-center">
-            <header class="text-center mb-8 mt-10">
-                <h2 class="text-3xl font-bold glow brand uppercase italic">CymorAllVideo</h2>
-                <p class="text-xs text-gray-500 uppercase tracking-widest mt-1">Multi-Platform Engine</p>
-            </header>
+        <section class="section-page">
+            <div class="w-full max-w-2xl mt-10">
+                <button onclick="slideUp()" class="mb-6 text-gray-500 hover:text-white text-xs uppercase tracking-widest flex items-center gap-2">
+                    ↑ Return Home
+                </button>
 
-            <div class="glass p-8 rounded-3xl w-full max-w-2xl">
-                <input id="urlInput"
-                    class="w-full p-4 bg-black/60 border border-red-900 rounded-xl text-white outline-none focus:border-red-500 transition-all"
-                    placeholder="Paste link here (TikTok, YT, FB)...">
+                <div class="glass p-8 rounded-3xl w-full border-t border-red-500/30">
+                    <h2 class="text-2xl font-bold brand glow mb-6 uppercase italic">Analyzer</h2>
+                    
+                    <input id="urlInput"
+                        class="w-full p-4 bg-black/60 border border-red-900 rounded-xl text-white outline-none focus:border-red-500 transition-all mb-4"
+                        placeholder="Paste direct link here...">
 
-                <div class="flex gap-2 mt-4">
-                    <button onclick="pasteFromClipboard()" class="flex-1 bg-gray-800 hover:bg-gray-700 p-4 rounded-xl font-bold uppercase text-xs">
-                        Paste Link
-                    </button>
-                    <button onclick="analyzeLink()" class="flex-[2] bg-red-700 hover:bg-red-600 p-4 rounded-xl font-bold uppercase tracking-widest shadow-lg shadow-red-900/20">
-                        Analyze Link
-                    </button>
-                </div>
-            </div>
-
-            <div id="preview" class="hidden glass p-8 rounded-3xl w-full max-w-2xl mt-6 border-t-2 border-red-600/30">
-                <div class="flex justify-between items-center border-b border-red-900/30 pb-4">
-                    <div>
-                        <p class="text-xs text-gray-500 uppercase font-bold tracking-tighter">Platform</p>
-                        <h2 id="platform" class="text-2xl font-bold text-red-500 brand"></h2>
-                    </div>
-                    <div class="text-right">
-                        <p class="text-xs text-gray-500 uppercase font-bold tracking-tighter">Status</p>
-                        <p id="status" class="text-green-400 font-semibold uppercase">READY</p>
+                    <div class="flex gap-2">
+                        <button onclick="pasteLink()" class="flex-1 bg-gray-900 hover:bg-gray-800 p-4 rounded-xl font-bold uppercase text-[10px] tracking-widest border border-white/5">
+                            Paste
+                        </button>
+                        <button onclick="analyzeLink()" class="flex-[3] bg-red-700 hover:bg-red-600 p-4 rounded-xl font-bold uppercase tracking-widest shadow-lg shadow-red-900/20">
+                            Analyze Link
+                        </button>
                     </div>
                 </div>
 
-                <div class="mt-6 flex flex-col gap-3">
-                    <button id="mp4Btn" onclick="download('mp4')" class="w-full bg-red-700 p-4 rounded-xl font-bold uppercase">Download MP4</button>
-                    <button id="mp3Btn" onclick="download('mp3')" class="w-full border border-red-700 hover:bg-red-700/10 p-4 rounded-xl font-bold uppercase">Download MP3</button>
+                <div id="preview" class="hidden glass p-8 rounded-3xl w-full mt-6 border-l-4 border-red-600">
+                    <div class="flex justify-between items-center border-b border-white/10 pb-4">
+                        <div>
+                            <p class="text-[10px] text-gray-500 uppercase font-bold tracking-widest">Target Platform</p>
+                            <h2 id="platform" class="text-2xl font-bold text-red-500 brand">---</h2>
+                        </div>
+                        <div class="text-right">
+                            <p class="text-[10px] text-gray-500 uppercase font-bold tracking-widest">Status</p>
+                            <p id="status" class="text-green-400 font-semibold">READY</p>
+                        </div>
+                    </div>
+
+                    <div class="mt-6 grid grid-cols-1 gap-3">
+                        <button id="mp4Btn" onclick="download('mp4')" class="w-full bg-red-700 hover:bg-red-600 p-4 rounded-xl font-bold uppercase transition-all">
+                            Download Video (MP4)
+                        </button>
+                        <button id="mp3Btn" onclick="download('mp3')" class="w-full border border-red-700/50 hover:bg-red-700/10 p-4 rounded-xl font-bold uppercase transition-all">
+                            Download Audio (MP3)
+                        </button>
+                    </div>
+                </div>
+
+                <div class="mt-12">
+                    <h3 class="text-red-500 font-bold brand text-xs uppercase tracking-[0.3em] mb-4">Recent Sessions</h3>
+                    <div id="history" class="space-y-2"></div>
                 </div>
             </div>
-
-            <div class="mt-10 w-full max-w-2xl">
-                <div class="flex items-center gap-2 mb-4">
-                    <div class="h-[1px] flex-1 bg-red-900/50"></div>
-                    <h2 class="text-red-500 font-bold brand text-sm uppercase">Recent Logs</h2>
-                    <div class="h-[1px] flex-1 bg-red-900/50"></div>
-                </div>
-                <div id="history" class="grid gap-2"></div>
-            </div>
-
-            <button onclick="goToLanding()" class="mt-8 text-gray-500 hover:text-white text-xs uppercase tracking-widest">
-                ← Back to Home
-            </button>
         </section>
 
     </div>
 
-    <footer class="fixed bottom-0 w-full pb-6 text-center text-gray-500 text-xs pointer-events-none">
-        <div class="pointer-events-auto">
-            <p class="tracking-widest uppercase">
-                Built by <span class="text-red-500 font-bold glow">Smiley Cymor</span>
-            </p>
-        </div>
+    <footer class="fixed bottom-4 text-center w-full pointer-events-none">
+        <p class="text-gray-600 text-[10px] uppercase tracking-[0.5em] pointer-events-auto">
+            Site created by <span class="text-red-600 font-bold glow">Legendary Smiley Cymor</span>
+        </p>
     </footer>
 
     <script>
         let currentUrl = "";
-        const PROXY_URL = "https://corsproxy.io/?"; 
-        const API_URL = "https://api.cobalt.tools/api/json";
+        
+        // Using a more robust proxy list
+        const PROXIES = [
+            "https://api.allorigins.win/raw?url=",
+            "https://corsproxy.io/?"
+        ];
 
-        function goToDownloader() {
-            document.getElementById('page-container').style.transform = 'translateY(-100vh)';
+        function slideDown() {
+            document.getElementById('page-wrapper').style.transform = 'translateY(-100vh)';
         }
 
-        function goToLanding() {
-            document.getElementById('page-container').style.transform = 'translateY(0)';
+        function slideUp() {
+            document.getElementById('page-wrapper').style.transform = 'translateY(0)';
         }
 
-        async function pasteFromClipboard() {
+        async function pasteLink() {
             try {
                 const text = await navigator.clipboard.readText();
                 document.getElementById('urlInput').value = text;
-            } catch (err) {
-                alert("Clipboard access denied. Please paste manually.");
-            }
+            } catch (e) { alert("Please paste manually."); }
         }
 
         function extractUrl(text) {
@@ -191,94 +190,101 @@
             return matches ? matches[0] : text;
         }
 
-        function detect(url) {
-            const lowUrl = url.toLowerCase();
-            if (lowUrl.includes("youtube.com") || lowUrl.includes("youtu.be")) return "YouTube";
-            if (lowUrl.includes("tiktok.com")) return "TikTok";
-            if (lowUrl.includes("facebook.com") || lowUrl.includes("fb.watch")) return "Facebook";
+        function detectPlatform(url) {
+            const low = url.toLowerCase();
+            if (low.includes("youtube.com") || low.includes("youtu.be")) return "YouTube";
+            if (low.includes("tiktok.com")) return "TikTok";
+            if (low.includes("facebook.com") || low.includes("fb.watch")) return "Facebook";
             return "Video Link";
         }
 
         function analyzeLink() {
-            const urlInput = document.getElementById("urlInput");
-            const cleanUrl = extractUrl(urlInput.value.trim());
-            urlInput.value = cleanUrl;
-
-            if (!cleanUrl.startsWith('http')) {
-                alert("Please paste a valid video link (starting with http/https).");
+            const input = document.getElementById("urlInput");
+            const cleanUrl = extractUrl(input.value.trim());
+            
+            if (!cleanUrl.startsWith("http")) {
+                alert("Error: Please provide a valid link starting with http:// or https://\n\nEnsure there is no extra text in the box.");
                 return;
             }
 
             currentUrl = cleanUrl;
+            input.value = cleanUrl;
             document.getElementById("preview").classList.remove("hidden");
-            document.getElementById("platform").innerText = detect(cleanUrl);
+            document.getElementById("platform").innerText = detectPlatform(cleanUrl);
             document.getElementById("status").innerText = "READY";
-            document.getElementById("status").className = "text-green-400 font-semibold uppercase";
+            document.getElementById("status").className = "text-green-400 font-semibold";
         }
 
         async function download(type) {
-            const statusText = document.getElementById("status");
-            const mp4Btn = document.getElementById("mp4Btn");
-            const mp3Btn = document.getElementById("mp3Btn");
+            const status = document.getElementById("status");
+            const btns = [document.getElementById("mp4Btn"), document.getElementById("mp3Btn")];
 
-            statusText.innerText = "BYPASSING BLOCKS...";
-            statusText.className = "text-yellow-500 font-semibold pulse-red uppercase";
-            mp4Btn.disabled = true;
-            mp3Btn.disabled = true;
+            status.innerText = "INITIALIZING ENGINE...";
+            status.className = "text-yellow-500 font-semibold pulse-red";
+            btns.forEach(b => b.disabled = true);
 
-            try {
-                const response = await fetch(PROXY_URL + encodeURIComponent(API_URL), {
-                    method: 'POST',
-                    headers: { 'Accept': 'application/json', 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ 
-                        url: currentUrl, 
-                        vQuality: "1080",
-                        isAudioOnly: type === 'mp3',
-                        isNoTTWatermark: true
-                    })
-                });
+            const payload = {
+                url: currentUrl,
+                vQuality: "1080",
+                isAudioOnly: type === 'mp3',
+                isNoTTWatermark: true
+            };
 
-                const data = await response.json();
+            // Trying the fetch with a loop over proxies if one fails
+            let success = false;
+            
+            for (let proxy of PROXIES) {
+                try {
+                    const target = "https://api.cobalt.tools/api/json";
+                    const response = await fetch(proxy + encodeURIComponent(target), {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+                        body: JSON.stringify(payload)
+                    });
 
-                if (data.url) {
-                    statusText.innerText = "SUCCESS!";
-                    statusText.className = "text-green-400 font-semibold uppercase";
-                    window.location.href = data.url; 
-                    saveHistory(currentUrl, detect(currentUrl));
-                } else {
-                    throw new Error(data.text || "Engine rejected the link");
+                    const data = await response.json();
+                    
+                    if (data.url) {
+                        status.innerText = "REDIRECTING...";
+                        status.className = "text-green-400 font-semibold";
+                        window.location.href = data.url;
+                        saveHistory(currentUrl, detectPlatform(currentUrl));
+                        success = true;
+                        break; 
+                    }
+                } catch (err) {
+                    console.log(`Proxy ${proxy} failed, trying next...`);
                 }
-            } catch (err) {
-                statusText.innerText = "FAILED";
-                statusText.className = "text-red-500 font-semibold uppercase";
-                alert("Cymor Engine Error: " + err.message + "\n\nTip: Use direct links only. No text in the box.");
-            } finally {
-                mp4Btn.disabled = false;
-                mp3Btn.disabled = false;
             }
+
+            if (!success) {
+                status.innerText = "ENGINE ERROR";
+                status.className = "text-red-500 font-semibold";
+                alert("All engine nodes are currently busy or blocked. \n\nTip: Try a different video link or refresh the page.");
+            }
+
+            btns.forEach(b => b.disabled = false);
         }
 
         function saveHistory(url, platform) {
-            let history = JSON.parse(localStorage.getItem("cymor_history") || "[]");
-            const entry = { url, platform, date: new Date().toLocaleTimeString() };
-            history = history.filter(item => item.url !== url);
-            history.unshift(entry);
-            localStorage.setItem("cymor_history", JSON.stringify(history.slice(0, 5)));
+            let logs = JSON.parse(localStorage.getItem("cymor_logs") || "[]");
+            logs.unshift({ url, platform, time: new Date().toLocaleTimeString() });
+            localStorage.setItem("cymor_logs", JSON.stringify(logs.slice(0, 5)));
             renderHistory();
         }
 
         function renderHistory() {
-            let history = JSON.parse(localStorage.getItem("cymor_history") || "[]");
+            const logs = JSON.parse(localStorage.getItem("cymor_logs") || "[]");
             const container = document.getElementById("history");
-            if (history.length === 0) {
-                container.innerHTML = `<p class="text-center text-gray-600 italic text-xs">No recent downloads.</p>`;
+            if (!logs.length) {
+                container.innerHTML = `<p class="text-gray-700 italic text-[10px]">No recent activity.</p>`;
                 return;
             }
-            container.innerHTML = history.map(h => `
-                <div class="bg-black/40 p-3 rounded-lg border border-red-900/20 flex justify-between items-center text-[10px]">
-                    <span class="text-red-500 font-bold brand">${h.platform}</span>
-                    <span class="text-gray-500 truncate max-w-[150px] ml-2">${h.url}</span>
-                    <span class="text-gray-600 ml-auto">${h.date}</span>
+            container.innerHTML = logs.map(l => `
+                <div class="bg-white/5 p-3 rounded-xl flex justify-between items-center border border-white/5">
+                    <span class="text-red-500 font-bold text-[10px] brand">${l.platform}</span>
+                    <span class="text-gray-500 text-[9px] truncate max-w-[150px]">${l.url}</span>
+                    <span class="text-gray-700 text-[9px]">${l.time}</span>
                 </div>
             `).join("");
         }
