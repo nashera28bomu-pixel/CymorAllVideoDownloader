@@ -2,278 +2,990 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <meta name="theme-color" content="#7f1d1d">
+
     <title>CymorAllVideo Downloader</title>
+
     <script src="https://cdn.tailwindcss.com"></script>
+
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Rajdhani:wght@400;600;700&display=swap');
 
-        body {
-            background: radial-gradient(circle at center, #2a0000 0%, #000000 100%);
-            color: white;
-            font-family: 'Rajdhani', sans-serif;
-            margin: 0;
-            overflow: hidden; /* Essential for the slide effect */
-            height: 100vh;
+        *{
+            margin:0;
+            padding:0;
+            box-sizing:border-box;
         }
 
-        #page-wrapper {
-            display: flex;
-            flex-direction: column;
-            height: 200vh;
-            transition: transform 0.8s cubic-bezier(0.85, 0, 0.15, 1);
+        html{
+            width:100%;
+            overflow-x:hidden;
+            overflow-y:hidden;
         }
 
-        .section-page {
-            height: 100vh;
-            width: 100%;
-            flex-shrink: 0;
-            overflow-y: auto;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            padding: 2rem 1rem;
+        body{
+            width:100%;
+            height:100vh;
+
+            overflow-x:hidden;
+            overflow-y:hidden;
+            overflow:hidden;
+
+            position:relative;
+
+            color:white;
+
+            font-family:'Rajdhani',sans-serif;
+
+            background:
+            radial-gradient(circle at top,
+            #3a0000 0%,
+            #120000 40%,
+            #000000 100%);
         }
 
-        .glass {
-            background: rgba(20,0,0,0.6);
-            backdrop-filter: blur(12px);
-            border: 1px solid rgba(255,0,0,0.2);
-            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.8);
+        #page-wrapper{
+            display:flex;
+            flex-direction:column;
+            width:100%;
+            height:200vh;
+
+            transition:
+            transform .8s cubic-bezier(0.85,0,0.15,1);
+
+            will-change:transform;
         }
 
-        .card-glass {
-            background: rgba(255,255,255,0.03);
-            border: 1px solid rgba(255,255,255,0.1);
-            transition: all 0.3s ease;
+        .section-page{
+            width:100%;
+            height:100vh;
+
+            flex-shrink:0;
+
+            overflow-y:auto;
+            overflow-x:hidden;
+
+            display:flex;
+            flex-direction:column;
+            align-items:center;
+
+            padding:2rem 1rem;
         }
 
-        .card-glass:hover {
-            border-color: rgba(255,0,0,0.5);
-            transform: translateY(-5px);
-            background: rgba(255,0,0,0.05);
+        .brand{
+            font-family:'Orbitron',sans-serif;
+            letter-spacing:2px;
         }
 
-        .glow { text-shadow: 0 0 10px red, 0 0 20px darkred; }
-        .brand { font-family: 'Orbitron', sans-serif; letter-spacing: 2px; }
-        .pulse-red { animation: pulse 1.5s infinite; }
-        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
+        .glow{
+            text-shadow:
+            0 0 10px red,
+            0 0 20px darkred,
+            0 0 30px crimson;
+        }
+
+        .glass{
+            background:rgba(15,0,0,.6);
+
+            backdrop-filter:blur(12px);
+            -webkit-backdrop-filter:blur(12px);
+
+            border:1px solid rgba(255,0,0,.2);
+
+            box-shadow:
+            0 8px 32px rgba(0,0,0,.8);
+        }
+
+        .card{
+            background:rgba(255,255,255,.03);
+
+            border:1px solid rgba(255,255,255,.08);
+
+            transition:.3s ease;
+        }
+
+        .card:hover{
+            transform:translateY(-5px);
+
+            border-color:rgba(255,0,0,.5);
+
+            background:rgba(255,0,0,.06);
+        }
+
+        .pulse-red{
+            animation:pulse 1.5s infinite;
+        }
+
+        @keyframes pulse{
+            0%,100%{
+                opacity:1;
+            }
+            50%{
+                opacity:.4;
+            }
+        }
+
+        input{
+            min-width:0;
+        }
+
+        button{
+            cursor:pointer;
+        }
+
+        button:disabled{
+            opacity:.6;
+            cursor:not-allowed;
+        }
+
+        .floating{
+            position:absolute;
+
+            font-family:'Orbitron',sans-serif;
+
+            color:rgba(255,0,0,.08);
+
+            animation:floatUp linear infinite;
+
+            user-select:none;
+
+            pointer-events:none;
+        }
+
+        @keyframes floatUp{
+            from{
+                transform:
+                translateY(100vh);
+            }
+
+            to{
+                transform:
+                translateY(-120vh);
+            }
+        }
+
+        @media(max-width:768px){
+
+            h1{
+                font-size:3rem !important;
+                line-height:1 !important;
+            }
+
+            .glass{
+                padding:1.2rem !important;
+            }
+
+            button{
+                min-height:52px;
+            }
+
+            #history div{
+                flex-wrap:wrap;
+            }
+
+            #history span{
+                max-width:100%;
+                word-break:break-word;
+            }
+        }
     </style>
 </head>
+
 <body>
 
+    <div class="floating"
+         style="left:5%;font-size:3rem;animation-duration:14s;">
+         CYMOR
+    </div>
+
+    <div class="floating"
+         style="left:30%;font-size:5rem;animation-duration:20s;">
+         VIDEO
+    </div>
+
+    <div class="floating"
+         style="left:70%;font-size:4rem;animation-duration:18s;">
+         AI
+    </div>
+
+    <div class="floating"
+         style="left:50%;font-size:6rem;animation-duration:25s;">
+         CYMOR
+    </div>
+
     <div id="page-wrapper">
-        
+
+        <!-- HOME PAGE -->
+
         <section class="section-page justify-center">
+
             <header class="text-center mb-10">
-                <p class="brand text-red-500 font-bold tracking-widest text-sm mb-2 uppercase">
+
+                <p class="brand
+                          text-red-500
+                          font-bold
+                          tracking-widest
+                          text-sm
+                          mb-3
+                          uppercase">
+
                     Cymor Tech Services Present
+
                 </p>
-                <h1 class="text-5xl md:text-8xl font-bold glow brand uppercase italic leading-none">
+
+                <h1 class="text-5xl
+                           md:text-8xl
+                           font-bold
+                           glow
+                           brand
+                           uppercase
+                           italic
+                           leading-none">
+
                     CymorAll<br>Video
+
                 </h1>
-                <p class="text-gray-400 mt-6 text-lg tracking-wide max-w-xl">
-                    High-speed downloads for YouTube, TikTok, and Facebook. No watermarks. No limits.
+
+                <p class="text-gray-400
+                          mt-6
+                          text-lg
+                          tracking-wide
+                          max-w-xl
+                          mx-auto">
+
+                    High-speed downloads for
+                    YouTube, TikTok, and Facebook.
+                    No watermarks. No limits.
+
                 </p>
+
             </header>
 
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 w-full max-w-5xl px-4 mb-10">
-                <div class="card-glass p-6 rounded-2xl text-center">
-                    <span class="text-red-600 text-3xl">▶</span>
-                    <h3 class="text-xl font-bold brand mt-2">YOUTUBE</h3>
-                    <p class="text-gray-500 text-xs mt-1">Shorts & 4K Video</p>
+            <div class="grid
+                        grid-cols-1
+                        md:grid-cols-3
+                        gap-4
+                        w-full
+                        max-w-5xl
+                        px-4
+                        mb-10">
+
+                <div class="card
+                            p-6
+                            rounded-2xl
+                            text-center">
+
+                    <span class="text-red-600 text-3xl">
+                        ▶
+                    </span>
+
+                    <h3 class="text-xl
+                               font-bold
+                               brand
+                               mt-2">
+
+                        YOUTUBE
+
+                    </h3>
+
+                    <p class="text-gray-500 text-xs mt-1">
+                        Shorts & 4K Video
+                    </p>
+
                 </div>
-                <div class="card-glass p-6 rounded-2xl text-center border-red-900/50">
-                    <span class="text-blue-500 text-3xl">f</span>
-                    <h3 class="text-xl font-bold brand mt-2">FACEBOOK</h3>
-                    <p class="text-gray-500 text-xs mt-1">Reels & Watch</p>
+
+                <div class="card
+                            p-6
+                            rounded-2xl
+                            text-center">
+
+                    <span class="text-blue-500 text-3xl">
+                        f
+                    </span>
+
+                    <h3 class="text-xl
+                               font-bold
+                               brand
+                               mt-2">
+
+                        FACEBOOK
+
+                    </h3>
+
+                    <p class="text-gray-500 text-xs mt-1">
+                        Reels & Watch
+                    </p>
+
                 </div>
-                <div class="card-glass p-6 rounded-2xl text-center">
-                    <span class="text-green-400 text-3xl">♪</span>
-                    <h3 class="text-xl font-bold brand mt-2">TIKTOK</h3>
-                    <p class="text-gray-500 text-xs mt-1">No Watermark MP4</p>
+
+                <div class="card
+                            p-6
+                            rounded-2xl
+                            text-center">
+
+                    <span class="text-green-400 text-3xl">
+                        ♪
+                    </span>
+
+                    <h3 class="text-xl
+                               font-bold
+                               brand
+                               mt-2">
+
+                        TIKTOK
+
+                    </h3>
+
+                    <p class="text-gray-500 text-xs mt-1">
+                        No Watermark MP4
+                    </p>
+
                 </div>
+
             </div>
 
-            <button onclick="slideDown()" class="bg-red-700 hover:bg-red-600 px-12 py-5 rounded-full font-bold text-xl uppercase tracking-tighter shadow-2xl shadow-red-900/40 transition-all transform hover:scale-105 active:scale-95">
+            <button
+                onclick="slideDown()"
+
+                class="bg-red-700
+                       hover:bg-red-600
+                       px-12
+                       py-5
+                       rounded-full
+                       font-bold
+                       text-xl
+                       uppercase
+                       tracking-tight
+                       shadow-2xl
+                       shadow-red-900/40
+                       transition-all
+                       transform
+                       hover:scale-105
+                       active:scale-95">
+
                 Download Now
+
             </button>
+
         </section>
 
+        <!-- DOWNLOAD PAGE -->
+
         <section class="section-page">
-            <div class="w-full max-w-2xl mt-10">
-                <button onclick="slideUp()" class="mb-6 text-gray-500 hover:text-white text-xs uppercase tracking-widest flex items-center gap-2">
+
+            <div class="w-full
+                        max-w-2xl
+                        mt-10">
+
+                <button
+                    onclick="slideUp()"
+
+                    class="mb-6
+                           text-gray-500
+                           hover:text-white
+                           text-xs
+                           uppercase
+                           tracking-widest
+                           flex
+                           items-center
+                           gap-2">
+
                     ↑ Return Home
+
                 </button>
 
-                <div class="glass p-8 rounded-3xl w-full border-t border-red-500/30">
-                    <h2 class="text-2xl font-bold brand glow mb-6 uppercase italic">Analyzer</h2>
-                    
-                    <input id="urlInput"
-                        class="w-full p-4 bg-black/60 border border-red-900 rounded-xl text-white outline-none focus:border-red-500 transition-all mb-4"
+                <!-- ANALYZER -->
+
+                <div class="glass
+                            p-8
+                            rounded-3xl
+                            w-full
+                            border-t
+                            border-red-500/30">
+
+                    <h2 class="text-2xl
+                               font-bold
+                               brand
+                               glow
+                               mb-6
+                               uppercase
+                               italic">
+
+                        Analyzer
+
+                    </h2>
+
+                    <input
+                        id="urlInput"
+
+                        class="w-full
+                               p-4
+                               bg-black/60
+                               border
+                               border-red-900
+                               rounded-xl
+                               text-white
+                               outline-none
+                               focus:border-red-500
+                               transition-all
+                               mb-4"
+
                         placeholder="Paste direct link here...">
 
                     <div class="flex gap-2">
-                        <button onclick="pasteLink()" class="flex-1 bg-gray-900 hover:bg-gray-800 p-4 rounded-xl font-bold uppercase text-[10px] tracking-widest border border-white/5">
+
+                        <button
+                            onclick="pasteLink()"
+
+                            class="flex-1
+                                   bg-gray-900
+                                   hover:bg-gray-800
+                                   p-4
+                                   rounded-xl
+                                   font-bold
+                                   uppercase
+                                   text-[10px]
+                                   tracking-widest">
+
                             Paste
+
                         </button>
-                        <button onclick="analyzeLink()" class="flex-[3] bg-red-700 hover:bg-red-600 p-4 rounded-xl font-bold uppercase tracking-widest shadow-lg shadow-red-900/20">
+
+                        <button
+                            onclick="analyzeLink()"
+
+                            class="flex-[3]
+                                   bg-red-700
+                                   hover:bg-red-600
+                                   p-4
+                                   rounded-xl
+                                   font-bold
+                                   uppercase
+                                   tracking-widest">
+
                             Analyze Link
+
                         </button>
+
                     </div>
+
                 </div>
 
-                <div id="preview" class="hidden glass p-8 rounded-3xl w-full mt-6 border-l-4 border-red-600">
-                    <div class="flex justify-between items-center border-b border-white/10 pb-4">
+                <!-- PREVIEW -->
+
+                <div id="preview"
+
+                     class="hidden
+                            glass
+                            p-8
+                            rounded-3xl
+                            w-full
+                            mt-6
+                            border-l-4
+                            border-red-600">
+
+                    <div class="flex
+                                justify-between
+                                items-center
+                                border-b
+                                border-white/10
+                                pb-4">
+
                         <div>
-                            <p class="text-[10px] text-gray-500 uppercase font-bold tracking-widest">Target Platform</p>
-                            <h2 id="platform" class="text-2xl font-bold text-red-500 brand">---</h2>
+
+                            <p class="text-[10px]
+                                      text-gray-500
+                                      uppercase
+                                      font-bold
+                                      tracking-widest">
+
+                                Target Platform
+
+                            </p>
+
+                            <h2 id="platform"
+
+                                class="text-2xl
+                                       font-bold
+                                       text-red-500
+                                       brand">
+
+                                ---
+
+                            </h2>
+
                         </div>
+
                         <div class="text-right">
-                            <p class="text-[10px] text-gray-500 uppercase font-bold tracking-widest">Status</p>
-                            <p id="status" class="text-green-400 font-semibold uppercase">READY</p>
+
+                            <p class="text-[10px]
+                                      text-gray-500
+                                      uppercase
+                                      font-bold
+                                      tracking-widest">
+
+                                Status
+
+                            </p>
+
+                            <p id="status"
+
+                               class="text-green-400
+                                      font-semibold
+                                      uppercase">
+
+                                READY
+
+                            </p>
+
                         </div>
+
                     </div>
 
-                    <div class="mt-6 grid grid-cols-1 gap-3">
-                        <button id="mp4Btn" onclick="download('mp4')" class="w-full bg-red-700 hover:bg-red-600 p-4 rounded-xl font-bold uppercase transition-all">
+                    <div class="mt-6
+                                grid
+                                grid-cols-1
+                                gap-3">
+
+                        <button
+                            id="mp4Btn"
+
+                            onclick="download('mp4')"
+
+                            class="w-full
+                                   bg-red-700
+                                   hover:bg-red-600
+                                   p-4
+                                   rounded-xl
+                                   font-bold
+                                   uppercase">
+
                             Download Video (MP4)
+
                         </button>
-                        <button id="mp3Btn" onclick="download('mp3')" class="w-full border border-red-700/50 hover:bg-red-700/10 p-4 rounded-xl font-bold uppercase transition-all">
+
+                        <button
+                            id="mp3Btn"
+
+                            onclick="download('mp3')"
+
+                            class="w-full
+                                   border
+                                   border-red-700/50
+                                   hover:bg-red-700/10
+                                   p-4
+                                   rounded-xl
+                                   font-bold
+                                   uppercase">
+
                             Download Audio (MP3)
+
                         </button>
+
                     </div>
+
                 </div>
+
+                <!-- HISTORY -->
 
                 <div class="mt-12">
-                    <h3 class="text-red-500 font-bold brand text-xs uppercase tracking-[0.3em] mb-4">Recent Sessions</h3>
-                    <div id="history" class="space-y-2"></div>
+
+                    <h3 class="text-red-500
+                               font-bold
+                               brand
+                               text-xs
+                               uppercase
+                               tracking-[0.3em]
+                               mb-4">
+
+                        Recent Sessions
+
+                    </h3>
+
+                    <div id="history"
+                         class="space-y-2">
+
+                    </div>
+
                 </div>
+
             </div>
+
         </section>
 
     </div>
 
-    <footer class="fixed bottom-4 text-center w-full pointer-events-none">
-        <p class="text-gray-600 text-[10px] uppercase tracking-[0.5em] pointer-events-auto">
-            Powered by <span class="text-red-600 font-bold glow">Cymor</span>
+    <footer class="fixed
+                   bottom-4
+                   text-center
+                   w-full
+                   pointer-events-none">
+
+        <p class="text-gray-600
+                  text-[10px]
+                  uppercase
+                  tracking-[0.5em]
+                  pointer-events-auto">
+
+            Powered by
+
+            <span class="text-red-600
+                         font-bold
+                         glow">
+
+                Cymor
+
+            </span>
+
         </p>
+
     </footer>
 
-    <script>
-        let currentUrl = "";
+<script>
 
-        function slideDown() {
-            document.getElementById('page-wrapper').style.transform = 'translateY(-100vh)';
+let currentUrl = "";
+
+function slideDown(){
+
+    document
+    .getElementById("page-wrapper")
+    .style
+    .transform = "translateY(-100vh)";
+}
+
+function slideUp(){
+
+    document
+    .getElementById("page-wrapper")
+    .style
+    .transform = "translateY(0)";
+}
+
+async function pasteLink(){
+
+    try{
+
+        const text =
+        await navigator.clipboard.readText();
+
+        document
+        .getElementById("urlInput")
+        .value = text;
+
+    }catch(e){
+
+        alert("Please paste manually.");
+    }
+}
+
+function extractUrl(text){
+
+    const urlRegex =
+    /(https?:\/\/[^\s]+)/g;
+
+    const matches = text.match(urlRegex);
+
+    return matches ? matches[0] : text;
+}
+
+function detectPlatform(url){
+
+    const low = url.toLowerCase();
+
+    if(
+        low.includes("youtube.com")
+        ||
+        low.includes("youtu.be")
+    ){
+        return "YouTube";
+    }
+
+    if(
+        low.includes("tiktok.com")
+    ){
+        return "TikTok";
+    }
+
+    if(
+        low.includes("facebook.com")
+        ||
+        low.includes("fb.watch")
+    ){
+        return "Facebook";
+    }
+
+    return "Video Link";
+}
+
+function analyzeLink(){
+
+    const input =
+    document.getElementById("urlInput");
+
+    const cleanUrl =
+    extractUrl(input.value.trim());
+
+    if(
+        !cleanUrl
+        ||
+        !cleanUrl.startsWith("http")
+    ){
+
+        alert(
+        "Please provide a valid URL."
+        );
+
+        return;
+    }
+
+    currentUrl = cleanUrl;
+
+    input.value = cleanUrl;
+
+    document
+    .getElementById("preview")
+    .classList
+    .remove("hidden");
+
+    document
+    .getElementById("platform")
+    .innerText =
+    detectPlatform(cleanUrl);
+
+    document
+    .getElementById("status")
+    .innerText = "READY";
+
+    document
+    .getElementById("status")
+    .className =
+    "text-green-400 font-semibold uppercase";
+}
+
+async function download(type){
+
+    if(!currentUrl){
+
+        alert("Analyze a link first.");
+
+        return;
+    }
+
+    const status =
+    document.getElementById("status");
+
+    const btns = [
+        document.getElementById("mp4Btn"),
+        document.getElementById("mp3Btn")
+    ];
+
+    status.innerText = "CONNECTING...";
+
+    status.className =
+    "text-yellow-500 font-semibold pulse-red uppercase";
+
+    btns.forEach(btn=>{
+
+        btn.disabled = true;
+    });
+
+    try{
+
+        const payload = {
+
+            url: currentUrl,
+
+            vQuality: "1080",
+
+            isAudioOnly:
+            type === "mp3",
+
+            isNoTTWatermark: true
+        };
+
+        const response =
+        await fetch(
+        "/.netlify/functions/download",
+        {
+            method:"POST",
+
+            headers:{
+                "Content-Type":
+                "application/json"
+            },
+
+            body:
+            JSON.stringify(payload)
+        });
+
+        const data =
+        await response.json();
+
+        if(!response.ok){
+
+            throw new Error(
+            data.error
+            ||
+            "Download failed"
+            );
         }
 
-        function slideUp() {
-            document.getElementById('page-wrapper').style.transform = 'translateY(0)';
+        if(data.url){
+
+            status.innerText =
+            "DOWNLOAD READY";
+
+            status.className =
+            "text-green-400 font-semibold uppercase";
+
+            saveHistory(
+                currentUrl,
+                detectPlatform(currentUrl)
+            );
+
+            window.open(
+                data.url,
+                "_blank"
+            );
+
+        }else{
+
+            throw new Error(
+            "No media found"
+            );
         }
 
-        async function pasteLink() {
-            try {
-                const text = await navigator.clipboard.readText();
-                document.getElementById('urlInput').value = text;
-            } catch (e) { alert("Please paste manually."); }
-        }
+    }catch(err){
 
-        function extractUrl(text) {
-            const urlRegex = /(https?:\/\/[^\s]+)/g;
-            const matches = text.match(urlRegex);
-            return matches ? matches[0] : text;
-        }
+        console.error(err);
 
-        function detectPlatform(url) {
-            const low = url.toLowerCase();
-            if (low.includes("youtube.com") || low.includes("youtu.be")) return "YouTube";
-            if (low.includes("tiktok.com")) return "TikTok";
-            if (low.includes("facebook.com") || low.includes("fb.watch")) return "Facebook";
-            return "Video Link";
-        }
+        status.innerText =
+        "FAILED";
 
-        function analyzeLink() {
-            const input = document.getElementById("urlInput");
-            const cleanUrl = extractUrl(input.value.trim());
-            
-            if (!cleanUrl.startsWith("http")) {
-                alert("Error: Please provide a valid link starting with http:// or https://");
-                return;
-            }
+        status.className =
+        "text-red-500 font-semibold uppercase";
 
-            currentUrl = cleanUrl;
-            input.value = cleanUrl;
-            document.getElementById("preview").classList.remove("hidden");
-            document.getElementById("platform").innerText = detectPlatform(cleanUrl);
-            document.getElementById("status").innerText = "READY";
-            document.getElementById("status").className = "text-green-400 font-semibold uppercase";
-        }
+        alert(
+        "Download failed.\n\nPossible reasons:\n- Private video\n- Invalid link\n- Server overloaded\n- Unsupported platform"
+        );
 
-        async function download(type) {
-            const status = document.getElementById("status");
-            const btns = [document.getElementById("mp4Btn"), document.getElementById("mp3Btn")];
+    }finally{
 
-            status.innerText = "CYMOR ENGINE CONNECTING...";
-            status.className = "text-yellow-500 font-semibold pulse-red uppercase";
-            btns.forEach(b => b.disabled = true);
+        btns.forEach(btn=>{
 
-            const payload = {
-                url: currentUrl,
-                vQuality: "1080",
-                isAudioOnly: type === 'mp3',
-                isNoTTWatermark: true
-            };
+            btn.disabled = false;
+        });
+    }
+}
 
-            try {
-                // Calling your internal Netlify Function bridge
-                const response = await fetch("/.netlify/functions/download", {
-                    method: 'POST',
-                    body: JSON.stringify(payload)
-                });
+function saveHistory(url,platform){
 
-                const data = await response.json();
-                
-                if (data.url) {
-                    status.innerText = "SUCCESS!";
-                    status.className = "text-green-400 font-semibold uppercase";
-                    window.location.href = data.url; 
-                    saveHistory(currentUrl, detectPlatform(currentUrl));
-                } else {
-                    throw new Error(data.error || "Engine error");
-                }
-            } catch (err) {
-                status.innerText = "ENGINE BUSY";
-                status.className = "text-red-500 font-semibold uppercase";
-                alert("Cymor Engine Alert: Nodes are currently under high load. Please wait a few seconds and try again.");
-            } finally {
-                btns.forEach(b => b.disabled = false);
-            }
-        }
+    let logs =
+    JSON.parse(
+    localStorage.getItem("cymor_logs")
+    ||
+    "[]"
+    );
 
-        function saveHistory(url, platform) {
-            let logs = JSON.parse(localStorage.getItem("cymor_logs") || "[]");
-            logs.unshift({ url, platform, time: new Date().toLocaleTimeString() });
-            localStorage.setItem("cymor_logs", JSON.stringify(logs.slice(0, 5)));
-            renderHistory();
-        }
+    logs.unshift({
 
-        function renderHistory() {
-            const logs = JSON.parse(localStorage.getItem("cymor_logs") || "[]");
-            const container = document.getElementById("history");
-            if (!logs.length) {
-                container.innerHTML = `<p class="text-gray-700 italic text-[10px]">No recent activity.</p>`;
-                return;
-            }
-            container.innerHTML = logs.map(l => `
-                <div class="bg-white/5 p-3 rounded-xl flex justify-between items-center border border-white/5">
-                    <span class="text-red-500 font-bold text-[10px] brand uppercase">${l.platform}</span>
-                    <span class="text-gray-500 text-[9px] truncate max-w-[150px] ml-2">${l.url}</span>
-                    <span class="text-gray-700 text-[9px] ml-auto">${l.time}</span>
-                </div>
-            `).join("");
-        }
+        url,
 
-        renderHistory();
-    </script>
+        platform,
+
+        time:
+        new Date()
+        .toLocaleTimeString()
+    });
+
+    localStorage.setItem(
+        "cymor_logs",
+        JSON.stringify(logs.slice(0,5))
+    );
+
+    renderHistory();
+}
+
+function renderHistory(){
+
+    const logs =
+    JSON.parse(
+    localStorage.getItem("cymor_logs")
+    ||
+    "[]"
+    );
+
+    const container =
+    document.getElementById("history");
+
+    if(!logs.length){
+
+        container.innerHTML =
+        `
+        <p class="text-gray-700 italic text-[10px]">
+        No recent activity.
+        </p>
+        `;
+
+        return;
+    }
+
+    container.innerHTML =
+    logs.map(l => `
+
+    <div class="
+        bg-white/5
+        p-3
+        rounded-xl
+        flex
+        justify-between
+        items-center
+        border
+        border-white/5">
+
+        <span class="
+            text-red-500
+            font-bold
+            text-[10px]
+            brand
+            uppercase">
+
+            ${l.platform}
+
+        </span>
+
+        <span class="
+            text-gray-500
+            text-[9px]
+            truncate
+            max-w-[150px]
+            ml-2">
+
+            ${l.url}
+
+        </span>
+
+        <span class="
+            text-gray-700
+            text-[9px]
+            ml-auto">
+
+            ${l.time}
+
+        </span>
+
+    </div>
+
+    `).join("");
+}
+
+renderHistory();
+
+</script>
+
 </body>
 </html>
