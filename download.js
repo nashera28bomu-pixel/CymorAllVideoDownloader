@@ -1,102 +1,124 @@
 const axios = require("axios");
 
 exports.handler = async (event) => {
-    // Allow only POST
+
+    if (event.httpMethod === "OPTIONS") {
+        return {
+            statusCode: 200,
+            headers: cors()
+        };
+    }
+
     if (event.httpMethod !== "POST") {
         return {
             statusCode: 405,
-            headers: corsHeaders(),
+            headers: cors(),
             body: JSON.stringify({
-                error: "Method Not Allowed"
+                error: "Method not allowed"
             })
         };
     }
 
     try {
-        const payload = JSON.parse(event.body);
 
-        if (!payload.url) {
+        const body = JSON.parse(event.body);
+
+        if (!body.url) {
             return {
                 statusCode: 400,
-                headers: corsHeaders(),
+                headers: cors(),
                 body: JSON.stringify({
                     error: "No URL provided"
                 })
             };
         }
 
-        // Working Cobalt mirrors
-        const apiNodes = [
+        const payload = {
+            url: body.url,
+            vQuality: body.vQuality || "1080",
+            isAudioOnly: body.isAudioOnly || false,
+            isNoTTWatermark: true
+        };
+
+        const nodes = [
             "https://api.cobalt.tools/api/json",
-            "https://co.wuk.sh/api/json",
-            "https://api-cobalt.is-an.org/api/json"
+            "https://co.wuk.sh/api/json"
         ];
 
-        let lastError = null;
+        for (const node of nodes) {
 
-        for (const node of apiNodes) {
             try {
-                const response = await axios.post(
+
+                const response =
+                await axios.post(
                     node,
                     payload,
                     {
                         headers: {
-                            Accept: "application/json",
+                            "Accept": "application/json",
                             "Content-Type": "application/json",
-                            "User-Agent": "CymorAllVideo/3.0"
+                            "User-Agent": "CymorDownloader/3.0"
                         },
-                        timeout: 15000
+                        timeout: 20000
                     }
                 );
 
                 const data = response.data;
 
-                // Direct download
+                console.log(data);
+
                 if (data.url) {
-                    return success(data.url);
+
+                    return {
+                        statusCode: 200,
+                        headers: cors(),
+                        body: JSON.stringify({
+                            url: data.url
+                        })
+                    };
                 }
 
-                // Picker support
                 if (
                     data.picker &&
                     Array.isArray(data.picker) &&
                     data.picker.length > 0
                 ) {
-                    return success(data.picker[0].url);
-                }
 
-                // Audio support
-                if (data.audio) {
-                    return success(data.audio);
-                }
-
-                // Error returned by API
-                if (data.status === "error") {
-                    lastError = data.text || "Unknown API error";
-                    continue;
+                    return {
+                        statusCode: 200,
+                        headers: cors(),
+                        body: JSON.stringify({
+                            url: data.picker[0].url
+                        })
+                    };
                 }
 
             } catch (err) {
-                console.log(`Failed node: ${node}`);
-                console.log(err.message);
 
-                lastError = err.message;
+                console.log(
+                    "Node failed:",
+                    node
+                );
+
                 continue;
             }
         }
 
         return {
             statusCode: 500,
-            headers: corsHeaders(),
+            headers: cors(),
             body: JSON.stringify({
-                error: lastError || "All servers busy"
+                error: "All nodes failed"
             })
         };
 
     } catch (err) {
+
+        console.log(err);
+
         return {
             statusCode: 500,
-            headers: corsHeaders(),
+            headers: cors(),
             body: JSON.stringify({
                 error: err.message
             })
@@ -104,22 +126,19 @@ exports.handler = async (event) => {
     }
 };
 
-function success(url) {
-    return {
-        statusCode: 200,
-        headers: corsHeaders(),
-        body: JSON.stringify({
-            success: true,
-            url
-        })
-    };
-}
+function cors() {
 
-function corsHeaders() {
     return {
+
         "Access-Control-Allow-Origin": "*",
-        "Access-Control-Allow-Headers": "Content-Type",
-        "Access-Control-Allow-Methods": "POST, OPTIONS",
-        "Content-Type": "application/json"
+
+        "Access-Control-Allow-Headers":
+        "Content-Type",
+
+        "Access-Control-Allow-Methods":
+        "POST, OPTIONS",
+
+        "Content-Type":
+        "application/json"
     };
 }
