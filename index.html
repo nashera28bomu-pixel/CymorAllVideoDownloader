@@ -130,7 +130,7 @@ function analyzeLink(){
 
 /* download via BACKEND */
 async function download(type){
-    const res = await fetch("https://YOUR-BACKEND-URL/download", {
+    const res = await fetch("https://cymorallvideodownloader-production.up.railway.app/download", {
         method: "POST",
         headers: {"Content-Type":"application/json"},
         body: JSON.stringify({
@@ -169,4 +169,4 @@ renderHistory();
 </script>
 
 </body>
-  </html>
+</html>
