@@ -22,22 +22,28 @@ app.post("/download", async (req, res) => {
     if (!url || typeof url !== "string") {
         return res.status(400).json({
             success: false,
-            message: "Invalid or missing URL"
+            message: "No URL provided"
         });
     }
 
-    const isMp3 = type === "mp3";
-
     try {
-        const response = await axios.post(COBALT_API, {
-            url: url.trim(),
-            vQuality: "1080",
-            isAudioOnly: isMp3,
-            isNoTTWatermark: true,
-            filenamePattern: "pretty"
-        }, {
-            timeout: 15000
-        });
+        const response = await axios.post(
+            COBALT_API,
+            {
+                url: url.trim(),
+                vQuality: "1080",
+                isAudioOnly: type === "mp3",
+                isNoTTWatermark: true,
+                filenamePattern: "pretty"
+            },
+            {
+                timeout: 20000,
+                headers: {
+                    "Content-Type": "application/json",
+                    "User-Agent": "Mozilla/5.0 (CymorDownloader/1.0)"
+                }
+            }
+        );
 
         const data = response.data;
 
@@ -50,20 +56,27 @@ app.post("/download", async (req, res) => {
 
         return res.status(400).json({
             success: false,
-            message: data?.text || "Media not supported"
+            message: data?.text || "Unsupported video or blocked link"
         });
 
     } catch (err) {
-        console.error("Cymor Backend Error:", err.message);
+        console.error("Cymor Backend Error:");
+
+        // 🔥 Better error visibility (VERY IMPORTANT)
+        if (err.response) {
+            console.error("Response Data:", err.response.data);
+        } else {
+            console.error("Error Message:", err.message);
+        }
 
         return res.status(500).json({
             success: false,
-            message: "Server error or API unavailable"
+            message: "Backend failed: " + (err.response?.data?.text || err.message)
         });
     }
 });
 
-/* PORT FIX FOR DEPLOYMENT */
+/* PORT FIX FOR RAILWAY */
 const PORT = process.env.PORT || 3000;
 
 app.listen(PORT, () => {
