@@ -1,207 +1,289 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>CymorAllVideo Downloader</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CymorAllVideo Downloader</title>
 
-<script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
 
-<style>
-@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Rajdhani:wght@400;600;700&display=swap');
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Rajdhani:wght@400;600;700&display=swap');
 
-body {
-    background: radial-gradient(circle at center, #2a0000 0%, #000000 100%);
-    color: white;
-    font-family: 'Rajdhani', sans-serif;
-    margin: 0;
-    overflow-x: hidden;
-    min-height: 100vh;
-}
+        body {
+            background: radial-gradient(circle at center, #2a0000 0%, #000000 100%);
+            color: white;
+            font-family: 'Rajdhani', sans-serif;
+            margin: 0;
+            overflow-x: hidden;
+            height: 100vh;
+        }
 
-.glass {
-    background: rgba(20,0,0,0.6);
-    backdrop-filter: blur(12px);
-    border: 1px solid rgba(255,0,0,0.2);
-}
+        /* Page Transition Logic */
+        #page-container {
+            display: flex;
+            flex-direction: column;
+            height: 200vh; /* Two pages tall */
+            transition: transform 0.8s cubic-bezier(0.65, 0, 0.35, 1);
+        }
 
-.card-glass {
-    background: rgba(255,255,255,0.03);
-    border: 1px solid rgba(255,255,255,0.1);
-}
+        .page {
+            height: 100vh;
+            width: 100%;
+            flex-shrink: 0;
+            overflow-y: auto;
+            padding: 2rem;
+        }
 
-.hidden-section { display: none; }
+        .glass {
+            background: rgba(20,0,0,0.6);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255,0,0,0.2);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.8);
+        }
 
-.glow {
-    text-shadow: 0 0 10px red, 0 0 20px darkred;
-}
+        .card-glass {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.1);
+            transition: all 0.3s ease;
+        }
 
-.brand {
-    font-family: 'Orbitron', sans-serif;
-}
-</style>
+        .card-glass:hover {
+            border-color: rgba(255,0,0,0.4);
+            transform: translateY(-5px);
+        }
+
+        .glow { text-shadow: 0 0 10px red, 0 0 20px darkred; }
+        .brand { font-family: 'Orbitron', sans-serif; letter-spacing: 2px; }
+        .pulse-red { animation: pulse 2s infinite; }
+        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+    </style>
 </head>
 
-<body class="flex flex-col items-center p-6">
+<body>
 
-<!-- PAGE 1 -->
-<div id="landingPage" class="w-full max-w-5xl flex flex-col items-center py-12">
+    <div id="page-container">
+        
+        <section id="landingPage" class="page flex flex-col items-center justify-center">
+            <header class="text-center mb-12">
+                <p class="brand text-red-500 font-bold tracking-widest text-sm mb-2">
+                    CYMOR TECH SERVICES PRESENT
+                </p>
+                <h1 class="text-5xl md:text-8xl font-bold glow brand uppercase italic">
+                    Download Anything.
+                </h1>
+                <p class="text-gray-400 mt-4 text-lg tracking-wide">
+                    YouTube • Facebook • TikTok — Fast, free, no watermark
+                </p>
+            </header>
 
-<header class="text-center mb-10">
-    <h1 class="text-5xl md:text-7xl font-bold glow brand">Download Anything</h1>
-    <p class="text-gray-400 mt-3">YouTube • TikTok • Facebook</p>
-</header>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 w-full max-w-5xl px-4">
+                <div class="card-glass p-8 rounded-2xl text-center">
+                    <div class="text-red-600 text-4xl mb-4">▶</div>
+                    <h3 class="text-2xl font-bold brand mb-2 uppercase">YouTube</h3>
+                    <p class="text-gray-400 text-sm">HD Videos & MP3 conversion.</p>
+                </div>
+                <div class="card-glass p-8 rounded-2xl text-center">
+                    <div class="text-blue-500 text-4xl mb-4">f</div>
+                    <h3 class="text-2xl font-bold brand mb-2 uppercase">Facebook</h3>
+                    <p class="text-gray-400 text-sm">Save Reels & high-quality posts.</p>
+                </div>
+                <div class="card-glass p-8 rounded-2xl text-center">
+                    <div class="text-green-400 text-4xl mb-4">♪</div>
+                    <h3 class="text-2xl font-bold brand mb-2 uppercase">TikTok</h3>
+                    <p class="text-gray-400 text-sm">No watermark, instant fetching.</p>
+                </div>
+            </div>
 
-<div class="grid md:grid-cols-3 gap-4 w-full">
-    <div class="card-glass p-6 rounded-xl text-center">YouTube</div>
-    <div class="card-glass p-6 rounded-xl text-center">Facebook</div>
-    <div class="card-glass p-6 rounded-xl text-center">TikTok</div>
-</div>
+            <button onclick="goToDownloader()" class="mt-12 bg-red-700 hover:bg-red-600 px-10 py-4 rounded-full font-bold text-xl uppercase tracking-widest shadow-2xl shadow-red-900/40 transition-all transform hover:scale-105">
+                Download Now
+            </button>
+        </section>
 
-<button onclick="showDownloader()"
-class="mt-10 bg-red-700 px-8 py-4 rounded-full font-bold">
-Start Downloading
-</button>
+        <section id="downloaderPage" class="page flex flex-col items-center">
+            <header class="text-center mb-8 mt-10">
+                <h2 class="text-3xl font-bold glow brand uppercase italic">CymorAllVideo</h2>
+                <p class="text-xs text-gray-500 uppercase tracking-widest mt-1">Multi-Platform Engine</p>
+            </header>
 
-</div>
+            <div class="glass p-8 rounded-3xl w-full max-w-2xl">
+                <input id="urlInput"
+                    class="w-full p-4 bg-black/60 border border-red-900 rounded-xl text-white outline-none focus:border-red-500 transition-all"
+                    placeholder="Paste link here (TikTok, YT, FB)...">
 
-<!-- PAGE 2 -->
-<div id="downloaderPage" class="hidden-section w-full max-w-2xl">
+                <div class="flex gap-2 mt-4">
+                    <button onclick="pasteFromClipboard()" class="flex-1 bg-gray-800 hover:bg-gray-700 p-4 rounded-xl font-bold uppercase text-xs">
+                        Paste Link
+                    </button>
+                    <button onclick="analyzeLink()" class="flex-[2] bg-red-700 hover:bg-red-600 p-4 rounded-xl font-bold uppercase tracking-widest shadow-lg shadow-red-900/20">
+                        Analyze Link
+                    </button>
+                </div>
+            </div>
 
-<h2 class="text-center text-3xl glow brand mb-6">Cymor Downloader</h2>
+            <div id="preview" class="hidden glass p-8 rounded-3xl w-full max-w-2xl mt-6 border-t-2 border-red-600/30">
+                <div class="flex justify-between items-center border-b border-red-900/30 pb-4">
+                    <div>
+                        <p class="text-xs text-gray-500 uppercase font-bold tracking-tighter">Platform</p>
+                        <h2 id="platform" class="text-2xl font-bold text-red-500 brand"></h2>
+                    </div>
+                    <div class="text-right">
+                        <p class="text-xs text-gray-500 uppercase font-bold tracking-tighter">Status</p>
+                        <p id="status" class="text-green-400 font-semibold uppercase">READY</p>
+                    </div>
+                </div>
 
-<div class="glass p-6 rounded-xl">
+                <div class="mt-6 flex flex-col gap-3">
+                    <button id="mp4Btn" onclick="download('mp4')" class="w-full bg-red-700 p-4 rounded-xl font-bold uppercase">Download MP4</button>
+                    <button id="mp3Btn" onclick="download('mp3')" class="w-full border border-red-700 hover:bg-red-700/10 p-4 rounded-xl font-bold uppercase">Download MP3</button>
+                </div>
+            </div>
 
-<input id="urlInput"
-class="w-full p-3 bg-black border border-red-800 rounded-lg"
-placeholder="Paste video link here">
+            <div class="mt-10 w-full max-w-2xl">
+                <div class="flex items-center gap-2 mb-4">
+                    <div class="h-[1px] flex-1 bg-red-900/50"></div>
+                    <h2 class="text-red-500 font-bold brand text-sm uppercase">Recent Logs</h2>
+                    <div class="h-[1px] flex-1 bg-red-900/50"></div>
+                </div>
+                <div id="history" class="grid gap-2"></div>
+            </div>
 
-<div class="flex gap-2 mt-4">
-<button onclick="pasteLink()" class="flex-1 bg-gray-800 p-3 rounded-lg">
-Paste
-</button>
-<button onclick="analyzeLink()" class="flex-1 bg-red-700 p-3 rounded-lg">
-Analyze
-</button>
-</div>
+            <button onclick="goToLanding()" class="mt-8 text-gray-500 hover:text-white text-xs uppercase tracking-widest">
+                ← Back to Home
+            </button>
+        </section>
 
-</div>
+    </div>
 
-<!-- PREVIEW -->
-<div id="preview" class="hidden glass p-6 rounded-xl mt-5">
+    <footer class="fixed bottom-0 w-full pb-6 text-center text-gray-500 text-xs pointer-events-none">
+        <div class="pointer-events-auto">
+            <p class="tracking-widest uppercase">
+                Built by <span class="text-red-500 font-bold glow">Smiley Cymor</span>
+            </p>
+        </div>
+    </footer>
 
-<p class="text-red-400">Platform: <span id="platform"></span></p>
-<p id="status" class="mt-2 text-green-400">READY</p>
+    <script>
+        let currentUrl = "";
+        const PROXY_URL = "https://corsproxy.io/?"; 
+        const API_URL = "https://api.cobalt.tools/api/json";
 
-<div class="mt-4 flex gap-2">
-<button onclick="downloadVideo('video')" class="flex-1 bg-red-700 p-3 rounded-lg">
-Download MP4
-</button>
+        function goToDownloader() {
+            document.getElementById('page-container').style.transform = 'translateY(-100vh)';
+        }
 
-<button onclick="downloadVideo('audio')" class="flex-1 border border-red-700 p-3 rounded-lg">
-MP3
-</button>
-</div>
+        function goToLanding() {
+            document.getElementById('page-container').style.transform = 'translateY(0)';
+        }
 
-</div>
+        async function pasteFromClipboard() {
+            try {
+                const text = await navigator.clipboard.readText();
+                document.getElementById('urlInput').value = text;
+            } catch (err) {
+                alert("Clipboard access denied. Please paste manually.");
+            }
+        }
 
-<button onclick="showLanding()" class="mt-6 text-gray-400">
-← Back
-</button>
+        function extractUrl(text) {
+            const urlRegex = /(https?:\/\/[^\s]+)/g;
+            const matches = text.match(urlRegex);
+            return matches ? matches[0] : text;
+        }
 
-</div>
+        function detect(url) {
+            const lowUrl = url.toLowerCase();
+            if (lowUrl.includes("youtube.com") || lowUrl.includes("youtu.be")) return "YouTube";
+            if (lowUrl.includes("tiktok.com")) return "TikTok";
+            if (lowUrl.includes("facebook.com") || lowUrl.includes("fb.watch")) return "Facebook";
+            return "Video Link";
+        }
 
-<script>
-let currentUrl = "";
+        function analyzeLink() {
+            const urlInput = document.getElementById("urlInput");
+            const cleanUrl = extractUrl(urlInput.value.trim());
+            urlInput.value = cleanUrl;
 
-// PAGE SWITCH (ALWAYS STABLE)
-function showDownloader(){
-document.getElementById("landingPage").classList.add("hidden-section");
-document.getElementById("downloaderPage").classList.remove("hidden-section");
-}
+            if (!cleanUrl.startsWith('http')) {
+                alert("Please paste a valid video link (starting with http/https).");
+                return;
+            }
 
-function showLanding(){
-document.getElementById("downloaderPage").classList.add("hidden-section");
-document.getElementById("landingPage").classList.remove("hidden-section");
-}
+            currentUrl = cleanUrl;
+            document.getElementById("preview").classList.remove("hidden");
+            document.getElementById("platform").innerText = detect(cleanUrl);
+            document.getElementById("status").innerText = "READY";
+            document.getElementById("status").className = "text-green-400 font-semibold uppercase";
+        }
 
-// CLIPBOARD
-async function pasteLink(){
-try {
-document.getElementById("urlInput").value = await navigator.clipboard.readText();
-} catch {
-alert("Paste manually");
-}
-}
+        async function download(type) {
+            const statusText = document.getElementById("status");
+            const mp4Btn = document.getElementById("mp4Btn");
+            const mp3Btn = document.getElementById("mp3Btn");
 
-// CLEAN URL
-function extractUrl(text){
-const match = text.match(/https?:\/\/[^\s]+/);
-return match ? match[0] : text;
-}
+            statusText.innerText = "BYPASSING BLOCKS...";
+            statusText.className = "text-yellow-500 font-semibold pulse-red uppercase";
+            mp4Btn.disabled = true;
+            mp3Btn.disabled = true;
 
-// PLATFORM DETECT
-function detect(url){
-if(url.includes("youtube")) return "YouTube";
-if(url.includes("tiktok")) return "TikTok";
-if(url.includes("facebook")) return "Facebook";
-return "Unknown";
-}
+            try {
+                const response = await fetch(PROXY_URL + encodeURIComponent(API_URL), {
+                    method: 'POST',
+                    headers: { 'Accept': 'application/json', 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ 
+                        url: currentUrl, 
+                        vQuality: "1080",
+                        isAudioOnly: type === 'mp3',
+                        isNoTTWatermark: true
+                    })
+                });
 
-// ANALYZE
-function analyzeLink(){
-let url = extractUrl(document.getElementById("urlInput").value);
+                const data = await response.json();
 
-if(!url.startsWith("http")){
-alert("Invalid link");
-return;
-}
+                if (data.url) {
+                    statusText.innerText = "SUCCESS!";
+                    statusText.className = "text-green-400 font-semibold uppercase";
+                    window.location.href = data.url; 
+                    saveHistory(currentUrl, detect(currentUrl));
+                } else {
+                    throw new Error(data.text || "Engine rejected the link");
+                }
+            } catch (err) {
+                statusText.innerText = "FAILED";
+                statusText.className = "text-red-500 font-semibold uppercase";
+                alert("Cymor Engine Error: " + err.message + "\n\nTip: Use direct links only. No text in the box.");
+            } finally {
+                mp4Btn.disabled = false;
+                mp3Btn.disabled = false;
+            }
+        }
 
-currentUrl = url;
+        function saveHistory(url, platform) {
+            let history = JSON.parse(localStorage.getItem("cymor_history") || "[]");
+            const entry = { url, platform, date: new Date().toLocaleTimeString() };
+            history = history.filter(item => item.url !== url);
+            history.unshift(entry);
+            localStorage.setItem("cymor_history", JSON.stringify(history.slice(0, 5)));
+            renderHistory();
+        }
 
-document.getElementById("preview").classList.remove("hidden");
-document.getElementById("platform").innerText = detect(url);
-document.getElementById("status").innerText = "READY";
-}
+        function renderHistory() {
+            let history = JSON.parse(localStorage.getItem("cymor_history") || "[]");
+            const container = document.getElementById("history");
+            if (history.length === 0) {
+                container.innerHTML = `<p class="text-center text-gray-600 italic text-xs">No recent downloads.</p>`;
+                return;
+            }
+            container.innerHTML = history.map(h => `
+                <div class="bg-black/40 p-3 rounded-lg border border-red-900/20 flex justify-between items-center text-[10px]">
+                    <span class="text-red-500 font-bold brand">${h.platform}</span>
+                    <span class="text-gray-500 truncate max-w-[150px] ml-2">${h.url}</span>
+                    <span class="text-gray-600 ml-auto">${h.date}</span>
+                </div>
+            `).join("");
+        }
 
-// 🔥 FIXED DOWNLOAD ENGINE (REAL DOWNLOAD HANDLING)
-async function downloadVideo(type){
-const status = document.getElementById("status");
-status.innerText = "Processing...";
-
-try {
-const res = await fetch("https://api.cobalt.tools/api/json", {
-method:"POST",
-headers:{ "Content-Type":"application/json" },
-body: JSON.stringify({
-url: currentUrl,
-isAudioOnly: type === "audio",
-filenamePattern:"pretty"
-})
-});
-
-const data = await res.json();
-
-if(!data.url) throw new Error("No download link returned");
-
-// 👉 BEST METHOD: force browser download
-const a = document.createElement("a");
-a.href = data.url;
-a.target = "_blank";
-a.download = "cymor-download";
-document.body.appendChild(a);
-a.click();
-a.remove();
-
-status.innerText = "Downloaded";
-
-} catch(err){
-status.innerText = "Failed";
-alert("Download error: " + err.message);
-}
-}
-
-</script>
-
+        renderHistory();
+    </script>
 </body>
 </html>
