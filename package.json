@@ -1,0 +1,31 @@
+{
+  "name": "cymor-allvideo-backend",
+  "version": "1.0.0",
+  "description": "Backend proxy for CymorAllVideo Downloader (secure API handler)",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "nodemon server.js"
+  },
+  "keywords": [
+    "video downloader",
+    "cymor",
+    "cobalt proxy",
+    "youtube downloader",
+    "tiktok downloader"
+  ],
+  "author": "Cymor Tech Service",
+  "license": "MIT",
+  "dependencies": {
+    "axios": "^1.6.0",
+    "cors": "^2.8.5",
+    "express": "^4.18.2",
+    "dotenv": "^16.4.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.0"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}
