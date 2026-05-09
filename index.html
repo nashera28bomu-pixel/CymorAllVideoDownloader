@@ -70,7 +70,7 @@
                     Cymor Tech Services Present
                 </p>
                 <h1 class="text-5xl md:text-8xl font-bold glow brand uppercase italic leading-none">
-                    CymorAll<br>Video Downloader.
+                    CymorAll<br>Video
                 </h1>
                 <p class="text-gray-400 mt-6 text-lg tracking-wide max-w-xl">
                     High-speed downloads for YouTube, TikTok, and Facebook. No watermarks. No limits.
@@ -131,7 +131,7 @@
                         </div>
                         <div class="text-right">
                             <p class="text-[10px] text-gray-500 uppercase font-bold tracking-widest">Status</p>
-                            <p id="status" class="text-green-400 font-semibold">READY</p>
+                            <p id="status" class="text-green-400 font-semibold uppercase">READY</p>
                         </div>
                     </div>
 
@@ -156,18 +156,12 @@
 
     <footer class="fixed bottom-4 text-center w-full pointer-events-none">
         <p class="text-gray-600 text-[10px] uppercase tracking-[0.5em] pointer-events-auto">
-            Site created by <span class="text-red-600 font-bold glow">Legendary Smiley Cymor</span>
+            Powered by <span class="text-red-600 font-bold glow">Cymor</span>
         </p>
     </footer>
 
     <script>
         let currentUrl = "";
-        
-        // Using a more robust proxy list
-        const PROXIES = [
-            "https://api.allorigins.win/raw?url=",
-            "https://corsproxy.io/?"
-        ];
 
         function slideDown() {
             document.getElementById('page-wrapper').style.transform = 'translateY(-100vh)';
@@ -203,7 +197,7 @@
             const cleanUrl = extractUrl(input.value.trim());
             
             if (!cleanUrl.startsWith("http")) {
-                alert("Error: Please provide a valid link starting with http:// or https://\n\nEnsure there is no extra text in the box.");
+                alert("Error: Please provide a valid link starting with http:// or https://");
                 return;
             }
 
@@ -212,15 +206,15 @@
             document.getElementById("preview").classList.remove("hidden");
             document.getElementById("platform").innerText = detectPlatform(cleanUrl);
             document.getElementById("status").innerText = "READY";
-            document.getElementById("status").className = "text-green-400 font-semibold";
+            document.getElementById("status").className = "text-green-400 font-semibold uppercase";
         }
 
         async function download(type) {
             const status = document.getElementById("status");
             const btns = [document.getElementById("mp4Btn"), document.getElementById("mp3Btn")];
 
-            status.innerText = "INITIALIZING ENGINE...";
-            status.className = "text-yellow-500 font-semibold pulse-red";
+            status.innerText = "CYMOR ENGINE CONNECTING...";
+            status.className = "text-yellow-500 font-semibold pulse-red uppercase";
             btns.forEach(b => b.disabled = true);
 
             const payload = {
@@ -230,40 +224,30 @@
                 isNoTTWatermark: true
             };
 
-            // Trying the fetch with a loop over proxies if one fails
-            let success = false;
-            
-            for (let proxy of PROXIES) {
-                try {
-                    const target = "https://api.cobalt.tools/api/json";
-                    const response = await fetch(proxy + encodeURIComponent(target), {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
-                        body: JSON.stringify(payload)
-                    });
+            try {
+                // Calling your internal Netlify Function bridge
+                const response = await fetch("/.netlify/functions/download", {
+                    method: 'POST',
+                    body: JSON.stringify(payload)
+                });
 
-                    const data = await response.json();
-                    
-                    if (data.url) {
-                        status.innerText = "REDIRECTING...";
-                        status.className = "text-green-400 font-semibold";
-                        window.location.href = data.url;
-                        saveHistory(currentUrl, detectPlatform(currentUrl));
-                        success = true;
-                        break; 
-                    }
-                } catch (err) {
-                    console.log(`Proxy ${proxy} failed, trying next...`);
+                const data = await response.json();
+                
+                if (data.url) {
+                    status.innerText = "SUCCESS!";
+                    status.className = "text-green-400 font-semibold uppercase";
+                    window.location.href = data.url; 
+                    saveHistory(currentUrl, detectPlatform(currentUrl));
+                } else {
+                    throw new Error(data.error || "Engine error");
                 }
+            } catch (err) {
+                status.innerText = "ENGINE BUSY";
+                status.className = "text-red-500 font-semibold uppercase";
+                alert("Cymor Engine Alert: Nodes are currently under high load. Please wait a few seconds and try again.");
+            } finally {
+                btns.forEach(b => b.disabled = false);
             }
-
-            if (!success) {
-                status.innerText = "ENGINE ERROR";
-                status.className = "text-red-500 font-semibold";
-                alert("All engine nodes are currently busy or blocked. \n\nTip: Try a different video link or refresh the page.");
-            }
-
-            btns.forEach(b => b.disabled = false);
         }
 
         function saveHistory(url, platform) {
@@ -282,9 +266,9 @@
             }
             container.innerHTML = logs.map(l => `
                 <div class="bg-white/5 p-3 rounded-xl flex justify-between items-center border border-white/5">
-                    <span class="text-red-500 font-bold text-[10px] brand">${l.platform}</span>
-                    <span class="text-gray-500 text-[9px] truncate max-w-[150px]">${l.url}</span>
-                    <span class="text-gray-700 text-[9px]">${l.time}</span>
+                    <span class="text-red-500 font-bold text-[10px] brand uppercase">${l.platform}</span>
+                    <span class="text-gray-500 text-[9px] truncate max-w-[150px] ml-2">${l.url}</span>
+                    <span class="text-gray-700 text-[9px] ml-auto">${l.time}</span>
                 </div>
             `).join("");
         }
