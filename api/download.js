@@ -2,10 +2,7 @@ const axios = require("axios");
 
 module.exports = async (req, res) => {
 
-    res.setHeader(
-        "Access-Control-Allow-Origin",
-        "*"
-    );
+    res.setHeader("Access-Control-Allow-Origin", "*");
 
     res.setHeader(
         "Access-Control-Allow-Methods",
@@ -36,15 +33,15 @@ module.exports = async (req, res) => {
             body = JSON.parse(body);
         }
 
-        const {
-            url,
-            isAudioOnly
-        } = body;
+        const url = body.url;
+
+        const isAudioOnly =
+        body.isAudioOnly || false;
 
         if (!url) {
 
             return res.status(400).json({
-                error: "No URL provided"
+                error: "Missing URL"
             });
         }
 
@@ -52,72 +49,102 @@ module.exports = async (req, res) => {
 
             url,
 
-            vQuality: "1080",
+            vQuality: "720",
 
-            isAudioOnly:
-            isAudioOnly || false,
+            filenamePattern: "basic",
+
+            isAudioOnly,
 
             isNoTTWatermark: true
         };
 
-        const response = await axios.post(
+        const nodes = [
 
             "https://api.cobalt.tools/api/json",
 
-            payload,
+            "https://co.wuk.sh/api/json",
 
-            {
-                headers: {
-                    "Accept":
-                    "application/json",
+            "https://api-cobalt.islantay.dev/api/json"
+        ];
 
-                    "Content-Type":
-                    "application/json",
+        for (const node of nodes) {
 
-                    "User-Agent":
-                    "Mozilla/5.0"
-                },
+            try {
 
-                timeout: 30000
+                const response =
+                await axios.post(
+                    node,
+                    payload,
+                    {
+                        headers: {
+                            accept:
+                            "application/json",
+
+                            "content-type":
+                            "application/json"
+                        },
+
+                        timeout: 45000
+                    }
+                );
+
+                const data =
+                response.data;
+
+                console.log(
+                    "SUCCESS NODE:",
+                    node
+                );
+
+                console.log(data);
+
+                if (data.url) {
+
+                    return res.status(200).json({
+                        url: data.url
+                    });
+                }
+
+                if (
+                    data.picker &&
+                    data.picker.length > 0
+                ) {
+
+                    return res.status(200).json({
+                        url:
+                        data.picker[0].url
+                    });
+                }
+
+            } catch (err) {
+
+                console.log(
+                    "FAILED NODE:",
+                    node
+                );
+
+                console.log(
+                    err.response?.data
+                    ||
+                    err.message
+                );
+
+                continue;
             }
-        );
-
-        const data = response.data;
-
-        console.log(data);
-
-        if (data.url) {
-
-            return res.status(200).json({
-                url: data.url
-            });
-        }
-
-        if (
-            data.picker &&
-            Array.isArray(data.picker) &&
-            data.picker.length > 0
-        ) {
-
-            return res.status(200).json({
-                url: data.picker[0].url
-            });
         }
 
         return res.status(500).json({
-            error: "No downloadable media found",
-            data
+            error:
+            "All download servers failed"
         });
 
     } catch (err) {
 
-        console.log(err.response?.data || err.message);
+        console.log(err);
 
         return res.status(500).json({
             error:
-            err.response?.data ||
-            err.message ||
-            "Server error"
+            err.message
         });
     }
 };
