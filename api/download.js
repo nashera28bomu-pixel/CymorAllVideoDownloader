@@ -22,6 +22,7 @@ module.exports = async (req, res) => {
     }
 
     if (req.method !== "POST") {
+
         return res.status(405).json({
             error: "Method not allowed"
         });
@@ -29,11 +30,16 @@ module.exports = async (req, res) => {
 
     try {
 
+        let body = req.body;
+
+        if (typeof body === "string") {
+            body = JSON.parse(body);
+        }
+
         const {
             url,
-            vQuality,
             isAudioOnly
-        } = req.body;
+        } = body;
 
         if (!url) {
 
@@ -46,8 +52,7 @@ module.exports = async (req, res) => {
 
             url,
 
-            vQuality:
-            vQuality || "1080",
+            vQuality: "1080",
 
             isAudioOnly:
             isAudioOnly || false,
@@ -55,84 +60,64 @@ module.exports = async (req, res) => {
             isNoTTWatermark: true
         };
 
-        const nodes = [
+        const response = await axios.post(
 
             "https://api.cobalt.tools/api/json",
 
-            "https://co.wuk.sh/api/json"
+            payload,
 
-        ];
+            {
+                headers: {
+                    "Accept":
+                    "application/json",
 
-        for (const node of nodes) {
+                    "Content-Type":
+                    "application/json",
 
-            try {
+                    "User-Agent":
+                    "Mozilla/5.0"
+                },
 
-                const response =
-                await axios.post(
-                    node,
-                    payload,
-                    {
-                        headers: {
-                            "Accept":
-                            "application/json",
-
-                            "Content-Type":
-                            "application/json",
-
-                            "User-Agent":
-                            "CymorDownloader/3.0"
-                        },
-
-                        timeout: 20000
-                    }
-                );
-
-                const data = response.data;
-
-                console.log(data);
-
-                if (data.url) {
-
-                    return res.status(200).json({
-                        url: data.url
-                    });
-                }
-
-                if (
-                    data.picker &&
-                    Array.isArray(data.picker) &&
-                    data.picker.length > 0
-                ) {
-
-                    return res.status(200).json({
-                        url:
-                        data.picker[0].url
-                    });
-                }
-
-            } catch (err) {
-
-                console.log(
-                    "Failed node:",
-                    node
-                );
-
-                continue;
+                timeout: 30000
             }
+        );
+
+        const data = response.data;
+
+        console.log(data);
+
+        if (data.url) {
+
+            return res.status(200).json({
+                url: data.url
+            });
+        }
+
+        if (
+            data.picker &&
+            Array.isArray(data.picker) &&
+            data.picker.length > 0
+        ) {
+
+            return res.status(200).json({
+                url: data.picker[0].url
+            });
         }
 
         return res.status(500).json({
-            error:
-            "All download nodes failed"
+            error: "No downloadable media found",
+            data
         });
 
     } catch (err) {
 
-        console.log(err);
+        console.log(err.response?.data || err.message);
 
         return res.status(500).json({
             error:
-            err.message
+            err.response?.data ||
+            err.message ||
+            "Server error"
         });
     }
 };
