@@ -1,837 +1,239 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-
-<meta name="viewport"
-content="width=device-width, initial-scale=1.0">
-
-<meta name="theme-color"
-content="#7f1d1d">
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<meta name="theme-color" content="#0f0f1a"/>
 
 <title>CymorAllVideo Downloader</title>
 
 <script src="https://cdn.tailwindcss.com"></script>
 
 <style>
-
-@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Rajdhani:wght@400;600;700&display=swap');
-
-*{
-margin:0;
-padding:0;
-box-sizing:border-box;
--webkit-tap-highlight-color:transparent;
-}
-
-html{
-scroll-behavior:smooth;
-overflow-x:hidden;
-}
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Inter:wght@300;400;600;700&display=swap');
 
 body{
-font-family:'Rajdhani',sans-serif;
-background:
-radial-gradient(circle at top,
-#3a0000 0%,
-#120000 40%,
-#000000 100%);
+font-family:'Inter',sans-serif;
+background: radial-gradient(circle at top,#1a1a2e,#0f0f1a,#000);
 color:white;
 overflow-x:hidden;
-min-height:100vh;
 }
 
 .brand{
 font-family:'Orbitron',sans-serif;
-letter-spacing:2px;
-}
-
-.glow{
-text-shadow:
-0 0 10px red,
-0 0 20px darkred,
-0 0 30px crimson;
 }
 
 .glass{
-background:rgba(15,0,0,.6);
-backdrop-filter:blur(12px);
--webkit-backdrop-filter:blur(12px);
-border:1px solid rgba(255,0,0,.2);
-box-shadow:0 8px 32px rgba(0,0,0,.7);
+background:rgba(255,255,255,0.05);
+backdrop-filter:blur(14px);
+border:1px solid rgba(255,255,255,0.1);
+border-radius:20px;
 }
 
-.card{
-background:rgba(255,255,255,.03);
-border:1px solid rgba(255,255,255,.08);
-transition:.3s ease;
+.glow{
+text-shadow:0 0 15px #ff004c;
 }
 
-.card:hover{
-transform:translateY(-6px);
-border-color:rgba(255,0,0,.4);
-background:rgba(255,0,0,.06);
+.btn{
+padding:14px;
+border-radius:14px;
+font-weight:600;
+transition:.3s;
 }
 
-.main-container{
-width:100%;
-max-width:1300px;
-margin:auto;
-padding:1rem;
+.btn:hover{
+transform:scale(1.03);
 }
 
-.hero{
-min-height:100vh;
-display:flex;
-flex-direction:column;
-justify-content:center;
-align-items:center;
-position:relative;
-overflow:hidden;
+.primary{
+background:linear-gradient(135deg,#ff004c,#ff416c);
 }
 
-.floating{
-position:absolute;
-font-family:'Orbitron',sans-serif;
-color:rgba(255,0,0,.08);
-animation:floatUp linear infinite;
-pointer-events:none;
-user-select:none;
-}
-
-@keyframes floatUp{
-
-from{
-transform:translateY(120vh);
-}
-
-to{
-transform:translateY(-120vh);
-}
-
-}
-
-.pulse-red{
-animation:pulse 1.5s infinite;
-}
-
-@keyframes pulse{
-
-0%,100%{
-opacity:1;
-}
-
-50%{
-opacity:.5;
-}
-
+.secondary{
+background:#1f2937;
 }
 
 input{
 width:100%;
-background:rgba(0,0,0,.5);
-border:1px solid rgba(255,0,0,.3);
-padding:1rem;
-border-radius:1rem;
-color:white;
+padding:14px;
+border-radius:14px;
+background:rgba(0,0,0,0.4);
+border:1px solid rgba(255,255,255,0.1);
 outline:none;
-transition:.3s;
+color:white;
 }
 
 input:focus{
-border-color:#ef4444;
+border-color:#ff004c;
 }
 
-button{
-border:none;
-cursor:pointer;
-transition:.25s;
+.card{
+transition:.3s;
 }
 
-button:active{
-transform:scale(.97);
+.card:hover{
+transform:translateY(-5px);
 }
-
-.download-btn{
-background:#b91c1c;
-padding:1rem;
-border-radius:1rem;
-font-weight:bold;
-text-transform:uppercase;
-color:white;
-}
-
-.download-btn:hover{
-background:#dc2626;
-}
-
-.secondary-btn{
-background:#111827;
-padding:1rem;
-border-radius:1rem;
-font-weight:bold;
-color:white;
-}
-
-.secondary-btn:hover{
-background:#1f2937;
-}
-
-.history-card{
-background:rgba(255,255,255,.04);
-border:1px solid rgba(255,255,255,.05);
-padding:.9rem;
-border-radius:1rem;
-display:flex;
-justify-content:space-between;
-gap:.5rem;
-flex-wrap:wrap;
-}
-
-footer{
-padding:2rem 1rem;
-text-align:center;
-color:#666;
-font-size:.7rem;
-letter-spacing:.3em;
-}
-
-@media(max-width:768px){
-
-.hero h1{
-font-size:3rem !important;
-line-height:1 !important;
-}
-
-.hero p{
-font-size:.95rem !important;
-}
-
-.glass{
-padding:1.2rem !important;
-}
-
-.download-btn,
-.secondary-btn{
-width:100%;
-min-height:54px;
-}
-
-}
-
 </style>
 </head>
 
-<body>
+<body class="min-h-screen flex flex-col items-center justify-center px-4">
 
-<div class="floating"
-style="left:5%;font-size:3rem;animation-duration:14s;">
-CYMOR
-</div>
-
-<div class="floating"
-style="left:30%;font-size:5rem;animation-duration:20s;">
-VIDEO
-</div>
-
-<div class="floating"
-style="left:70%;font-size:4rem;animation-duration:18s;">
-AI
-</div>
-
-<div class="floating"
-style="left:50%;font-size:6rem;animation-duration:25s;">
-CYMOR
-</div>
-
-<section class="hero">
-
-<div class="main-container text-center">
-
-<p class="brand
-text-red-500
-font-bold
-tracking-widest
-text-sm
-mb-3
-uppercase">
-
-Cymor Tech Services Present
-
-</p>
-
-<h1 class="text-6xl
-md:text-8xl
-font-bold
-brand
-glow
-uppercase
-italic">
-
-CymorAll<br>Video
-
+<!-- HEADER -->
+<div class="text-center mb-10">
+<h1 class="brand text-4xl md:text-6xl glow text-red-500 font-bold">
+CymorAllVideo
 </h1>
-
-<p class="text-gray-400
-mt-6
-text-lg
-max-w-2xl
-mx-auto">
-
-High-speed downloads for YouTube,
-TikTok and Facebook.
-No watermarks. No limits.
-
+<p class="text-gray-400 mt-2">
+Fast video downloads from YouTube • TikTok • Facebook
 </p>
-
-<div class="grid
-grid-cols-1
-md:grid-cols-3
-gap-4
-mt-12">
-
-<div class="card p-6 rounded-3xl">
-
-<div class="text-4xl text-red-500">
-▶
 </div>
 
-<h3 class="brand text-xl mt-3">
-YOUTUBE
-</h3>
+<!-- MAIN BOX -->
+<div class="glass p-6 w-full max-w-2xl">
 
-<p class="text-gray-500 text-sm mt-2">
-Shorts & 4K Videos
-</p>
+<input id="urlInput" placeholder="Paste video link here..." />
 
-</div>
+<div class="grid grid-cols-2 gap-3 mt-4">
 
-<div class="card p-6 rounded-3xl">
-
-<div class="text-4xl text-blue-500">
-f
-</div>
-
-<h3 class="brand text-xl mt-3">
-FACEBOOK
-</h3>
-
-<p class="text-gray-500 text-sm mt-2">
-Reels & Watch
-</p>
-
-</div>
-
-<div class="card p-6 rounded-3xl">
-
-<div class="text-4xl text-green-400">
-♪
-</div>
-
-<h3 class="brand text-xl mt-3">
-TIKTOK
-</h3>
-
-<p class="text-gray-500 text-sm mt-2">
-No Watermark MP4
-</p>
-
-</div>
-
-</div>
-
-<div class="glass
-rounded-3xl
-p-6
-mt-12
-max-w-3xl
-mx-auto">
-
-<h2 class="brand
-text-2xl
-glow
-mb-6
-uppercase">
-
-Analyzer
-
-</h2>
-
-<input
-id="urlInput"
-placeholder="Paste video link here...">
-
-<div class="grid
-grid-cols-1
-md:grid-cols-2
-gap-3
-mt-4">
-
-<button
-onclick="pasteLink()"
-class="secondary-btn">
-
-Paste Link
-
+<button class="btn secondary" onclick="pasteLink()">
+Paste
 </button>
 
-<button
-onclick="analyzeLink()"
-class="download-btn">
-
-Analyze Link
-
+<button class="btn primary" onclick="analyze()">
+Analyze
 </button>
 
 </div>
 
-</div>
+<!-- RESULT -->
+<div id="result" class="hidden mt-6">
 
-<div id="preview"
-class="hidden
-glass
-rounded-3xl
-p-6
-mt-6
-max-w-3xl
-mx-auto">
-
-<div class="flex
-justify-between
-items-center
-gap-4
-flex-wrap">
-
+<div class="flex justify-between mb-4">
 <div>
-
-<p class="text-xs
-tracking-widest
-text-gray-500
-uppercase">
-
-Platform
-
-</p>
-
-<h2 id="platform"
-class="text-3xl
-brand
-text-red-500">
-
----
-
-</h2>
-
+<p class="text-xs text-gray-400">Platform</p>
+<h2 id="platform" class="text-xl font-bold text-red-400">---</h2>
 </div>
 
 <div>
-
-<p class="text-xs
-tracking-widest
-text-gray-500
-uppercase">
-
-Status
-
-</p>
-
-<p id="status"
-class="text-green-400
-font-bold">
-
-READY
-
-</p>
-
+<p class="text-xs text-gray-400">Status</p>
+<p id="status" class="text-green-400 font-bold">READY</p>
+</div>
 </div>
 
-</div>
+<div class="grid grid-cols-2 gap-3">
 
-<div class="grid
-grid-cols-1
-md:grid-cols-2
-gap-3
-mt-6">
-
-<button
-id="mp4Btn"
-onclick="download('mp4')"
-class="download-btn">
-
+<button class="btn primary" onclick="downloadVideo('mp4')">
 Download MP4
-
 </button>
 
-<button
-id="mp3Btn"
-onclick="download('mp3')"
-class="secondary-btn">
-
+<button class="btn secondary" onclick="downloadVideo('mp3')">
 Download MP3
-
 </button>
 
 </div>
 
 </div>
-
-<div class="max-w-3xl
-mx-auto
-mt-10">
-
-<h3 class="brand
-text-red-500
-tracking-[0.3em]
-text-xs
-mb-4
-uppercase">
-
-Recent Sessions
-
-</h3>
-
-<div id="history"
-class="space-y-3">
-
 </div>
 
-</div>
-
-</div>
-
-</section>
-
-<footer>
-
-Powered By
-<span class="text-red-600 font-bold">
-CYMOR
-</span>
-
-</footer>
+<!-- FOOTER -->
+<p class="text-xs text-gray-500 mt-10">
+Powered by CYMOR TECH SERVICES
+</p>
 
 <script>
+
+const BACKEND_URL =
+"https://7d2322f7-3172-498c-91f8-1b1c8fb4b2db-00-2h748bduzftvx.riker.replit.dev";
 
 let currentUrl = "";
 
 async function pasteLink(){
-
 try{
-
-const text =
-await navigator.clipboard.readText();
-
-document
-.getElementById("urlInput")
-.value = text;
-
-}catch(err){
-
-alert("Paste manually.");
+const text = await navigator.clipboard.readText();
+document.getElementById("urlInput").value = text;
+}catch{
+alert("Please paste manually");
 }
-
-}
-
-function extractUrl(text){
-
-const regex =
-/(https?:\/\/[^\s]+)/g;
-
-const matches =
-text.match(regex);
-
-return matches
-? matches[0]
-: text;
-
 }
 
 function detectPlatform(url){
-
-const low =
-url.toLowerCase();
-
-if(
-low.includes("youtube.com")
-||
-low.includes("youtu.be")
-){
-return "YouTube";
+if(url.includes("youtube")) return "YouTube";
+if(url.includes("tiktok")) return "TikTok";
+if(url.includes("facebook") || url.includes("fb.watch")) return "Facebook";
+return "Unknown";
 }
 
-if(
-low.includes("tiktok.com")
-){
-return "TikTok";
-}
+function analyze(){
 
-if(
-low.includes("facebook.com")
-||
-low.includes("fb.watch")
-){
-return "Facebook";
-}
+const url =
+document.getElementById("urlInput").value.trim();
 
-return "Video";
-}
-
-function analyzeLink(){
-
-const input =
-document.getElementById("urlInput");
-
-const cleanUrl =
-extractUrl(input.value.trim());
-
-if(
-!cleanUrl
-||
-!cleanUrl.startsWith("http")
-){
-
-alert(
-"Please provide a valid link."
-);
-
+if(!url.startsWith("http")){
+alert("Invalid link");
 return;
 }
 
-currentUrl = cleanUrl;
+currentUrl = url;
 
-document
-.getElementById("preview")
-.classList
-.remove("hidden");
-
-document
-.getElementById("platform")
-.innerText =
-detectPlatform(cleanUrl);
-
-document
-.getElementById("status")
-.innerText =
-"READY";
+document.getElementById("result").classList.remove("hidden");
+document.getElementById("platform").innerText = detectPlatform(url);
+document.getElementById("status").innerText = "READY";
 }
 
-async function download(type){
+async function downloadVideo(type){
 
 if(!currentUrl){
-
-alert(
-"Analyze a link first."
-);
-
+alert("Analyze link first");
 return;
 }
 
-const status =
-document.getElementById("status");
-
-const btns = [
-
-document.getElementById("mp4Btn"),
-
-document.getElementById("mp3Btn")
-
-];
-
-status.innerText =
-"CONNECTING...";
-
-status.className =
-"text-yellow-500 font-bold pulse-red";
-
-btns.forEach(btn=>{
-
-btn.disabled = true;
-
-});
+const status = document.getElementById("status");
+status.innerText = "PROCESSING...";
+status.className = "text-yellow-400 font-bold";
 
 try{
 
-const payload = {
-
-url: currentUrl,
-
-vQuality: "1080",
-
-isAudioOnly:
-type === "mp3",
-
-isNoTTWatermark: true
-};
-
-const response =
-await fetch(
-"/api/download",
-{
+const res = await fetch(`${BACKEND_URL}/api/download`,{
 method:"POST",
-
 headers:{
-"Content-Type":
-"application/json"
+"Content-Type":"application/json"
 },
+body:JSON.stringify({
+url: currentUrl,
+quality: "best",
+format: type
+})
+});
 
-body:
-JSON.stringify(payload)
-}
-);
+const data = await res.json();
 
-const data =
-await response.json();
-
-if(!response.ok){
-
-throw new Error(
-data.error
-||
-"Download failed"
-);
+if(!res.ok){
+throw new Error(data.error || "Download failed");
 }
 
-if(data.url){
+if(data?.data?.url){
+status.innerText = "READY";
+status.className = "text-green-400 font-bold";
 
-status.innerText =
-"DOWNLOAD READY";
-
-status.className =
-"text-green-400 font-bold";
-
-saveHistory(
-currentUrl,
-detectPlatform(currentUrl)
-);
-
-window.open(
-data.url,
-"_blank"
-);
+window.open(data.data.url, "_blank");
 
 }else{
-
-throw new Error(
-"No media found"
-);
+throw new Error("No download URL returned");
 }
 
 }catch(err){
 
 console.error(err);
 
-status.innerText =
-"FAILED";
+status.innerText = "FAILED";
+status.className = "text-red-500 font-bold";
 
-status.className =
-"text-red-500 font-bold";
-
-alert(
-"Download failed.\n\nPossible reasons:\n- Invalid video\n- Server busy\n- Unsupported platform"
-);
-
-}finally{
-
-btns.forEach(btn=>{
-
-btn.disabled = false;
-
-});
+alert("Download failed. Server issue or unsupported video.");
 
 }
 
 }
-
-function saveHistory(url,platform){
-
-let logs =
-JSON.parse(
-localStorage.getItem("cymor_logs")
-||
-"[]"
-);
-
-logs.unshift({
-
-url,
-
-platform,
-
-time:
-new Date()
-.toLocaleTimeString()
-
-});
-
-localStorage.setItem(
-"cymor_logs",
-JSON.stringify(logs.slice(0,5))
-);
-
-renderHistory();
-}
-
-function renderHistory(){
-
-const logs =
-JSON.parse(
-localStorage.getItem("cymor_logs")
-||
-"[]"
-);
-
-const container =
-document.getElementById("history");
-
-if(!logs.length){
-
-container.innerHTML =
-`
-<p class="text-gray-600 text-sm">
-No recent activity.
-</p>
-`;
-
-return;
-}
-
-container.innerHTML =
-logs.map(log => `
-
-<div class="history-card">
-
-<span class="
-text-red-500
-font-bold
-uppercase">
-
-${log.platform}
-
-</span>
-
-<span class="
-text-gray-500
-truncate
-max-w-[140px]">
-
-${log.url}
-
-</span>
-
-<span class="
-text-gray-700">
-
-${log.time}
-
-</span>
-
-</div>
-
-`).join("");
-
-}
-
-renderHistory();
 
 </script>
 
