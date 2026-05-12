@@ -1,60 +1,112 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Cymor Movie Hub</title>
-    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Cymor Movie Hub</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet"
+  href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+
+  <link rel="stylesheet" href="style.css"/>
 </head>
 <body>
 
-    <nav class="top-nav">
-        <div class="logo">Cymor<span>MovieHub</span></div>
-        <div class="search-box">
-            <i class="fas fa-search"></i>
-            <input type="text" id="search-input" placeholder="Search movies...">
-        </div>
-    </nav>
+  <!-- TOP NAV -->
+  <nav class="top-nav">
 
-    <section id="hero" class="hero-carousel">
-        </section>
-
-    <div class="category-container">
-        <button class="chip active">All</button>
-        <button class="chip">Hollywood</button>
-        <button class="chip">Nollywood</button>
-        <button class="chip">Action</button>
-        <button class="chip">Series</button>
+    <div class="logo">
+      <span class="logo-cymor">Cymor</span>
+      <span class="logo-hub">MovieHub</span>
     </div>
 
-    <main class="content-wrapper">
-        <section class="movie-section">
-            <div class="section-header">
-                <h3>Popular Series</h3>
-                <a href="#">All <i class="fas fa-chevron-right"></i></a>
-            </div>
-            <div id="popular-series" class="horizontal-grid wide-cards"></div>
-        </section>
+    <div class="search-box">
+      <i class="fas fa-search"></i>
 
-        <section class="movie-section">
-            <div class="section-header">
-                <h3>Popular Movies</h3>
-                <a href="#">All <i class="fas fa-chevron-right"></i></a>
-            </div>
-            <div id="popular-movies" class="horizontal-grid tall-cards"></div>
-        </section>
-    </main>
+      <input
+        type="text"
+        id="search-input"
+        placeholder="Search movies or series..."
+      />
+    </div>
 
-    <nav class="bottom-nav">
-        <div class="nav-item active"><i class="fas fa-house"></i><span>Home</span></div>
-        <div class="nav-item"><i class="fas fa-play-circle"></i><span>ShortTV</span></div>
-        <div class="nav-item center-btn"><div class="free-badge">FREE</div></div>
-        <div class="nav-item"><i class="fas fa-download"></i><span>Downloads</span></div>
-        <div class="nav-item"><i class="fas fa-user"></i><span>Me</span></div>
-    </nav>
+  </nav>
 
-    <script src="script.js"></script>
+  <!-- HERO -->
+  <section id="hero" class="hero-carousel"></section>
+
+  <!-- CATEGORIES -->
+  <div class="category-container">
+    <button class="chip active" data-category="all">All</button>
+    <button class="chip" data-category="movie">Movies</button>
+    <button class="chip" data-category="tv">Series</button>
+    <button class="chip" data-category="action">Action</button>
+    <button class="chip" data-category="comedy">Comedy</button>
+  </div>
+
+  <!-- CONTENT -->
+  <main class="content-wrapper">
+
+    <section class="movie-section">
+      <div class="section-header">
+        <h3>🔥 Trending Series</h3>
+      </div>
+
+      <div id="popular-series" class="horizontal-grid wide-cards"></div>
+    </section>
+
+    <section class="movie-section">
+      <div class="section-header">
+        <h3>🎬 Popular Movies</h3>
+      </div>
+
+      <div id="popular-movies" class="horizontal-grid tall-cards"></div>
+    </section>
+
+    <!-- SEARCH RESULTS -->
+    <section class="movie-section">
+      <div class="section-header">
+        <h3>🔍 Search Results</h3>
+      </div>
+
+      <div id="search-results" class="horizontal-grid tall-cards"></div>
+    </section>
+
+  </main>
+
+  <!-- BOTTOM NAV -->
+  <nav class="bottom-nav">
+
+    <div class="nav-item active">
+      <i class="fas fa-house"></i>
+      <span>Home</span>
+    </div>
+
+    <div class="nav-item">
+      <i class="fas fa-tv"></i>
+      <span>Series</span>
+    </div>
+
+    <div class="nav-item center-btn">
+      <i class="fas fa-play"></i>
+    </div>
+
+    <div class="nav-item">
+      <i class="fas fa-download"></i>
+      <span>Downloads</span>
+    </div>
+
+    <div class="nav-item">
+      <i class="fas fa-user"></i>
+      <span>Profile</span>
+    </div>
+
+  </nav>
+
+  <script src="script.js"></script>
+
 </body>
 </html>
