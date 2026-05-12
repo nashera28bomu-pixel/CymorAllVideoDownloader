@@ -3,29 +3,21 @@ const params = new URLSearchParams(window.location.search);
 const id = params.get("id");
 const type = params.get("type");
 
-// State management
 let currentSeason = 1;
 let currentEpisode = 1;
 
-/**
- * INIT: Loads the video and the metadata
- */
 async function initWatch() {
   if (!id || !type) return (window.location.href = "index.html");
 
-  // 1. Fetch Movie/Show Details for the UI
   await loadDetails();
-
-  // 2. Load the actual video source
   await loadVideoSource();
+  
+  // Setup Download and Subtitle buttons with tracking
+  setupActionButtons();
 
-  // 3. Start saving progress every 30 seconds
   setInterval(saveProgress, 30000);
 }
 
-/**
- * Loads metadata (Title, Description, and Episode list if TV)
- */
 async function loadDetails() {
   try {
     const res = await fetch(`${API}/tmdb/details/${type}/${id}`);
@@ -33,6 +25,9 @@ async function loadDetails() {
 
     document.getElementById("movieTitle").innerText = data.title || data.name;
     document.getElementById("movieDesc").innerText = data.overview;
+    
+    // Store poster globally so we can save it to downloads later
+    window.currentPoster = `https://image.tmdb.org/t/p/w500${data.poster_path}`;
 
     if (type === "tv") {
       renderEpisodeSelector(data.seasons);
@@ -42,13 +37,12 @@ async function loadDetails() {
   }
 }
 
-/**
- * Switches the iframe source to the actual stream
- */
 async function loadVideoSource() {
   const player = document.getElementById("player");
   
-  // Use the new sources route we created in the backend
+  // THE AD-KILLER: Trap pop-ups by sandboxing the iframe
+  player.setAttribute("sandbox", "allow-forms allow-pointer-lock allow-same-origin allow-scripts allow-top-navigation");
+
   let endpoint = `${API}/watch/sources/${type}/${id}`;
   if (type === "tv") endpoint += `/${currentSeason}/${currentEpisode}`;
 
@@ -57,56 +51,83 @@ async function loadVideoSource() {
     const data = await res.json();
 
     if (data.success) {
-      // Point the iframe to our streaming provider
       player.src = data.stream.embedUrl;
+      // Store download link for the button
+      window.currentDownloadUrl = data.stream.downloadUrl || "#";
     }
   } catch (err) {
-    player.srcdoc = "<h2 style='color:white;text-align:center;'>Source temporarily unavailable</h2>";
+    player.srcdoc = "<h2 style='color:white;text-align:center;padding-top:20%;'>Source Offline. Try again later.</h2>";
   }
 }
 
-/**
- * Renders the Episode Grid for TV Shows
- */
+function setupActionButtons() {
+  const dlBtn = document.getElementById("downloadBtn");
+  const subBtn = document.getElementById("subBtn");
+
+  if (dlBtn) {
+    dlBtn.onclick = () => {
+      // 1. Get the current movie data for the Downloads Tab
+      const downloadItem = {
+        id: id,
+        title: document.getElementById("movieTitle").innerText,
+        poster: window.currentPoster || "", 
+        date: new Date().toLocaleDateString()
+      };
+
+      // 2. Save to localStorage so it appears in the Downloads tab
+      let downloads = JSON.parse(localStorage.getItem("my_downloads") || "[]");
+      
+      if (!downloads.find(d => d.id === downloadItem.id)) {
+        downloads.push(downloadItem);
+        localStorage.setItem("my_downloads", JSON.stringify(downloads));
+      }
+
+      // 3. Trigger the real download
+      if (window.currentDownloadUrl && window.currentDownloadUrl !== "#") {
+        window.open(window.currentDownloadUrl, '_blank');
+      } else {
+        alert("Fetching download link... Try again in a second.");
+      }
+    };
+  }
+
+  if (subBtn) {
+    subBtn.onclick = () => {
+      alert("Subtitles are managed inside the player settings (CC button).");
+    };
+  }
+}
+
 function renderEpisodeSelector(seasons) {
   const container = document.getElementById("episodeList");
   if (!container) return;
   container.innerHTML = "";
 
-  // For simplicity, we'll show episodes of the current selected season
   const season = seasons.find(s => s.season_number === currentSeason) || seasons[0];
   
   for (let i = 1; i <= season.episode_count; i++) {
     const btn = document.createElement("button");
     btn.className = `ep-btn ${i === currentEpisode ? 'active' : ''}`;
-    btn.innerText = `Ep ${i}`;
+    btn.innerText = `E${i}`;
     btn.onclick = () => {
       currentEpisode = i;
       loadVideoSource();
-      renderEpisodeSelector(seasons); // Refresh active state
+      renderEpisodeSelector(seasons);
     };
     container.appendChild(btn);
   }
 }
 
-/**
- * Sends current watch data to our Render backend
- */
 async function saveProgress() {
-  const timestamp = 0; // If using a custom player, get player.currentTime
-  
-  await fetch(`${API}/watch/save`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      id,
-      type,
-      season: currentSeason,
-      episode: currentEpisode,
-      timestamp: timestamp
-    })
-  });
+  try {
+    await fetch(`${API}/watch/save`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ id, type, season: currentSeason, episode: currentEpisode })
+    });
+  } catch (e) {
+    console.log("Progress save failed.");
+  }
 }
 
-// Start the page
 initWatch();
