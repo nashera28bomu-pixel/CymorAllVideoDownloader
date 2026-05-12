@@ -1,241 +1,68 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<meta name="theme-color" content="#0f0f1a"/>
-
-<title>CymorAllVideo Downloader</title>
-
-<script src="https://cdn.tailwindcss.com"></script>
-
-<style>
-@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Inter:wght@300;400;600;700&display=swap');
-
-body{
-font-family:'Inter',sans-serif;
-background: radial-gradient(circle at top,#1a1a2e,#0f0f1a,#000);
-color:white;
-overflow-x:hidden;
-}
-
-.brand{
-font-family:'Orbitron',sans-serif;
-}
-
-.glass{
-background:rgba(255,255,255,0.05);
-backdrop-filter:blur(14px);
-border:1px solid rgba(255,255,255,0.1);
-border-radius:20px;
-}
-
-.glow{
-text-shadow:0 0 15px #ff004c;
-}
-
-.btn{
-padding:14px;
-border-radius:14px;
-font-weight:600;
-transition:.3s;
-}
-
-.btn:hover{
-transform:scale(1.03);
-}
-
-.primary{
-background:linear-gradient(135deg,#ff004c,#ff416c);
-}
-
-.secondary{
-background:#1f2937;
-}
-
-input{
-width:100%;
-padding:14px;
-border-radius:14px;
-background:rgba(0,0,0,0.4);
-border:1px solid rgba(255,255,255,0.1);
-outline:none;
-color:white;
-}
-
-input:focus{
-border-color:#ff004c;
-}
-
-.card{
-transition:.3s;
-}
-
-.card:hover{
-transform:translateY(-5px);
-}
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Cymor Movie Hub</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;500;700&family=Lexend:wght@700;800&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <link rel="stylesheet" href="style.css">
 </head>
+<body>
 
-<body class="min-h-screen flex flex-col items-center justify-center px-4">
+    <nav id="navbar" class="glass">
+        <div class="nav-container">
+            <h1 class="logo font-lexend">Cymor<span>MovieHub</span></h1>
+            
+            <div class="search-wrap">
+                <input type="text" id="search-input" placeholder="Search movies, shows...">
+                <button id="search-btn"><i class="fas fa-search"></i></button>
+            </div>
+        </div>
+    </nav>
 
-<!-- HEADER -->
-<div class="text-center mb-10">
-<h1 class="brand text-4xl md:text-6xl glow text-red-500 font-bold">
-CymorAllVideo
-</h1>
-<p class="text-gray-400 mt-2">
-Fast video downloads from YouTube • TikTok • Facebook
-</p>
-</div>
+    <main id="main-container">
+        
+        <header id="hero" class="hidden">
+            <div id="hero-backdrop" class="hero-image"></div>
+            <div class="hero-content">
+                <h2 id="hero-title" class="font-lexend text-glow"></h2>
+                <p id="hero-desc"></p>
+                <div class="hero-btns">
+                    <button class="btn-play"><i class="fas fa-play"></i> Play</button>
+                    <button class="btn-info"><i class="fas fa-info-circle"></i> Info</button>
+                </div>
+            </div>
+        </header>
 
-<!-- MAIN BOX -->
-<div class="glass p-6 w-full max-w-2xl">
+        <section class="movie-section">
+            <div class="row-header">
+                <h3 class="font-lexend">Trending Now</h3>
+                <span class="view-all text-purple">View All</span>
+            </div>
+            <div id="trending-grid" class="movie-grid"></div>
+        </section>
 
-<input id="urlInput" placeholder="Paste video link here..." />
+        <section class="movie-section">
+            <div class="row-header">
+                <h3 class="font-lexend">New Releases</h3>
+                <span class="view-all text-purple">View All</span>
+            </div>
+            <div id="new-grid" class="movie-grid"></div>
+        </section>
 
-<div class="grid grid-cols-2 gap-3 mt-4">
+    </main>
 
-<button class="btn secondary" onclick="pasteLink()">
-Paste
-</button>
+    <div id="movie-modal" class="modal hidden">
+        <div class="modal-content glass">
+            <span class="close-modal"><i class="fas fa-times"></i></span>
+            <div id="modal-details"></div>
+        </div>
+    </div>
 
-<button class="btn primary" onclick="analyze()">
-Analyze
-</button>
-
-</div>
-
-<!-- RESULT -->
-<div id="result" class="hidden mt-6">
-
-<div class="flex justify-between mb-4">
-<div>
-<p class="text-xs text-gray-400">Platform</p>
-<h2 id="platform" class="text-xl font-bold text-red-400">---</h2>
-</div>
-
-<div>
-<p class="text-xs text-gray-400">Status</p>
-<p id="status" class="text-green-400 font-bold">READY</p>
-</div>
-</div>
-
-<div class="grid grid-cols-2 gap-3">
-
-<button class="btn primary" onclick="downloadVideo('mp4')">
-Download MP4
-</button>
-
-<button class="btn secondary" onclick="downloadVideo('mp3')">
-Download MP3
-</button>
-
-</div>
-
-</div>
-</div>
-
-<!-- FOOTER -->
-<p class="text-xs text-gray-500 mt-10">
-Powered by CYMOR TECH SERVICES
-</p>
-
-<script>
-
-const BACKEND_URL =
-"https://7d2322f7-3172-498c-91f8-1b1c8fb4b2db-00-2h748bduzftvx.riker.replit.dev";
-
-let currentUrl = "";
-
-async function pasteLink(){
-try{
-const text = await navigator.clipboard.readText();
-document.getElementById("urlInput").value = text;
-}catch{
-alert("Please paste manually");
-}
-}
-
-function detectPlatform(url){
-if(url.includes("youtube")) return "YouTube";
-if(url.includes("tiktok")) return "TikTok";
-if(url.includes("facebook") || url.includes("fb.watch")) return "Facebook";
-return "Unknown";
-}
-
-function analyze(){
-
-const url =
-document.getElementById("urlInput").value.trim();
-
-if(!url.startsWith("http")){
-alert("Invalid link");
-return;
-}
-
-currentUrl = url;
-
-document.getElementById("result").classList.remove("hidden");
-document.getElementById("platform").innerText = detectPlatform(url);
-document.getElementById("status").innerText = "READY";
-}
-
-async function downloadVideo(type){
-
-if(!currentUrl){
-alert("Analyze link first");
-return;
-}
-
-const status = document.getElementById("status");
-status.innerText = "PROCESSING...";
-status.className = "text-yellow-400 font-bold";
-
-try{
-
-const res = await fetch(`${BACKEND_URL}/api/download`,{
-method:"POST",
-headers:{
-"Content-Type":"application/json"
-},
-body:JSON.stringify({
-url: currentUrl,
-quality: "best",
-format: type
-})
-});
-
-const data = await res.json();
-
-if(!res.ok){
-throw new Error(data.error || "Download failed");
-}
-
-if(data?.data?.url){
-status.innerText = "READY";
-status.className = "text-green-400 font-bold";
-
-window.open(data.data.url, "_blank");
-
-}else{
-throw new Error("No download URL returned");
-}
-
-}catch(err){
-
-console.error(err);
-
-status.innerText = "FAILED";
-status.className = "text-red-500 font-bold";
-
-alert("Download failed. Server issue or unsupported video.");
-
-}
-
-}
-
-</script>
-
+    <script src="script.js"></script>
 </body>
 </html>
