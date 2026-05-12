@@ -4,64 +4,56 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Cymor Movie Hub</title>
-    
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;500;700&family=Lexend:wght@700;800&display=swap" rel="stylesheet">
-    
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-    <nav id="navbar" class="glass">
-        <div class="nav-container">
-            <h1 class="logo font-lexend">Cymor<span>MovieHub</span></h1>
-            
-            <div class="search-wrap">
-                <input type="text" id="search-input" placeholder="Search movies, shows...">
-                <button id="search-btn"><i class="fas fa-search"></i></button>
-            </div>
+    <nav class="top-nav">
+        <div class="logo">Cymor<span>MovieHub</span></div>
+        <div class="search-box">
+            <i class="fas fa-search"></i>
+            <input type="text" id="search-input" placeholder="Search movies...">
         </div>
     </nav>
 
-    <main id="main-container">
-        
-        <header id="hero" class="hidden">
-            <div id="hero-backdrop" class="hero-image"></div>
-            <div class="hero-content">
-                <h2 id="hero-title" class="font-lexend text-glow"></h2>
-                <p id="hero-desc"></p>
-                <div class="hero-btns">
-                    <button class="btn-play"><i class="fas fa-play"></i> Play</button>
-                    <button class="btn-info"><i class="fas fa-info-circle"></i> Info</button>
-                </div>
-            </div>
-        </header>
+    <section id="hero" class="hero-carousel">
+        </section>
 
+    <div class="category-container">
+        <button class="chip active">All</button>
+        <button class="chip">Hollywood</button>
+        <button class="chip">Nollywood</button>
+        <button class="chip">Action</button>
+        <button class="chip">Series</button>
+    </div>
+
+    <main class="content-wrapper">
         <section class="movie-section">
-            <div class="row-header">
-                <h3 class="font-lexend">Trending Now</h3>
-                <span class="view-all text-purple">View All</span>
+            <div class="section-header">
+                <h3>Popular Series</h3>
+                <a href="#">All <i class="fas fa-chevron-right"></i></a>
             </div>
-            <div id="trending-grid" class="movie-grid"></div>
+            <div id="popular-series" class="horizontal-grid wide-cards"></div>
         </section>
 
         <section class="movie-section">
-            <div class="row-header">
-                <h3 class="font-lexend">New Releases</h3>
-                <span class="view-all text-purple">View All</span>
+            <div class="section-header">
+                <h3>Popular Movies</h3>
+                <a href="#">All <i class="fas fa-chevron-right"></i></a>
             </div>
-            <div id="new-grid" class="movie-grid"></div>
+            <div id="popular-movies" class="horizontal-grid tall-cards"></div>
         </section>
-
     </main>
 
-    <div id="movie-modal" class="modal hidden">
-        <div class="modal-content glass">
-            <span class="close-modal"><i class="fas fa-times"></i></span>
-            <div id="modal-details"></div>
-        </div>
-    </div>
+    <nav class="bottom-nav">
+        <div class="nav-item active"><i class="fas fa-house"></i><span>Home</span></div>
+        <div class="nav-item"><i class="fas fa-play-circle"></i><span>ShortTV</span></div>
+        <div class="nav-item center-btn"><div class="free-badge">FREE</div></div>
+        <div class="nav-item"><i class="fas fa-download"></i><span>Downloads</span></div>
+        <div class="nav-item"><i class="fas fa-user"></i><span>Me</span></div>
+    </nav>
 
     <script src="script.js"></script>
 </body>
