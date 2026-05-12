@@ -1,0 +1,18 @@
+<!-- Inside downloads.html -->
+<div id="download-list" class="grid" style="padding: 20px;"></div>
+
+<script>
+  const list = document.getElementById('download-list');
+  const saved = JSON.parse(localStorage.getItem("my_downloads") || "[]");
+
+  if(saved.length === 0) {
+    list.innerHTML = "<p>No downloads yet.</p>";
+  } else {
+    list.innerHTML = saved.map(item => `
+      <div class="card">
+        <p>${item.title}</p>
+        <small>Downloaded on: ${item.date}</small>
+      </div>
+    `).join('');
+  }
+</script>
