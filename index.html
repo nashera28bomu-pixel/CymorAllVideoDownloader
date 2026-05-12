@@ -1,48 +1,105 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Cymor Movie Hub</title>
-
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+  <title>Cymor Movie Hub</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="style.css">
 </head>
-
 <body>
 
-<header class="nav">
-  <div class="logo">
-    <span class="cyan">Cymor</span> MovieHub
+  <header class="main-header">
+    <div class="header-top">
+      <div class="logo">
+        <img src="logo.png" alt="Icon" class="logo-icon"> </div>
+      <div class="search-bar">
+        <i class="fa fa-search"></i>
+        <input id="search" placeholder="Teen Wolf" />
+        <button class="search-btn">Search</button>
+      </div>
+    </div>
+    
+    <nav class="top-tabs">
+      <a href="#" class="tab active">FightZone</a>
+      <a href="#" class="tab">Trending</a>
+      <a href="#" class="tab">Movie</a>
+      <a href="#" class="tab">TV</a>
+      <a href="#" class="tab">Anime</a>
+    </nav>
+  </header>
+
+  <main class="content-wrapper">
+    <section id="hero" class="featured-hero">
+      </section>
+
+    <section class="categories-section">
+      <h3>Categories</h3>
+      <div class="chip-container">
+        <div class="chip active"><i class="fa fa-border-all"></i> All</div>
+        <div class="chip">Hollywood</div>
+        <div class="chip">Nollywood</div>
+        <div class="chip">Bollywood</div>
+      </div>
+    </section>
+
+    <section class="movie-row">
+      <div class="row-header">
+        <h2>Popular Series</h2>
+        <a href="#" class="view-all">All <i class="fa fa-chevron-right"></i></a>
+      </div>
+      <div id="series-row" class="horizontal-scroll">
+        </div>
+    </section>
+
+    <section class="movie-row">
+      <div class="row-header">
+        <h2>Popular Movies</h2>
+        <a href="#" class="view-all">All <i class="fa fa-chevron-right"></i></a>
+      </div>
+      <div id="movies-row" class="horizontal-scroll">
+        </div>
+    </section>
+
+    <section class="movie-row">
+      <div class="row-header">
+        <h2>Continue Watching</h2>
+      </div>
+      <div id="continue-row" class="horizontal-scroll">
+        </div>
+    </section>
+  </main>
+
+  <nav class="bottom-nav">
+    <a href="#" class="nav-item active">
+      <i class="fa fa-home"></i>
+      <span>Home</span>
+    </a>
+    <a href="#" class="nav-item">
+      <i class="fa fa-play-circle"></i>
+      <span>ShortTV</span>
+    </a>
+    <div class="nav-item floating-action">
+      <div class="free-badge">FREE</div>
+      <img src="avatar.jpg" alt="Profile" class="nav-avatar">
+    </div>
+    <a href="#" class="nav-item">
+      <i class="fa fa-download"></i>
+      <span>Downloads</span>
+    </a>
+    <a href="#" class="nav-item">
+      <i class="fa fa-user"></i>
+      <span>Me</span>
+    </a>
+  </nav>
+
+  <div id="modal" class="modal hidden">
+    <div class="modal-overlay"></div>
+    <div class="modal-content" id="modalContent">
+      </div>
   </div>
 
-  <input id="search" placeholder="Search movies, series..." />
-</header>
-
-<!-- HERO -->
-<section id="hero"></section>
-
-<!-- ROWS -->
-<section class="row">
-  <h2>Trending</h2>
-  <div id="trending" class="grid"></div>
-</section>
-
-<section class="row">
-  <h2>Popular Movies</h2>
-  <div id="movies" class="grid"></div>
-</section>
-
-<section class="row">
-  <h2>Continue Watching</h2>
-  <div id="continue" class="grid"></div>
-</section>
-
-<!-- MODAL -->
-<div id="modal" class="modal hidden">
-  <div class="modal-content" id="modalContent"></div>
-</div>
-
-<script src="script.js"></script>
+  <script src="script.js"></script>
 </body>
 </html>
