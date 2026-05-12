@@ -15,45 +15,36 @@
       <span class="logo-cymor">Cymor</span><span class="logo-hub">MovieHub</span>
     </div>
     <div class="search-box">
-      <i class="fas fa-search" id="search-trigger"></i>
+      <i class="fas fa-search"></i>
       <input type="text" id="search-input" placeholder="Search movies or series..."/>
     </div>
   </nav>
 
-  <section id="hero" class="hero-carousel"></section>
+  <main id="home-content">
+    <section id="hero" class="hero-carousel"></section>
 
-  <div class="category-container">
-    <button class="chip active" data-type="all">All</button>
-    <button class="chip" data-type="movie">Movies</button>
-    <button class="chip" data-type="tv">Series</button>
-    <button class="chip" data-type="trending">Trending</button>
-  </div>
-
-  <main class="content-wrapper">
-    <section class="movie-section" id="trending-section">
+    <section class="movie-section">
       <div class="section-header"><h3>🔥 Trending Series</h3></div>
       <div id="popular-series" class="horizontal-grid wide-cards"></div>
     </section>
 
-    <section class="movie-section" id="movies-section">
-      <div class="section-header"><h3>🎬 Popular Movies</h3></div>
+    <section class="movie-section">
+      <div class="section-header"><h3 id="movies-title">🎬 Popular Movies</h3></div>
       <div id="popular-movies" class="horizontal-grid tall-cards"></div>
     </section>
   </main>
 
-  <div id="movie-modal" class="modal-overlay hidden">
-    <div class="modal-content">
-      <button class="close-modal"><i class="fas fa-times"></i></button>
-      <div id="modal-body"></div>
-    </div>
+  <div id="movie-modal" class="modal-view hidden">
+    <button class="back-btn"><i class="fas fa-chevron-left"></i> Back</button>
+    <div id="modal-body"></div>
   </div>
 
   <nav class="bottom-nav">
-    <div class="nav-item active" data-target="home"><i class="fas fa-house"></i><span>Home</span></div>
-    <div class="nav-item" data-target="series"><i class="fas fa-tv"></i><span>Series</span></div>
+    <div class="nav-item active" data-nav="home"><i class="fas fa-house"></i><span>Home</span></div>
+    <div class="nav-item" data-nav="series"><i class="fas fa-tv"></i><span>Series</span></div>
     <div class="nav-item center-btn"><i class="fas fa-play"></i></div>
-    <div class="nav-item" data-target="downloads"><i class="fas fa-download"></i><span>Downloads</span></div>
-    <div class="nav-item" data-target="profile"><i class="fas fa-user"></i><span>Profile</span></div>
+    <div class="nav-item" data-nav="downloads"><i class="fas fa-download"></i><span>Downloads</span></div>
+    <div class="nav-item" data-nav="profile"><i class="fas fa-user"></i><span>Profile</span></div>
   </nav>
 
   <script src="script.js"></script>
