@@ -1,16 +1,34 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>Watch</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Watching - Cymor Hub</title>
   <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
-<body>
+<body style="padding-bottom: 20px;">
 
-<iframe id="player"
-  width="100%" height="100%"
-  style="height:100vh;border:none;">
-</iframe>
+  <div class="video-container" style="width: 100%; aspect-ratio: 16/9; background: #000;">
+    <!-- The sandbox here is what stops the "Pause = Ad" behavior -->
+    <iframe id="player" src="" frameborder="0" allowfullscreen 
+      sandbox="allow-forms allow-pointer-lock allow-same-origin allow-scripts allow-top-navigation"
+      style="width: 100%; height: 100%;"></iframe>
+  </div>
 
-<script src="watch.js"></script>
+  <div class="watch-details" style="padding: 20px;">
+    <h1 id="movieTitle" style="margin: 0 0 10px 0;">Loading...</h1>
+    <p id="movieDesc" style="color: #aaa; font-size: 14px; line-height: 1.6;"></p>
+
+    <div class="action-bar" style="display: flex; gap: 10px; margin: 20px 0;">
+      <button id="downloadBtn" class="ep-btn">📥 Download</button>
+      <button id="subBtn" class="ep-btn">💬 Subtitles</button>
+    </div>
+
+    <h3 id="episodeTitle" style="display:none; margin-top: 30px;">Episodes</h3>
+    <div id="episodeList" class="episode-grid"></div>
+  </div>
+
+  <script src="watch.js"></script>
 </body>
 </html>
