@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Cymor Bible App</title>
+
+  <meta name="theme-color" content="#0F172A"/>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+  <style>
+    body { font-family: Inter, sans-serif; }
+    .verse:hover { background: rgba(59,130,246,0.08); }
+    .highlight { background: rgba(250, 204, 21, 0.2); }
+    .underline { text-decoration: underline; }
+    /* Hide scrollbar for clean UI */
+    ::-webkit-scrollbar { width: 0px; background: transparent; }
+  </style>
+</head>
+
+<body class="bg-[#0F172A] text-slate-100 min-h-screen flex flex-col">
+
+<header class="sticky top-0 z-50 bg-[#0F172A]/95 backdrop-blur border-b border-slate-800">
+  <div class="max-w-md mx-auto px-4 py-3 flex items-center justify-between">
+    <a href="./index.html" class="text-slate-400 text-sm">← Home</a>
+    <h1 class="text-sm font-semibold">Cymor Bible Pro</h1>
+    <button id="searchBtn" class="text-slate-400 text-sm">Search</button>
+  </div>
+
+  <div id="searchBox" class="hidden max-w-md mx-auto px-4 pb-3">
+    <input id="searchInput"
+      class="w-full px-3 py-2 rounded-xl bg-slate-900 border border-slate-700 text-sm"
+      placeholder="Search verses (e.g. love, faith)"
+    />
+  </div>
+</header>
+
+<main class="max-w-md mx-auto w-full px-4 py-3 space-y-3 flex-1">
+
+  <div class="grid grid-cols-2 gap-2">
+    <select id="bookSelect" class="p-3 bg-slate-900 border border-slate-800 rounded-xl text-sm outline-none focus:border-blue-500"></select>
+    <select id="chapterSelect" class="p-3 bg-slate-900 border border-slate-800 rounded-xl text-sm outline-none focus:border-blue-500"></select>
+  </div>
+
+  <div class="flex gap-2">
+    <button id="saveHistoryBtn" class="flex-1 bg-slate-800 p-3 rounded-xl text-xs font-semibold active:scale-95 transition-transform">Save Reading</button>
+    <button id="whatsappBtn" class="flex-1 bg-green-600 p-3 rounded-xl text-xs font-semibold active:scale-95 transition-transform">WhatsApp Share</button>
+  </div>
+
+  <section class="bg-slate-900/40 border border-slate-800 rounded-2xl p-5 mb-10">
+    <h2 id="reference" class="text-blue-400 font-bold text-sm mb-4 uppercase tracking-widest"></h2>
+    <div id="verseContainer" class="space-y-4 text-[15px] leading-relaxed">
+        <p class="text-slate-500 text-center animate-pulse py-10">Initializing scriptures...</p>
+    </div>
+  </section>
+
+</main>
+
+<script type="module" src="./app.js"></script>
+
+<script>
+let bible = [];
+let currentBook = 0;
+let currentChapter = 0;
+
+const bookSelect = document.getElementById("bookSelect");
+const chapterSelect = document.getElementById("chapterSelect");
+const verseContainer = document.getElementById("verseContainer");
+const reference = document.getElementById("reference");
+
+const historyKey = "cymorReadingHistory";
+const highlightsKey = "cymorHighlights";
+
+// Check for the bridge we built in app.js
+function connectToEngine() {
+    if (window.CymorBibleDebugBridge) {
+        const state = window.CymorBibleDebugBridge.inspectAppState();
+        if (state.bibleData && state.bibleData.length > 0) {
+            bible = state.bibleData;
+            init();
+            return;
+        }
+    }
+    // If data isn't ready yet, poll again in 200ms
+    setTimeout(connectToEngine, 200);
+}
+
+window.addEventListener("DOMContentLoaded", connectToEngine);
+
+/* ========================
+   INIT
+======================== */
+function init() {
+  bookSelect.innerHTML = bible.map((b,i)=>`<option value="${i}">${b.name}</option>`).join("");
+  loadChapters(0);
+}
+
+/* ========================
+   CHAPTERS
+======================== */
+function loadChapters(bookIndex) {
+  currentBook = bookIndex;
+  const book = bible[bookIndex];
+
+  chapterSelect.innerHTML = book.chapters.map((_,i)=>
+    `<option value="${i}">Chapter ${i+1}</option>`
+  ).join("");
+
+  render(bookIndex,0);
+}
+
+/* ========================
+   RENDER VERSES
+======================== */
+function render(bIndex, cIndex) {
+  currentChapter = parseInt(cIndex);
+
+  const book = bible[bIndex];
+  const chapter = book.chapters[currentChapter];
+
+  reference.textContent = `${book.name} ${currentChapter+1}`;
+
+  const highlights = JSON.parse(localStorage.getItem(highlightsKey) || "[]");
+
+  verseContainer.innerHTML = chapter.map((v,i)=>{
+    const id = `${book.name}-${currentChapter+1}-${i+1}`;
+    const isHighlighted = highlights.includes(id);
+
+    return `
+      <div class="verse p-2 rounded-lg cursor-pointer transition-colors ${isHighlighted ? 'highlight underline' : ''}"
+        onclick="toggleHighlight('${id}', this)">
+        <span class="text-blue-500 font-bold text-[10px] mr-2">${i+1}</span>
+        <span class="text-slate-200">${v}</span>
+      </div>
+    `;
+  }).join("");
+
+  saveHistory();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+/* ========================
+   HIGHLIGHT SYSTEM
+======================== */
+window.toggleHighlight = function(id, el) {
+  let highlights = JSON.parse(localStorage.getItem(highlightsKey) || "[]");
+
+  if (highlights.includes(id)) {
+    highlights = highlights.filter(h => h !== id);
+    el.classList.remove("highlight","underline");
+  } else {
+    highlights.push(id);
+    el.classList.add("highlight","underline");
+  }
+
+  localStorage.setItem(highlightsKey, JSON.stringify(highlights));
+};
+
+/* ========================
+   SEARCH ENGINE
+======================== */
+document.getElementById("searchBtn").onclick = () => {
+  document.getElementById("searchBox").classList.toggle("hidden");
+};
+
+document.getElementById("searchInput").addEventListener("input", (e) => {
+  const query = e.target.value.toLowerCase();
+  if (query.length < 3) return;
+
+  let results = [];
+  bible.forEach(book=>{
+    book.chapters.forEach((ch,ci)=>{
+      ch.forEach((v,vi)=>{
+        if (v.toLowerCase().includes(query)) {
+          results.push({
+            book: book.name,
+            chapter: ci+1,
+            verse: vi+1,
+            text: v
+          });
+        }
+      });
+    });
+  });
+
+  if (results.length > 0) {
+    verseContainer.innerHTML = results.slice(0,30).map(r=>`
+        <div class="p-3 border-b border-slate-800 bg-slate-900/20 rounded-lg">
+        <div class="text-blue-400 font-bold text-xs mb-1">${r.book} ${r.chapter}:${r.verse}</div>
+        <div class="text-slate-300 text-sm">${r.text}</div>
+        </div>
+    `).join("");
+  }
+});
+
+/* ========================
+   READING HISTORY
+======================== */
+function saveHistory() {
+  const history = JSON.parse(localStorage.getItem(historyKey) || "[]");
+  const entry = {
+    book: bible[currentBook].name,
+    chapter: currentChapter+1,
+    date: new Date().toLocaleDateString()
+  };
+  
+  // Prevent duplicate consecutive entries
+  if(history[0]?.book === entry.book && history[0]?.chapter === entry.chapter) return;
+
+  history.unshift(entry);
+  localStorage.setItem(historyKey, JSON.stringify(history.slice(0,10)));
+}
+
+/* ========================
+   WHATSAPP SHARE
+======================== */
+document.getElementById("whatsappBtn").onclick = () => {
+  const book = bible[currentBook].name;
+  const chapter = bible[currentBook].chapters[currentChapter];
+  const verseText = chapter.slice(0,3).join("\n\n"); // Share first 3 verses
+  const text = `📖 *${book} ${currentChapter+1}*\n\n${verseText}\n\nRead more on *Cymor Bible Pro*`;
+  window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`, "_blank");
+};
+
+/* ========================
+   EVENTS
+======================== */
+bookSelect.onchange = (e)=> loadChapters(e.target.value);
+chapterSelect.onchange = (e)=> render(currentBook, e.target.value);
+
+</script>
+</body>
+</html>
