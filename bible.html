@@ -16,7 +16,6 @@
     .verse:hover { background: rgba(59,130,246,0.08); }
     .highlight { background: rgba(250, 204, 21, 0.2); }
     .underline { text-decoration: underline; }
-    /* Hide scrollbar for clean UI */
     ::-webkit-scrollbar { width: 0px; background: transparent; }
   </style>
 </head>
@@ -39,7 +38,6 @@
 </header>
 
 <main class="max-w-md mx-auto w-full px-4 py-3 space-y-3 flex-1">
-
   <div class="grid grid-cols-2 gap-2">
     <select id="bookSelect" class="p-3 bg-slate-900 border border-slate-800 rounded-xl text-sm outline-none focus:border-blue-500"></select>
     <select id="chapterSelect" class="p-3 bg-slate-900 border border-slate-800 rounded-xl text-sm outline-none focus:border-blue-500"></select>
@@ -56,7 +54,6 @@
         <p class="text-slate-500 text-center animate-pulse py-10">Initializing scriptures...</p>
     </div>
   </section>
-
 </main>
 
 <script type="module" src="./app.js"></script>
@@ -74,26 +71,27 @@ const reference = document.getElementById("reference");
 const historyKey = "cymorReadingHistory";
 const highlightsKey = "cymorHighlights";
 
-// Check for the bridge we built in app.js
+// Robust Connection Logic
 function connectToEngine() {
     if (window.CymorBibleDebugBridge) {
         const state = window.CymorBibleDebugBridge.inspectAppState();
-        if (state.bibleData && state.bibleData.length > 0) {
+        if (state && state.bibleData && state.bibleData.length > 0) {
+            console.log("Engine Connected. Data loaded.");
             bible = state.bibleData;
             init();
             return;
         }
     }
-    // If data isn't ready yet, poll again in 200ms
-    setTimeout(connectToEngine, 200);
+    setTimeout(connectToEngine, 100);
 }
 
-window.addEventListener("DOMContentLoaded", connectToEngine);
+window.addEventListener("load", connectToEngine);
 
 /* ========================
    INIT
 ======================== */
 function init() {
+  if(!bible || bible.length === 0) return;
   bookSelect.innerHTML = bible.map((b,i)=>`<option value="${i}">${b.name}</option>`).join("");
   loadChapters(0);
 }
@@ -102,14 +100,14 @@ function init() {
    CHAPTERS
 ======================== */
 function loadChapters(bookIndex) {
-  currentBook = bookIndex;
-  const book = bible[bookIndex];
+  currentBook = parseInt(bookIndex);
+  const book = bible[currentBook];
 
   chapterSelect.innerHTML = book.chapters.map((_,i)=>
     `<option value="${i}">Chapter ${i+1}</option>`
   ).join("");
 
-  render(bookIndex,0);
+  render(currentBook, 0);
 }
 
 /* ========================
@@ -117,10 +115,8 @@ function loadChapters(bookIndex) {
 ======================== */
 function render(bIndex, cIndex) {
   currentChapter = parseInt(cIndex);
-
   const book = bible[bIndex];
   const chapter = book.chapters[currentChapter];
-
   reference.textContent = `${book.name} ${currentChapter+1}`;
 
   const highlights = JSON.parse(localStorage.getItem(highlightsKey) || "[]");
@@ -147,7 +143,6 @@ function render(bIndex, cIndex) {
 ======================== */
 window.toggleHighlight = function(id, el) {
   let highlights = JSON.parse(localStorage.getItem(highlightsKey) || "[]");
-
   if (highlights.includes(id)) {
     highlights = highlights.filter(h => h !== id);
     el.classList.remove("highlight","underline");
@@ -155,7 +150,6 @@ window.toggleHighlight = function(id, el) {
     highlights.push(id);
     el.classList.add("highlight","underline");
   }
-
   localStorage.setItem(highlightsKey, JSON.stringify(highlights));
 };
 
@@ -206,10 +200,7 @@ function saveHistory() {
     chapter: currentChapter+1,
     date: new Date().toLocaleDateString()
   };
-  
-  // Prevent duplicate consecutive entries
   if(history[0]?.book === entry.book && history[0]?.chapter === entry.chapter) return;
-
   history.unshift(entry);
   localStorage.setItem(historyKey, JSON.stringify(history.slice(0,10)));
 }
@@ -220,7 +211,7 @@ function saveHistory() {
 document.getElementById("whatsappBtn").onclick = () => {
   const book = bible[currentBook].name;
   const chapter = bible[currentBook].chapters[currentChapter];
-  const verseText = chapter.slice(0,3).join("\n\n"); // Share first 3 verses
+  const verseText = chapter.slice(0,3).join("\n\n");
   const text = `📖 *${book} ${currentChapter+1}*\n\n${verseText}\n\nRead more on *Cymor Bible Pro*`;
   window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`, "_blank");
 };
@@ -230,7 +221,6 @@ document.getElementById("whatsappBtn").onclick = () => {
 ======================== */
 bookSelect.onchange = (e)=> loadChapters(e.target.value);
 chapterSelect.onchange = (e)=> render(currentBook, e.target.value);
-
 </script>
 </body>
 </html>
