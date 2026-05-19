@@ -7,7 +7,7 @@
    GLOBAL CORE STORAGE STATE
    ========================================================================== */
 const APP_VERSION = "1.0.0";
-const BIBLE_PATH = "./assets/bible/en_kjv.json";
+const BIBLE_PATH = "./en_kjv.json";
 
 const state = {
   bibleData: [],
