@@ -14,8 +14,8 @@
 
   <meta name="theme-color" content="#0F172A" />
 
+  <!-- TailwindCSS & Html2Canvas Libraries -->
   <script src="https://cdn.tailwindcss.com"></script>
-
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 
   <link
@@ -80,26 +80,17 @@
       background:rgba(30,41,59,0.7);
     }
 
-    /* SHARE TEMPLATE */
-
+    /* SHARE TEMPLATE WORKING CANVAS */
     #share-template{
       position:absolute;
       left:-9999px;
       top:-9999px;
-
       width:1080px;
       height:1080px;
-
-      background:linear-gradient(
-        135deg,
-        #0F172A 0%,
-        #1E293B 100%
-      );
-
+      background:linear-gradient(135deg, #0F172A 0%, #1E293B 100%);
       display:flex;
       justify-content:center;
       align-items:center;
-
       padding:80px;
       text-align:center;
     }
@@ -108,141 +99,66 @@
 
 <body class="text-slate-100 min-h-screen flex flex-col pb-28">
 
-  <!-- SHARE TEMPLATE -->
+  <!-- SHARE CANVAS ENGINE ELEMENT -->
   <div id="share-template">
-
-    <div
-      style="
-        border:2px solid rgba(59,130,246,0.3);
-        border-radius:60px;
-        padding:60px;
-        background:rgba(15,23,42,0.5);
-        width:100%;
-      "
-    >
-
-      <p
-        style="
-          color:#3b82f6;
-          text-transform:uppercase;
-          letter-spacing:0.5em;
-          font-weight:800;
-          font-size:24px;
-          margin-bottom:40px;
-        "
-      >
+    <div style="border:2px solid rgba(59,130,246,0.3); border-radius:60px; padding:60px; background:rgba(15,23,42,0.5); width:100%;">
+      <p style="color:#3b82f6; text-transform:uppercase; letter-spacing:0.5em; font-weight:800; font-size:24px; margin-bottom:40px;">
         Cymor Bible Daily
       </p>
-
-      <h2
-        id="share-content"
-        style="
-          font-family:'Playfair Display',serif;
-          color:white;
-          font-style:italic;
-          font-size:48px;
-          line-height:1.4;
-          margin-bottom:40px;
-        "
-      ></h2>
-
-      <p
-        id="share-ref"
-        style="
-          color:#3b82f6;
-          font-weight:bold;
-          font-size:32px;
-        "
-      ></p>
-
+      <h2 id="share-content" style="font-family:'Playfair Display',serif; color:white; font-style:italic; font-size:48px; line-height:1.4; margin-bottom:40px;"></h2>
+      <p id="share-ref" style="color:#3b82f6; font-weight:bold; font-size:32px;"></p>
     </div>
   </div>
 
-  <!-- HEADER -->
+  <!-- HEADER MAP -->
   <header class="sticky top-0 z-50 bg-[#0F172A]/95 backdrop-blur border-b border-slate-800 px-4 py-3">
-
     <div class="max-w-md mx-auto space-y-3">
-
       <div class="flex items-center justify-between">
-
-        <a
-          href="index.html"
-          class="text-blue-400 text-xs font-bold uppercase tracking-widest"
-        >
+        <a href="index.html" class="text-blue-400 text-xs font-bold uppercase tracking-widest">
           ← Home
         </a>
-
         <h1 class="text-sm font-bold tracking-tight">
           Scripture Reader
         </h1>
-
         <div class="w-8"></div>
-
       </div>
 
-      <!-- SEARCH -->
+      <!-- SEARCH INPUT -->
       <div class="relative">
-
         <input
           id="searchInput"
           type="text"
           placeholder="Search scripture keyword..."
           class="w-full bg-slate-900 border border-slate-700 text-slate-100 text-sm rounded-2xl px-4 py-3 outline-none focus:border-blue-500 transition-all"
         />
-
-        <div class="absolute right-4 top-3.5 text-slate-500">
-          🔍
-        </div>
-
+        <div class="absolute right-4 top-3.5 text-slate-500">🔍</div>
       </div>
-
     </div>
-
   </header>
 
-  <!-- MAIN -->
+  <!-- MAIN ENGINE INTERFACE -->
   <main class="max-w-md mx-auto w-full px-4 py-6 space-y-6 flex-1">
 
-    <!-- SELECTORS -->
+    <!-- DROP DOWNS SELECTION -->
     <section class="space-y-4">
-
-      <!-- TESTAMENT -->
       <div class="relative">
-
         <select
           id="testament-select"
           class="w-full p-4 bg-slate-900 border border-slate-800 rounded-2xl text-sm outline-none focus:border-blue-500 cursor-pointer"
         >
-
-          <option value="">
-            Select Testament
-          </option>
-
-          <option value="OT">
-            Old Testament
-          </option>
-
-          <option value="NT">
-            New Testament
-          </option>
-
+          <option value="">Select Testament</option>
+          <option value="OT">Old Testament</option>
+          <option value="NT">New Testament</option>
         </select>
-
       </div>
 
-      <!-- BOOK + CHAPTER -->
       <div class="grid grid-cols-2 gap-3">
-
         <select
           id="book-select"
           disabled
           class="p-4 bg-slate-900 border border-slate-800 rounded-2xl text-sm outline-none opacity-50 focus:border-blue-500 cursor-pointer transition-all"
         >
-
-          <option value="">
-            Select Book
-          </option>
-
+          <option value="">Select Book</option>
         </select>
 
         <select
@@ -250,28 +166,21 @@
           disabled
           class="p-4 bg-slate-900 border border-slate-800 rounded-2xl text-sm outline-none opacity-50 focus:border-blue-500 cursor-pointer transition-all"
         >
-
-          <option value="">
-            Select Chapter
-          </option>
-
+          <option value="">Select Chapter</option>
         </select>
-
       </div>
 
-      <!-- PWA -->
+      <!-- PWA UTILITY ACTION -->
       <button
         id="pwaInstallBtn"
         class="hidden w-full bg-gradient-to-r from-blue-600 to-blue-500 text-white p-4 rounded-2xl text-xs font-bold shadow-lg shadow-blue-500/20 active:scale-95 transition-all"
       >
         📥 DOWNLOAD OFFLINE VERSION
       </button>
-
     </section>
 
-    <!-- ACTIONS -->
+    <!-- CORE CONTROL ACTIONS -->
     <div class="flex gap-3">
-
       <button
         onclick="saveReadingProgress()"
         class="flex-1 bg-slate-800 border border-slate-700 p-4 rounded-2xl text-[10px] font-bold uppercase tracking-wider active:scale-95 transition-all"
@@ -285,189 +194,157 @@
       >
         Share Image
       </button>
-
     </div>
 
-    <!-- SCRIPTURE DISPLAY -->
+    <!-- MAIN TEXT RENDER WINDOW -->
     <section class="bg-slate-900/40 border border-slate-800 rounded-[32px] p-6 mb-12 min-h-[300px]">
-
-      <div
-        id="bible-display"
-        class="space-y-5 text-[16px] leading-relaxed text-slate-200"
-      >
-
+      <div id="bible-display" class="space-y-5 text-[16px] leading-relaxed text-slate-200">
         <div class="flex flex-col items-center justify-center py-12 text-slate-500 space-y-4">
-
           <div class="w-10 h-10 border-2 border-blue-500/20 border-t-blue-500 rounded-full animate-spin"></div>
-
           <p class="text-xs uppercase tracking-widest font-bold">
             Loading Scriptures...
           </p>
-
         </div>
-
       </div>
-
     </section>
 
   </main>
 
-  <!-- NAVIGATION -->
+  <!-- NAVIGATION TASKBAR -->
   <nav class="fixed bottom-0 left-0 right-0 glass border-t border-slate-800 px-8 py-4 flex justify-between items-center z-[100]">
-
     <a href="index.html" class="flex flex-col items-center gap-1 text-slate-500">
-
       <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
         <path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z"/>
       </svg>
-
-      <span class="text-[10px]">
-        Home
-      </span>
-
+      <span class="text-[10px]">Home</span>
     </a>
 
     <a href="bible.html" class="flex flex-col items-center gap-1 nav-active">
-
       <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
         <path d="M9 4.804A7.968 7.968 0 005.5 4c-1.255 0-2.443.29-3.5.804v10A7.969 7.969 0 015.5 14c1.669 0 3.218.51 4.5 1.385A7.962 7.962 0 0114.5 14c1.255 0 2.443.29 3.5.804v-10A7.968 7.968 0 0014.5 4c-1.255 0-2.443.29-3.5.804V12a1 1 0 11-2 0V4.804z"/>
       </svg>
-
-      <span class="text-[10px]">
-        Bible
-      </span>
-
+      <span class="text-[10px]">Bible</span>
     </a>
 
     <a href="prayer.html" class="flex flex-col items-center gap-1 text-slate-500">
-
       <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
         <path fill-rule="evenodd" d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z" clip-rule="evenodd"/>
       </svg>
-
-      <span class="text-[10px]">
-        Prayers
-      </span>
-
+      <span class="text-[10px]">Prayers</span>
     </a>
 
     <a href="favorites.html" class="flex flex-col items-center gap-1 text-slate-500">
-
       <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
         <path d="M5 4a2 2 0 012-2h6a2 2 0 012 2v14l-5-2.5L5 18V4z"/>
       </svg>
-
-      <span class="text-[10px]">
-        Saved
-      </span>
-
+      <span class="text-[10px]">Saved</span>
     </a>
-
   </nav>
 
-  <!-- SCRIPT -->
+  <!-- REWRITTEN SCRIPTS ENGINE -->
   <script>
+    /* =========================================================
+       DOM ARCHITECTURE SELECTORS
+    ========================================================= */
     const testamentSelect = document.getElementById("testament-select");
     const bookSelect = document.getElementById("book-select");
     const chapterSelect = document.getElementById("chapter-select");
     const bibleDisplay = document.getElementById("bible-display");
     const searchInput = document.getElementById("searchInput");
-
     const shareContent = document.getElementById("share-content");
     const shareRef = document.getElementById("share-ref");
     const shareTemplate = document.getElementById("share-template");
+    const pwaInstallBtn = document.getElementById("pwaInstallBtn");
 
+    /* =========================================================
+       GLOBAL APP CORE STATE
+    ========================================================= */
     let bibleData = [];
     let currentText = "";
     let currentRef = "";
+    let deferredPrompt;
 
     /* =========================================================
-       LOAD BIBLE DATA
+       EXPLICIT BIBLE BOOK CONSTRAINTS
     ========================================================= */
+    const OLD_TESTAMENT_BOOKS = [
+      "Genesis","Exodus","Leviticus","Numbers","Deuteronomy",
+      "Joshua","Judges","Ruth","1 Samuel","2 Samuel",
+      "1 Kings","2 Kings","1 Chronicles","2 Chronicles","Ezra",
+      "Nehemiah","Esther","Job","Psalms","Proverbs",
+      "Ecclesiastes","Song of Solomon","Isaiah","Jeremiah","Lamentations",
+      "Ezekiel","Daniel","Hosea","Joel","Amos",
+      "Obadiah","Jonah","Micah","Nahum","Habakkuk",
+      "Zephaniah","Haggai","Zechariah","Malachi"
+    ];
 
-    async function loadBibleData(){
+    const NEW_TESTAMENT_BOOKS = [
+      "Matthew","Mark","Luke","John","Acts",
+      "Romans","1 Corinthians","2 Corinthians","Galatians","Ephesians",
+      "Philippians","Colossians","1 Thessalonians","2 Thessalonians","1 Timothy",
+      "2 Timothy","Titus","Philemon","Hebrews","James",
+      "1 Peter","2 Peter","1 John","2 John","3 John",
+      "Jude","Revelation"
+    ];
 
-      try{
-
+    /* =========================================================
+       DATA PIPELINE: CORES FETCH
+    ========================================================= */
+    async function loadBibleData() {
+      try {
         const response = await fetch("./en_kjv.json");
+        if (!response.ok) throw new Error("Bible JSON failed to load");
 
         bibleData = await response.json();
+        console.log("Bible Engine Synchronized:", bibleData);
 
         bibleDisplay.innerHTML = `
           <div class="text-center py-12 fade-in">
             <p class="text-blue-400 font-bold uppercase tracking-[0.3em] text-xs mb-3">
-              Cymor Bible Ready
+              CYMOR BIBLE READY
             </p>
-
             <h2 class="text-2xl font-bold text-white mb-3">
               Select Testament To Begin
             </h2>
-
             <p class="text-slate-400 text-sm">
               Browse scriptures beautifully offline.
             </p>
           </div>
         `;
-
-      }catch(error){
-
+      } catch (error) {
         console.error(error);
-
         bibleDisplay.innerHTML = `
           <div class="text-center py-12 text-red-400">
-            Failed to load Bible data.
+            Failed to load Bible data. Check database availability.
           </div>
         `;
       }
     }
 
     /* =========================================================
-       TESTAMENT CHANGE
+       EVENT ACTIONS: TESTAMENT SYSTEM CONTROL
     ========================================================= */
-
     testamentSelect.addEventListener("change", () => {
-
       const testament = testamentSelect.value;
 
-      bookSelect.innerHTML = `
-        <option value="">
-          Select Book
-        </option>
-      `;
-
-      chapterSelect.innerHTML = `
-        <option value="">
-          Select Chapter
-        </option>
-      `;
-
+      bookSelect.innerHTML = `<option value="">Select Book</option>`;
+      chapterSelect.innerHTML = `<option value="">Select Chapter</option>`;
       chapterSelect.disabled = true;
       chapterSelect.classList.add("opacity-50");
 
-      if(!testament){
-
+      if (!testament) {
         bookSelect.disabled = true;
         bookSelect.classList.add("opacity-50");
-
         return;
       }
 
-      const filteredBooks = bibleData.filter(book => {
-
-        if(testament === "OT"){
-          return book.id <= 39;
-        }
-
-        return book.id > 39;
-      });
+      const allowedBooks = testament === "OT" ? OLD_TESTAMENT_BOOKS : NEW_TESTAMENT_BOOKS;
+      const filteredBooks = bibleData.filter(book => allowedBooks.includes(book.name));
 
       filteredBooks.forEach(book => {
-
         const option = document.createElement("option");
-
         option.value = book.name;
         option.textContent = book.name;
-
         bookSelect.appendChild(option);
       });
 
@@ -476,32 +353,18 @@
     });
 
     /* =========================================================
-       BOOK CHANGE
+       EVENT ACTIONS: BOOK SELECTION SYSTEM
     ========================================================= */
-
     bookSelect.addEventListener("change", () => {
+      const selectedBook = bibleData.find(book => book.name === bookSelect.value);
+      chapterSelect.innerHTML = `<option value="">Select Chapter</option>`;
 
-      const selectedBook = bibleData.find(
-        book => book.name === bookSelect.value
-      );
+      if (!selectedBook) return;
 
-      chapterSelect.innerHTML = `
-        <option value="">
-          Select Chapter
-        </option>
-      `;
-
-      if(!selectedBook){
-        return;
-      }
-
-      selectedBook.chapters.forEach((chapter,index) => {
-
+      selectedBook.chapters.forEach((chapter, index) => {
         const option = document.createElement("option");
-
         option.value = index;
         option.textContent = `Chapter ${index + 1}`;
-
         chapterSelect.appendChild(option);
       });
 
@@ -510,55 +373,39 @@
     });
 
     /* =========================================================
-       CHAPTER CHANGE
+       EVENT ACTIONS: CHAPTER VIEWER PIPELINE
     ========================================================= */
-
     chapterSelect.addEventListener("change", () => {
-
-      const selectedBook = bibleData.find(
-        book => book.name === bookSelect.value
-      );
-
-      if(!selectedBook){
-        return;
-      }
+      const selectedBook = bibleData.find(book => book.name === bookSelect.value);
+      if (!selectedBook) return;
 
       const chapterIndex = parseInt(chapterSelect.value);
-
       const verses = selectedBook.chapters[chapterIndex];
 
       bibleDisplay.innerHTML = `
         <div class="fade-in">
           <div class="mb-6">
-
             <p class="text-blue-400 uppercase tracking-[0.3em] text-xs font-bold mb-2">
               Holy Scripture
             </p>
-
             <h2 class="text-2xl font-bold text-white">
               ${selectedBook.name} ${chapterIndex + 1}
             </h2>
-
           </div>
 
           <div class="space-y-5">
-            ${verses.map((verse,index)=>`
-
+            ${verses.map((verse, index) => `
               <div
-                onclick="shareVerse('${verse.replace(/'/g,"\\'")}', '${selectedBook.name} ${chapterIndex+1}:${index+1}')"
-                class="verse-card flex gap-4 p-3 rounded-2xl transition-all cursor-pointer"
+                onclick="shareVerse('${verse.replace(/'/g, "\\'")}', '${selectedBook.name} ${chapterIndex + 1}:${index + 1}')"
+                class="verse-card flex gap-4 p-3 rounded-2xl transition-all cursor-pointer bg-slate-800/30"
               >
-
                 <span class="text-blue-500 font-bold text-xs mt-1">
                   ${index + 1}
                 </span>
-
                 <p class="text-slate-200 leading-relaxed text-[15px]">
                   ${verse}
                 </p>
-
               </div>
-
             `).join("")}
           </div>
         </div>
@@ -569,30 +416,20 @@
     });
 
     /* =========================================================
-       SEARCH ENGINE
+       SEARCH PROCESSING ENGINE
     ========================================================= */
-
     searchInput.addEventListener("input", () => {
-
       const keyword = searchInput.value.toLowerCase().trim();
-
-      if(keyword.length < 2){
-        return;
-      }
+      if (keyword.length < 2) return;
 
       let results = [];
-
       bibleData.forEach(book => {
-
-        book.chapters.forEach((chapter,cIndex) => {
-
-          chapter.forEach((verse,vIndex) => {
-
-            if(verse.toLowerCase().includes(keyword)){
-
+        book.chapters.forEach((chapter, cIndex) => {
+          chapter.forEach((verse, vIndex) => {
+            if (verse.toLowerCase().includes(keyword)) {
               results.push({
-                reference:`${book.name} ${cIndex+1}:${vIndex+1}`,
-                text:verse
+                reference: `${book.name} ${cIndex + 1}:${vIndex + 1}`,
+                text: verse
               });
             }
           });
@@ -601,231 +438,132 @@
 
       bibleDisplay.innerHTML = `
         <div class="fade-in">
-
           <div class="mb-6">
             <p class="text-blue-400 uppercase tracking-[0.3em] text-xs font-bold mb-2">
               Search Results
             </p>
-
-            <h2 class="text-2xl font-bold">
-              "${keyword}"
-            </h2>
+            <h2 class="text-2xl font-bold">"${keyword}"</h2>
           </div>
 
           <div class="space-y-5">
-
             ${results.length > 0
-              ? results.slice(0,50).map(result=>`
-
+              ? results.slice(0, 50).map(result => `
                 <div
-                  onclick="shareVerse('${result.text.replace(/'/g,"\\'")}', '${result.reference}')"
+                  onclick="shareVerse('${result.text.replace(/'/g, "\\'")}', '${result.reference}')"
                   class="verse-card p-4 rounded-2xl bg-slate-800/40 border border-slate-800"
                 >
-
-                  <p class="text-blue-400 text-xs font-bold mb-3">
-                    ${result.reference}
-                  </p>
-
-                  <p class="text-slate-200 text-sm leading-relaxed">
-                    ${result.text}
-                  </p>
-
+                  <p class="text-blue-400 text-xs font-bold mb-3">${result.reference}</p>
+                  <p class="text-slate-200 text-sm leading-relaxed">${result.text}</p>
                 </div>
-
               `).join("")
-              :
-              `
-                <div class="text-center py-10 text-slate-500">
-                  No scripture found.
-                </div>
-              `
+              : `<div class="text-center py-10 text-slate-500">No scripture found.</div>`
             }
-
           </div>
-
         </div>
       `;
     });
 
     /* =========================================================
-       SHARE ENGINE
+       ADVANCED SHARING GENERATOR WITH IMAGE BLOB & SYSTEM APP CAPABILITY
     ========================================================= */
-
-    async function shareVerse(text,reference){
-
+    async function shareVerse(text, reference) {
       shareContent.innerText = `"${text}"`;
       shareRef.innerText = reference;
 
-      try{
-
-        const canvas = await html2canvas(
-          shareTemplate,
-          {
-            backgroundColor:"#0F172A",
-            scale:2
-          }
-        );
-
-        canvas.toBlob(async(blob)=>{
-
-          const file = new File(
-            [blob],
-            "cymor-scripture.png",
-            {
-              type:"image/png"
-            }
-          );
-
-          if(
-            navigator.share &&
-            navigator.canShare({files:[file]})
-          ){
-
-            await navigator.share({
-              files:[file],
-              title:"Cymor Bible",
-              text:reference
-            });
-
-          }else{
-
-            const link = document.createElement("a");
-
-            link.href = canvas.toDataURL();
-
-            link.download = "cymor-scripture.png";
-
-            link.click();
-          }
-
+      try {
+        const canvas = await html2canvas(shareTemplate, {
+          backgroundColor: "#0F172A",
+          scale: 2
         });
 
-      }catch(error){
-        console.error(error);
+        canvas.toBlob(async (blob) => {
+          const file = new File([blob], "cymor-scripture.png", { type: "image/png" });
+
+          if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
+            await navigator.share({
+              files: [file],
+              title: "Cymor Bible",
+              text: reference
+            });
+          } else {
+            // Direct Local Download Fallback
+            const link = document.createElement("a");
+            link.href = canvas.toDataURL();
+            link.download = "cymor-scripture.png";
+            link.click();
+          }
+        });
+      } catch (error) {
+        console.error("Image generation or sharing intercepted:", error);
       }
     }
 
-    async function shareCurrentView(){
-
-      if(!currentText){
+    function shareCurrentView() {
+      if (!currentText) {
         alert("Open a chapter first.");
         return;
       }
-
-      shareVerse(currentText,currentRef);
+      shareVerse(currentText, currentRef);
     }
 
-    function saveReadingProgress(){
-
+    /* =========================================================
+       DATA PERSISTENCE SYSTEM (SAVE/RESTORE)
+    ========================================================= */
+    function saveReadingProgress() {
       const progress = {
-        book:bookSelect.value,
-        chapter:chapterSelect.value,
-        savedAt:new Date().toISOString()
+        book: bookSelect.value,
+        chapter: chapterSelect.value,
+        savedAt: new Date().toISOString()
       };
-
-      localStorage.setItem(
-        "cymorBibleProgress",
-        JSON.stringify(progress)
-      );
-
+      localStorage.setItem("cymorBibleProgress", JSON.stringify(progress));
       alert("Reading progress saved.");
     }
 
-    /* =========================================================
-       PWA INSTALL
-    ========================================================= */
+    function restoreProgress() {
+      const saved = JSON.parse(localStorage.getItem("cymorBibleProgress"));
+      if (!saved || !saved.book) return;
 
-    let deferredPrompt;
+      const isOT = OLD_TESTAMENT_BOOKS.includes(saved.book);
+      testamentSelect.value = isOT ? "OT" : "NT";
+      testamentSelect.dispatchEvent(new Event("change"));
 
-    window.addEventListener(
-      "beforeinstallprompt",
-      (e)=>{
-        e.preventDefault();
-
-        deferredPrompt = e;
-
-        document
-          .getElementById("pwaInstallBtn")
-          .classList.remove("hidden");
-      }
-    );
-
-    document
-      .getElementById("pwaInstallBtn")
-      .addEventListener("click", async()=>{
-
-        if(!deferredPrompt){
-          return;
-        }
-
-        deferredPrompt.prompt();
-
-        deferredPrompt = null;
-      });
-
-    /* =========================================================
-       RESTORE PROGRESS
-    ========================================================= */
-
-    function restoreProgress(){
-
-      const saved = JSON.parse(
-        localStorage.getItem("cymorBibleProgress")
-      );
-
-      if(!saved){
-        return;
-      }
-
-      testamentSelect.value =
-        saved.book &&
-        bibleData.find(book=>book.name===saved.book)?.id <= 39
-          ? "OT"
-          : "NT";
-
-      testamentSelect.dispatchEvent(
-        new Event("change")
-      );
-
-      setTimeout(()=>{
-
+      setTimeout(() => {
         bookSelect.value = saved.book;
+        bookSelect.dispatchEvent(new Event("change"));
 
-        bookSelect.dispatchEvent(
-          new Event("change")
-        );
-
-        setTimeout(()=>{
-
+        setTimeout(() => {
           chapterSelect.value = saved.chapter;
-
-          chapterSelect.dispatchEvent(
-            new Event("change")
-          );
-
-        },200);
-
-      },200);
+          chapterSelect.dispatchEvent(new Event("change"));
+        }, 200);
+      }, 200);
     }
 
     /* =========================================================
-       INIT
+       PROGRESSIVE WEB APP (PWA) DEPLOYMENT INTERFACE
     ========================================================= */
-
-    window.addEventListener("DOMContentLoaded", async()=>{
-
-      await loadBibleData();
-
-      restoreProgress();
-
-      if("serviceWorker" in navigator){
-
-        navigator.serviceWorker
-          .register("./sw.js")
-          .catch(()=>{});
-      }
+    window.addEventListener("beforeinstallprompt", (e) => {
+      e.preventDefault();
+      deferredPrompt = e;
+      pwaInstallBtn.classList.remove("hidden");
     });
 
+    pwaInstallBtn.addEventListener("click", async () => {
+      if (!deferredPrompt) return;
+      deferredPrompt.prompt();
+      deferredPrompt = null;
+    });
+
+    /* =========================================================
+       SYSTEM ROOT INITIALIZATION
+    ========================================================= */
+    window.addEventListener("DOMContentLoaded", async () => {
+      await loadBibleData();
+      restoreProgress();
+
+      if ("serviceWorker" in navigator) {
+        navigator.serviceWorker.register("./sw.js").catch(() => {});
+      }
+    });
   </script>
 
 </body>
