@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Cymor Bible — Settings</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+  <style>
+    body { font-family: 'Inter', sans-serif; }
+    .glass { background: rgba(30, 41, 59, 0.7); backdrop-filter: blur(14px); border: 1px solid rgba(255,255,255,0.05); }
+    .accent-card { background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%); border: 1px solid #1e293b; }
+  </style>
+</head>
+<body class="bg-[#0F172A] text-slate-100 min-h-screen pb-24">
+
+  <header class="p-6 flex items-center gap-4 border-b border-slate-800/50">
+    <a href="index.html" class="text-slate-400 text-lg">←</a>
+    <h1 class="font-bold text-lg tracking-tight">App Settings</h1>
+  </header>
+
+  <main class="px-4 py-6 space-y-8">
+    
+    <section class="accent-card rounded-[32px] p-6 text-center shadow-2xl">
+        <div class="w-20 h-20 bg-blue-600 rounded-full mx-auto mb-4 flex items-center justify-center text-2xl font-bold border-4 border-slate-800">
+            SC
+        </div>
+        <h2 class="text-xl font-bold text-white">Legendary Smiley Cymor</h2>
+        <p class="text-blue-400 text-xs font-semibold uppercase tracking-widest mt-1">C.E.O of CymorTechServices</p>
+        
+        <div class="mt-6 flex justify-center gap-4">
+            <a href="https://wa.me/254113821327" class="bg-green-600/10 text-green-500 px-4 py-2 rounded-xl text-xs font-bold border border-green-600/20 hover:bg-green-600 hover:text-white transition-all">
+                Dm me on whatsapp
+            </a>
+            <button class="bg-slate-800 text-slate-300 px-4 py-2 rounded-xl text-xs font-bold border border-slate-700">
+                Portfolio
+            </button>
+        </div>
+    </section>
+
+    <section class="space-y-3">
+        <h3 class="text-[10px] font-bold text-slate-500 uppercase tracking-[0.2em] px-4">Display & Interface</h3>
+        
+        <div class="glass rounded-3xl divide-y divide-slate-800/50">
+            <div class="p-5 flex justify-between items-center">
+                <div>
+                    <p class="text-sm font-semibold">Reading Mode</p>
+                    <p class="text-[10px] text-slate-400">Optimize font for long reading</p>
+                </div>
+                <input type="checkbox" class="w-10 h-5 bg-slate-700 rounded-full appearance-none checked:bg-blue-600 relative transition-all before:content-[''] before:absolute before:w-4 before:h-4 before:bg-white before:rounded-full before:top-0.5 before:left-0.5 checked:before:left-5 before:transition-all">
+            </div>
+
+            <div class="p-5 flex justify-between items-center">
+                <div>
+                    <p class="text-sm font-semibold">Verse Animations</p>
+                    <p class="text-[10px] text-slate-400">Enable smooth home transitions</p>
+                </div>
+                <input type="checkbox" checked class="w-10 h-5 bg-slate-700 rounded-full appearance-none checked:bg-blue-600 relative transition-all before:content-[''] before:absolute before:w-4 before:h-4 before:bg-white before:rounded-full before:top-0.5 before:left-0.5 checked:before:left-5 before:transition-all">
+            </div>
+        </div>
+    </section>
+
+    <section class="space-y-3">
+        <h3 class="text-[10px] font-bold text-slate-500 uppercase tracking-[0.2em] px-4">Storage</h3>
+        
+        <div class="glass rounded-3xl">
+            <button onclick="clearCache()" class="w-full p-5 flex justify-between items-center text-left">
+                <div>
+                    <p class="text-sm font-semibold text-red-400">Clear Saved Highlights</p>
+                    <p class="text-[10px] text-slate-400">This will delete all marked verses</p>
+                </div>
+                <span class="text-slate-600">🗑️</span>
+            </button>
+        </div>
+    </section>
+
+    <footer class="text-center pt-4">
+        <p class="text-[10px] text-slate-600 font-medium">Cymor Bible App v1.0.4 PRO</p>
+        <p class="text-[9px] text-slate-700 mt-1">© 2026 CymorTechServices. All Rights Reserved.</p>
+    </footer>
+
+  </main>
+
+  <script>
+    function clearCache() {
+        if(confirm("Are you sure you want to delete all highlights and history?")) {
+            localStorage.removeItem("cymorHighlights");
+            localStorage.removeItem("cymorReadingHistory");
+            alert("Data cleared successfully.");
+        }
+    }
+  </script>
+
+</body>
+</html>
