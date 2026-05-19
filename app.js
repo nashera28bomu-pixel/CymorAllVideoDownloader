@@ -1,10 +1,14 @@
 /* ==========================================================================
-   CYMOR BIBLE APP — CORE ORCHESTRATOR v1.4.0
+   CYMOR BIBLE APP — CORE ORCHESTRATOR v1.5.0
    File: app.js • Brand: CymorTechServices
    ========================================================================== */
 
-const APP_VERSION = "1.4.0";
+const APP_VERSION = "1.5.0";
 const BIBLE_PATH = "./en_kjv.json";
+
+/* ==========================================================================
+   GLOBAL STATE
+   ========================================================================== */
 
 const state = {
   bibleData: [],
@@ -14,25 +18,35 @@ const state = {
   favorites: JSON.parse(localStorage.getItem("cymorFavorites")) || [],
 };
 
+/* ==========================================================================
+   DOM REFERENCES
+   ========================================================================== */
+
 const DOM = {
   verseCardAnchor: document.getElementById("verseCardAnchor"),
   prayerCardAnchor: document.getElementById("prayerCardAnchor"),
+
   testamentSelect: document.getElementById("testament-select"),
   bookSelect: document.getElementById("book-select"),
   chapterSelect: document.getElementById("chapter-select"),
+
   bibleDisplay: document.getElementById("bible-display"),
+
   pwaInstallBtn: document.getElementById("pwaInstallBtn"),
+
   currentDateStr: document.getElementById("currentDateStr"),
   greetingText: document.getElementById("greetingText"),
 
-  // Share Template Elements
+  searchInput: document.getElementById("searchInput"),
+
+  // Share Template
   shareTemplate: document.getElementById("share-template"),
   shareContent: document.getElementById("share-content"),
   shareRef: document.getElementById("share-ref")
 };
 
 /* ==========================================================================
-   DAILY ENCOURAGEMENT ENGINE
+   DAILY VERSES
    ========================================================================== */
 
 const DAILY_VERSES = [
@@ -56,8 +70,6 @@ const DAILY_VERSES = [
     reference: "Romans 8:28",
     text: "And we know that all things work together for good to them that love God."
   },
-
-  // NEW VERSES
   {
     reference: "Joshua 1:9",
     text: "Be strong and of a good courage; be not afraid, neither be thou dismayed: for the Lord thy God is with thee whithersoever thou goest."
@@ -80,44 +92,41 @@ const DAILY_VERSES = [
   }
 ];
 
+/* ==========================================================================
+   DAILY PRAYERS
+   ========================================================================== */
+
 const DAILY_PRAYERS = [
   {
     title: "Morning Strength",
     content:
       "Heavenly Father, thank You for the gift of a new day. Fill my heart with courage, wisdom, and strength as I step into every opportunity before me. Guide my thoughts, words, and actions so that I may walk in peace and purpose. Protect me from fear, discouragement, and confusion. Let Your favor surround me and let Your light shine through my life today. Amen."
   },
-
   {
     title: "Divine Peace",
     content:
       "Lord Jesus, calm every storm within my heart and mind. Remove every burden, anxiety, and worry that tries to steal my peace. Teach me to trust in You completely even when life becomes difficult. Let Your presence bring comfort to my soul and clarity to my thoughts. Fill my home, family, and future with divine peace that surpasses all understanding. Amen."
   },
-
-  // NEW LENGTHY PRAYERS
   {
     title: "Prayer For Guidance",
     content:
       "Dear God, I ask for Your divine guidance in every area of my life. Help me make wise decisions and walk on the path You have prepared for me. When I feel uncertain, remind me that Your plans are perfect. Open doors that align with my destiny and close every door that will bring harm or confusion. Give me patience to wait on Your timing and faith to trust Your direction even when I cannot see the full picture. Lead me with Your wisdom and let Your Spirit guide me daily. Amen."
   },
-
   {
     title: "Prayer For Protection",
     content:
       "Almighty Father, I place myself and my loved ones under Your protection today. Guard our hearts, minds, and bodies from danger, sickness, negativity, and evil. Surround us with Your angels and let no weapon formed against us prosper. Keep us safe while traveling, working, studying, and resting. Strengthen us during difficult times and remind us that You are always near. Cover our homes with peace, unity, and joy. Thank You for being our refuge and shield forever. Amen."
   },
-
   {
     title: "Prayer For Faith",
     content:
       "Lord, strengthen my faith when doubts begin to rise. Help me believe in Your promises even when circumstances seem impossible. Teach me to trust You during seasons of waiting and uncertainty. Fill my heart with confidence that You are working all things together for good. Let my faith grow deeper through every challenge I face. Help me encourage others and remain hopeful no matter what happens around me. Thank You for never abandoning me and for always remaining faithful. Amen."
   },
-
   {
     title: "Prayer For Success",
     content:
       "Heavenly Father, bless the work of my hands and help me succeed in every good thing I pursue. Give me discipline, creativity, focus, and determination. Help me use my talents wisely and honor You through my work and achievements. Remove distractions, laziness, and fear from my path. Connect me with opportunities and people that will help me grow into the person You created me to be. May my success become a testimony of Your goodness and grace in my life. Amen."
   },
-
   {
     title: "Prayer Of Gratitude",
     content:
@@ -130,33 +139,42 @@ const DAILY_PRAYERS = [
    ========================================================================== */
 
 document.addEventListener("DOMContentLoaded", async () => {
+
   initializeTemporalContext();
+
   initializePWAHook();
+
   registerCoreServiceWorker();
 
   await loadBibleDataset();
 
   setupBibleNavigation();
 
-  // Start Rotations
+  setupSearch();
+
+  // ROTATIONS
   cycleVerse();
   cyclePrayer();
 
-  // UPDATED ROTATION TIMES
   setInterval(cycleVerse, 40000);
   setInterval(cyclePrayer, 40000);
 });
 
 /* ==========================================================================
-   UI ENGINE & ROTATION
+   VERSE ROTATION
    ========================================================================== */
 
 function cycleVerse() {
+
   if (!DOM.verseCardAnchor) return;
 
-  DOM.verseCardAnchor.classList.add('opacity-0', 'translate-y-2');
+  DOM.verseCardAnchor.classList.add(
+    "opacity-0",
+    "translate-y-2"
+  );
 
   setTimeout(() => {
+
     const verse = DAILY_VERSES[state.vIndex];
 
     state.currentViewContent = {
@@ -198,12 +216,13 @@ function cycleVerse() {
         >
           SHARE AS IMAGE
         </button>
+
       </div>
     `;
 
     DOM.verseCardAnchor.classList.remove(
-      'opacity-0',
-      'translate-y-2'
+      "opacity-0",
+      "translate-y-2"
     );
 
     state.vIndex =
@@ -212,15 +231,21 @@ function cycleVerse() {
   }, 500);
 }
 
+/* ==========================================================================
+   PRAYER ROTATION
+   ========================================================================== */
+
 function cyclePrayer() {
+
   if (!DOM.prayerCardAnchor) return;
 
   DOM.prayerCardAnchor.classList.add(
-    'opacity-0',
-    'translate-y-2'
+    "opacity-0",
+    "translate-y-2"
   );
 
   setTimeout(() => {
+
     const prayer = DAILY_PRAYERS[state.pIndex];
 
     DOM.prayerCardAnchor.innerHTML = `
@@ -244,12 +269,13 @@ function cyclePrayer() {
         >
           SHARE PRAYER IMAGE
         </button>
+
       </div>
     `;
 
     DOM.prayerCardAnchor.classList.remove(
-      'opacity-0',
-      'translate-y-2'
+      "opacity-0",
+      "translate-y-2"
     );
 
     state.pIndex =
@@ -259,34 +285,87 @@ function cyclePrayer() {
 }
 
 /* ==========================================================================
-   BIBLE LOGIC
+   BIBLE NAVIGATION — FIXED
    ========================================================================== */
 
 function setupBibleNavigation() {
+
   if (!DOM.testamentSelect) return;
 
-  DOM.testamentSelect.addEventListener('change', (e) => {
+  // OLD TESTAMENT
+  const OLD_TESTAMENT_BOOKS = [
+    "Genesis","Exodus","Leviticus","Numbers","Deuteronomy",
+    "Joshua","Judges","Ruth","1 Samuel","2 Samuel",
+    "1 Kings","2 Kings","1 Chronicles","2 Chronicles","Ezra",
+    "Nehemiah","Esther","Job","Psalms","Proverbs",
+    "Ecclesiastes","Song of Solomon","Isaiah","Jeremiah","Lamentations",
+    "Ezekiel","Daniel","Hosea","Joel","Amos",
+    "Obadiah","Jonah","Micah","Nahum","Habakkuk",
+    "Zephaniah","Haggai","Zechariah","Malachi"
+  ];
+
+  // NEW TESTAMENT
+  const NEW_TESTAMENT_BOOKS = [
+    "Matthew","Mark","Luke","John","Acts",
+    "Romans","1 Corinthians","2 Corinthians","Galatians","Ephesians",
+    "Philippians","Colossians","1 Thessalonians","2 Thessalonians","1 Timothy",
+    "2 Timothy","Titus","Philemon","Hebrews","James",
+    "1 Peter","2 Peter","1 John","2 John","3 John",
+    "Jude","Revelation"
+  ];
+
+  /* =========================================================
+     TESTAMENT CHANGE
+  ========================================================= */
+
+  DOM.testamentSelect.addEventListener("change", (e) => {
+
     const val = e.target.value;
 
+    // RESET
     DOM.bookSelect.innerHTML =
       '<option value="">Select Book</option>';
 
+    DOM.chapterSelect.innerHTML =
+      '<option value="">Select Chapter</option>';
+
+    DOM.bookSelect.disabled = true;
     DOM.chapterSelect.disabled = true;
+
+    DOM.bookSelect.classList.add("opacity-50");
+    DOM.chapterSelect.classList.add("opacity-50");
 
     if (!val) return;
 
+    const allowedBooks =
+      val === "OT"
+        ? OLD_TESTAMENT_BOOKS
+        : NEW_TESTAMENT_BOOKS;
+
     const filtered = state.bibleData.filter(
-      b => val === 'OT' ? b.id <= 39 : b.id > 39
+      b => allowedBooks.includes(b.name)
     );
 
-    filtered.forEach(b =>
-      DOM.bookSelect.add(new Option(b.name, b.name))
-    );
+    filtered.forEach(book => {
+
+      const option = document.createElement("option");
+
+      option.value = book.name;
+      option.textContent = book.name;
+
+      DOM.bookSelect.appendChild(option);
+    });
 
     DOM.bookSelect.disabled = false;
+    DOM.bookSelect.classList.remove("opacity-50");
   });
 
-  DOM.bookSelect.addEventListener('change', (e) => {
+  /* =========================================================
+     BOOK CHANGE
+  ========================================================= */
+
+  DOM.bookSelect.addEventListener("change", (e) => {
+
     const book = state.bibleData.find(
       b => b.name === e.target.value
     );
@@ -294,89 +373,247 @@ function setupBibleNavigation() {
     DOM.chapterSelect.innerHTML =
       '<option value="">Select Chapter</option>';
 
-    if (book) {
-      book.chapters.forEach((_, i) =>
-        DOM.chapterSelect.add(
-          new Option(`Chapter ${i + 1}`, i)
-        )
-      );
+    if (!book) return;
 
-      DOM.chapterSelect.disabled = false;
-    }
+    book.chapters.forEach((_, i) => {
+
+      const option = document.createElement("option");
+
+      option.value = i;
+      option.textContent = `Chapter ${i + 1}`;
+
+      DOM.chapterSelect.appendChild(option);
+    });
+
+    DOM.chapterSelect.disabled = false;
+    DOM.chapterSelect.classList.remove("opacity-50");
   });
 
-  DOM.chapterSelect.addEventListener('change', (e) => {
+  /* =========================================================
+     CHAPTER CHANGE
+  ========================================================= */
+
+  DOM.chapterSelect.addEventListener("change", (e) => {
+
     const book = state.bibleData.find(
       b => b.name === DOM.bookSelect.value
     );
 
-    if (book && e.target.value !== "") {
-      const idx = parseInt(e.target.value);
+    if (!book || e.target.value === "") return;
 
-      const verses = book.chapters[idx];
+    const idx = parseInt(e.target.value);
 
-      DOM.bibleDisplay.innerHTML = `
-        <div class="flex justify-between items-center mb-6">
-          <h2 class="text-blue-400 font-bold text-xs uppercase tracking-[0.2em]">
+    const verses = book.chapters[idx];
+
+    DOM.bibleDisplay.innerHTML = `
+
+      <div class="fade-in">
+
+        <div class="mb-6">
+          <p class="text-blue-400 uppercase tracking-[0.3em] text-xs font-bold mb-2">
+            Holy Scripture
+          </p>
+
+          <h2 class="text-2xl font-bold text-white">
             ${book.name} ${idx + 1}
           </h2>
         </div>
 
-        ${verses.map((v, i) => `
-          <div
-            class="mb-4 flex gap-4 verse p-2 rounded-lg transition-all"
-            onclick="window.CymorBibleDebugBridge.shareAsImage('${v.replace(/'/g, "\\'")}', '${book.name} ${idx+1}:${i+1}')"
-          >
-            <span class="text-blue-500/50 font-bold text-xs mt-1">
-              ${i + 1}
-            </span>
+        <div class="space-y-5">
 
-            <p class="text-slate-200 text-sm">
-              ${v}
-            </p>
-          </div>
-        `).join('')}
-      `;
-    }
+          ${verses.map((v, i) => `
+
+            <div
+              class="mb-4 flex gap-4 verse p-3 rounded-2xl transition-all bg-slate-800/30 active:scale-[0.99]"
+              onclick="window.CymorBibleDebugBridge.shareAsImage('${v.replace(/'/g, "\\'")}', '${book.name} ${idx + 1}:${i + 1}')"
+            >
+
+              <span class="text-blue-500/50 font-bold text-xs mt-1">
+                ${i + 1}
+              </span>
+
+              <p class="text-slate-200 text-sm leading-relaxed">
+                ${v}
+              </p>
+
+            </div>
+
+          `).join("")}
+
+        </div>
+
+      </div>
+    `;
   });
 }
 
+/* ==========================================================================
+   SEARCH ENGINE
+   ========================================================================== */
+
+function setupSearch() {
+
+  if (!DOM.searchInput) return;
+
+  DOM.searchInput.addEventListener("input", (e) => {
+
+    const query = e.target.value
+      .trim()
+      .toLowerCase();
+
+    if (!query) return;
+
+    const results = [];
+
+    state.bibleData.forEach(book => {
+
+      book.chapters.forEach((chapter, cIndex) => {
+
+        chapter.forEach((verse, vIndex) => {
+
+          if (
+            verse.toLowerCase().includes(query)
+          ) {
+            results.push({
+              reference:
+                `${book.name} ${cIndex + 1}:${vIndex + 1}`,
+              text: verse
+            });
+          }
+        });
+      });
+    });
+
+    DOM.bibleDisplay.innerHTML = `
+
+      <div class="space-y-4">
+
+        <div class="mb-6">
+          <p class="text-blue-400 uppercase tracking-[0.3em] text-xs font-bold mb-2">
+            Search Results
+          </p>
+
+          <h2 class="text-2xl font-bold text-white">
+            ${results.length} Verse(s) Found
+          </h2>
+        </div>
+
+        ${
+          results.length > 0
+            ? results.slice(0, 50).map(result => `
+
+              <div
+                class="p-4 rounded-2xl bg-slate-800/40 border border-slate-700"
+              >
+
+                <p class="text-blue-400 text-xs font-bold mb-3">
+                  ${result.reference}
+                </p>
+
+                <p class="text-slate-200 text-sm leading-relaxed">
+                  ${result.text}
+                </p>
+
+              </div>
+
+            `).join("")
+            : `
+              <div class="text-center py-10">
+                <p class="text-slate-400">
+                  No verses found.
+                </p>
+              </div>
+            `
+        }
+
+      </div>
+    `;
+  });
+}
+
+/* ==========================================================================
+   LOAD BIBLE DATA
+   ========================================================================== */
+
 async function loadBibleDataset() {
+
   try {
+
     const res = await fetch(BIBLE_PATH);
+
+    if (!res.ok) {
+      throw new Error("Bible JSON failed to load");
+    }
 
     state.bibleData = await res.json();
 
+    console.log(
+      "Bible Loaded:",
+      state.bibleData.length,
+      "books"
+    );
+
     if (DOM.bibleDisplay) {
+
       DOM.bibleDisplay.innerHTML = `
-        <p class="text-slate-500 text-center py-10 text-xs uppercase tracking-widest font-bold">
-          Select a testament to begin
-        </p>
+        <div class="text-center py-16">
+
+          <p class="text-blue-400 uppercase tracking-[0.4em] text-xs font-bold mb-6">
+            Cymor Bible Ready
+          </p>
+
+          <h2 class="text-4xl font-black text-white mb-5 leading-tight">
+            Select Testament To Begin
+          </h2>
+
+          <p class="text-slate-400 text-lg">
+            Browse scriptures beautifully offline.
+          </p>
+
+        </div>
       `;
     }
 
   } catch (err) {
-    DOM.bibleDisplay.innerHTML = `
-      <p class="text-red-400 text-center py-10">
-        Error loading scriptures.
-      </p>
-    `;
+
+    console.error(err);
+
+    if (DOM.bibleDisplay) {
+
+      DOM.bibleDisplay.innerHTML = `
+        <div class="text-center py-16">
+
+          <p class="text-red-400 text-xl font-bold mb-4">
+            Failed To Load Bible Data
+          </p>
+
+          <p class="text-slate-400 text-sm break-all">
+            ${err.message}
+          </p>
+
+        </div>
+      `;
+    }
   }
 }
 
 /* ==========================================================================
-   IMAGE SHARING ENGINE
+   SHARE ENGINE
    ========================================================================== */
 
 window.CymorBibleDebugBridge = {
 
   shareAsImage: async (text, reference) => {
+
     if (!DOM.shareTemplate) return;
 
-    DOM.shareContent.innerText = `"${text}"`;
-    DOM.shareRef.innerText = reference;
+    DOM.shareContent.innerText = `"${text || "Cymor Bible"}"`;
+
+    DOM.shareRef.innerText =
+      reference || "Holy Scripture";
 
     try {
+
       const canvas = await html2canvas(
         DOM.shareTemplate,
         {
@@ -392,48 +629,65 @@ window.CymorBibleDebugBridge = {
         const file = new File(
           [blob],
           "cymor-bible-share.png",
-          { type: "image/png" }
+          {
+            type: "image/png"
+          }
         );
 
         if (
           navigator.share &&
+          navigator.canShare &&
           navigator.canShare({ files: [file] })
         ) {
 
           await navigator.share({
             files: [file],
-            title: 'Cymor Bible App',
-            text: `Check out this word from Cymor Bible: ${reference}`
+            title: "Cymor Bible",
+            text: reference || "Holy Scripture"
           });
 
         } else {
 
-          const link = document.createElement('a');
+          const link =
+            document.createElement("a");
 
-          link.download = `CymorBible_${reference}.png`;
+          link.download =
+            `CymorBible_${Date.now()}.png`;
 
-          link.href = canvas.toDataURL();
+          link.href =
+            canvas.toDataURL("image/png");
 
           link.click();
         }
 
-      }, "image/png", 1.0);
+      });
 
     } catch (err) {
-      console.error("Image generation failed", err);
+
+      console.error(
+        "Image generation failed",
+        err
+      );
     }
   },
 
   toggleFav: () => {
+
     const v = state.currentViewContent;
 
-    const idx = state.favorites.findIndex(
-      f => f.reference === v.ref
-    );
+    if (!v) return;
+
+    const idx =
+      state.favorites.findIndex(
+        f => f.reference === v.ref
+      );
 
     if (idx > -1) {
+
       state.favorites.splice(idx, 1);
+
     } else {
+
       state.favorites.push({
         reference: v.ref,
         text: v.text
@@ -446,6 +700,25 @@ window.CymorBibleDebugBridge = {
     );
 
     cycleVerse();
+  },
+
+  saveProgress: () => {
+
+    const progress = {
+      testament:
+        DOM.testamentSelect?.value || "",
+      book:
+        DOM.bookSelect?.value || "",
+      chapter:
+        DOM.chapterSelect?.value || ""
+    };
+
+    localStorage.setItem(
+      "cymorBibleProgress",
+      JSON.stringify(progress)
+    );
+
+    alert("Reading progress saved.");
   }
 };
 
@@ -454,18 +727,24 @@ window.CymorBibleDebugBridge = {
    ========================================================================== */
 
 function initializeTemporalContext() {
+
   const now = new Date();
 
   if (DOM.currentDateStr) {
+
     DOM.currentDateStr.textContent =
-      now.toLocaleDateString("en-US", {
-        weekday: "long",
-        month: "long",
-        day: "numeric"
-      });
+      now.toLocaleDateString(
+        "en-US",
+        {
+          weekday: "long",
+          month: "long",
+          day: "numeric"
+        }
+      );
   }
 
   if (DOM.greetingText) {
+
     const hrs = now.getHours();
 
     DOM.greetingText.textContent =
@@ -478,37 +757,52 @@ function initializeTemporalContext() {
 }
 
 function initializePWAHook() {
+
   let prompt;
 
   window.addEventListener(
     "beforeinstallprompt",
     (e) => {
+
       e.preventDefault();
 
       prompt = e;
 
-      DOM.pwaInstallBtn?.classList.remove("hidden");
+      DOM.pwaInstallBtn?.classList.remove(
+        "hidden"
+      );
     }
   );
 
   DOM.pwaInstallBtn?.addEventListener(
     "click",
     () => {
+
       if (prompt) {
+
         prompt.prompt();
 
         prompt = null;
 
-        DOM.pwaInstallBtn.classList.add("hidden");
+        DOM.pwaInstallBtn.classList.add(
+          "hidden"
+        );
       }
     }
   );
 }
 
 async function registerCoreServiceWorker() {
+
   if ("serviceWorker" in navigator) {
+
     navigator.serviceWorker
       .register("./sw.js")
-      .catch(() => {});
+      .catch(err => {
+        console.error(
+          "SW registration failed",
+          err
+        );
+      });
   }
-}
+   }
