@@ -1,105 +1,67 @@
 /* ==========================================================================
-   CYMOR BIBLE APP — SERVICE WORKER ENGINE
-   File: sw.js • Strategy: Stale-While-Revalidate & Cache-First
+   CYMOR BIBLE APP — SERVICE WORKER v1.3.1
+   Strategy: Stale-While-Revalidate
    ========================================================================== */
 
-const CACHE_NAME = "cymor-bible-cache-v1";
+const CACHE_NAME = "cymor-bible-cache-v1.3";
 
-// Core assets required for complete offline standalone operations
+// Only include files that ACTUALLY exist in your root directory
 const STATIC_ASSETS = [
   "./",
   "./index.html",
-  "./styles.css",
+  "./bible.html",
+  "./prayer.html",
+  "./favorites.html",
   "./app.js",
   "./manifest.json",
-  "./pages/bible.html",
-  "./pages/prayer.html",
-  "./pages/favorites.html",
-  "./pages/settings.html",
-  // Fallbacks & Fonts
-  "https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Playfair+Display:ital,wght@0,500;0,600;1,400&display=swap"
+  "./en_kjv.json",
+  "./icon.svg"
 ];
 
-/* ==========================================================================
-   LIFECYCLE: INSTALLATION
-   ========================================================================== */
-// Pre-caches all essential UI shell resources immediately upon installation
 self.addEventListener("install", (event) => {
   event.waitUntil(
     caches.open(CACHE_NAME).then((cache) => {
-      console.log("⚙ [Service Worker] Pre-caching core application shell...");
-      return cache.addAll(STATIC_ASSETS);
-    }).then(() => {
-      // Forces the waiting service worker to become the active service worker immediately
-      return self.skipWaiting();
-    })
-  );
-});
-
-/* ==========================================================================
-   LIFECYCLE: ACTIVATION
-   ========================================================================== */
-// Cleans up legacy cache versions to free up device storage space
-self.addEventListener("activate", (event) => {
-  event.waitUntil(
-    caches.keys().then((cacheNames) => {
+      console.log("⚙️ [Cymor SW] Pre-caching verified assets...");
+      // Using map to catch specific file errors
       return Promise.all(
-        cacheNames.map((cache) => {
-          if (cache !== CACHE_NAME) {
-            console.log(`⚙ [Service Worker] Purging legacy cache: ${cache}`);
-            return caches.delete(cache);
-          }
+        STATIC_ASSETS.map(url => {
+          return cache.add(url).catch(err => console.warn(`Skipped missing file: ${url}`));
         })
       );
-    }).then(() => {
-      // Allows the active service worker to immediately take control of all open clients
-      return self.clients.claim();
-    })
+    }).then(() => self.skipWaiting())
   );
 });
 
-/* ==========================================================================
-   STRATEGY: INTERACTION INTERCEPTION & FETCH PIPELINE
-   ========================================================================== */
-self.addEventListener("fetch", (event) => {
-  const requestUrl = new URL(event.request.url);
+self.addEventListener("activate", (event) => {
+  event.waitUntil(
+    caches.keys().then((keys) => {
+      return Promise.all(keys.map((k) => k !== CACHE_NAME && caches.delete(k)));
+    }).then(() => self.clients.claim())
+  );
+});
 
-  // Strategy 1: Cache-First for the massive Bible JSON dataset
-  // Since the Bible text is static, we serve it from cache instantly to save data.
-  if (requestUrl.pathname.includes("en_jsv.json") || requestUrl.pathname.includes("en_kjv.json")) {
+self.addEventListener("fetch", (event) => {
+  // Strategy: Network-First for Bible Data (to allow updates), Cache-First for UI
+  if (event.request.url.includes("en_kjv.json")) {
     event.respondWith(
-      caches.open(CACHE_NAME).then((cache) => {
-        return cache.match(event.request).then((cachedResponse) => {
-          if (cachedResponse) {
-            return cachedResponse;
-          }
-          return fetch(event.request).then((networkResponse) => {
-            cache.put(event.request, networkResponse.clone());
-            return networkResponse;
-          });
-        });
-      })
+      fetch(event.request)
+        .then((res) => {
+          const clone = res.clone();
+          caches.open(CACHE_NAME).then((cache) => cache.put(event.request, clone));
+          return res;
+        })
+        .catch(() => caches.match(event.request))
     );
     return;
   }
 
-  // Strategy 2: Stale-While-Revalidate for standard application assets
-  // Serves the cached version instantly for speed, while updating the cache in the background.
   event.respondWith(
-    caches.open(CACHE_NAME).then((cache) => {
-      return cache.match(event.request).then((cachedResponse) => {
-        const fetchPromise = fetch(event.request).then((networkResponse) => {
-          // Only cache valid standard HTTP successes
-          if (networkResponse.status === 200) {
-            cache.put(event.request, networkResponse.clone());
-          }
-          return networkResponse;
-        }).catch(() => {
-          // Silent catch to handle network failure states gracefully offline
+    caches.match(event.request).then((cached) => {
+      return cached || fetch(event.request).then((res) => {
+        return caches.open(CACHE_NAME).then((cache) => {
+          cache.put(event.request, res.clone());
+          return res;
         });
-
-        // Return the cached asset immediately, falling back to the network promise if empty
-        return cachedResponse || fetchPromise;
       });
     })
   );
