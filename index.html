@@ -6,85 +6,65 @@
   <title>Cymor Bible — Home</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&family=Playfair+Display:ital,wght@1,400&display=swap" rel="stylesheet">
+  <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
+
   <style>
     body { font-family: 'Inter', sans-serif; }
-    .glass { background: rgba(30, 41, 59, 0.7); backdrop-filter: blur(12px); border: 1px solid rgba(255,255,255,0.05); }
+    .glass { background: rgba(30, 41, 59, 0.7); backdrop-filter: blur(14px); border: 1px solid rgba(255,255,255,0.05); }
     .nav-active { color: #60a5fa; }
+    
+    /* Cross-Fade Animation */
+    .content-transition { transition: opacity 0.5s ease, transform 0.5s ease; }
+    .fade-out { opacity: 0; transform: translateY(10px); }
   </style>
 </head>
+
 <body class="bg-[#0F172A] text-slate-100 min-h-screen pb-24">
 
   <header class="p-6 flex justify-between items-center">
     <div class="flex items-center gap-3">
-        <div class="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center font-bold text-xl shadow-lg shadow-blue-900/20">C</div>
-        <h1 class="font-bold text-lg tracking-tight">Cymor Bible</h1>
+      <div class="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center font-bold text-xl shadow-lg shadow-blue-900/20">C</div>
+      <h1 class="font-bold text-lg tracking-tight">Cymor Bible</h1>
     </div>
-    <button class="text-slate-400">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-        </svg>
-    </button>
+    <a href="settings.html" class="p-2 bg-slate-800 rounded-xl text-xs">⚙️</a>
   </header>
 
   <section class="px-6 mb-8">
-    <h2 class="text-3xl font-bold mb-1" id="greeting">Good Evening</h2>
+    <h2 class="text-3xl font-bold mb-1" id="greeting">Welcome</h2>
     <p class="text-slate-400 text-sm" id="currentDate"></p>
   </section>
 
   <main class="px-4 space-y-6">
-    <section class="glass rounded-[32px] p-8 relative overflow-hidden">
-        <div class="absolute top-0 left-0 w-1 h-16 bg-blue-500 mt-10"></div>
-        <p class="text-[10px] font-bold tracking-[0.2em] text-blue-400 uppercase mb-6">Verse of the Day</p>
-        
-        <p class="text-xl leading-relaxed font-serif italic text-slate-100 mb-6" id="dailyVerse">
-            "Fear thou not; for I am with thee: be not dismayed; for I am thy God: I will strengthen thee; yea, I will help thee."
-        </p>
-        <p class="text-blue-400 font-semibold mb-8" id="dailyRef">Isaiah 41:10</p>
-        
-        <div class="flex gap-3">
-            <button class="flex-1 bg-blue-600 hover:bg-blue-500 py-4 rounded-2xl font-bold text-sm transition-all active:scale-95 shadow-lg shadow-blue-900/40">
-                Share Devotional
-            </button>
-            <button class="w-14 bg-slate-800 rounded-2xl flex items-center justify-center">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-amber-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
-                </svg>
-            </button>
-        </div>
-    </section>
-
-    <section class="glass rounded-[32px] p-6">
-        <div class="flex justify-between items-center mb-4">
-            <p class="text-[10px] font-bold tracking-[0.2em] text-amber-400 uppercase">Daily Prayer</p>
-            <span class="text-xl">🙏</span>
-        </div>
-        <h3 class="text-lg font-bold mb-2">Prayer For Peace</h3>
-        <p class="text-slate-400 text-sm leading-relaxed line-clamp-2">Father, calm every internal storm within me. Let your peace which surpasses all understanding...</p>
-    </section>
+    <div id="verse-container" class="content-transition"></div>
+    <div id="prayer-container" class="content-transition"></div>
   </main>
 
   <nav class="fixed bottom-0 left-0 right-0 glass border-t border-slate-800 px-8 py-4 flex justify-between items-center z-[100]">
     <a href="index.html" class="flex flex-col items-center gap-1 nav-active">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
-        <span class="text-[10px] font-medium">Home</span>
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z"/></svg>
+        <span class="text-[10px]">Home</span>
     </a>
     <a href="bible.html" class="flex flex-col items-center gap-1 text-slate-500">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" /></svg>
-        <span class="text-[10px] font-medium">Bible</span>
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path d="M9 4.804A7.968 7.968 0 005.5 4c-1.255 0-2.443.29-3.5.804v10A7.969 7.969 0 015.5 14c1.669 0 3.218.51 4.5 1.385A7.962 7.962 0 0114.5 14c1.255 0 2.443.29 3.5.804v-10A7.968 7.968 0 0014.5 4c-1.255 0-2.443.29-3.5.804V12a1 1 0 11-2 0V4.804z"/></svg>
+        <span class="text-[10px]">Bible</span>
     </a>
     <a href="prayer.html" class="flex flex-col items-center gap-1 text-slate-500">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" /></svg>
-        <span class="text-[10px] font-medium">Prayers</span>
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z" clip-rule="evenodd"/></svg>
+        <span class="text-[10px]">Prayers</span>
     </a>
     <a href="favorites.html" class="flex flex-col items-center gap-1 text-slate-500">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" /></svg>
-        <span class="text-[10px] font-medium">Saved</span>
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path d="M5 4a2 2 0 012-2h6a2 2 0 012 2v14l-5-2.5L5 18V4z"/></svg>
+        <span class="text-[10px]">Saved</span>
     </a>
   </nav>
 
-  <script>
-    // Set dynamic date and greeting
+  <script type="module">
+    import { VerseCard } from './components/verse-card.js';
+    import { PrayerCard } from './components/prayer-card.js';
+
+    /* ================================
+       DATE & GREETING
+    ================================== */
     const now = new Date();
     const hours = now.getHours();
     const greetingEl = document.getElementById('greeting');
@@ -94,7 +74,76 @@
     else if (hours < 18) greetingEl.innerText = "Good Afternoon";
     else greetingEl.innerText = "Good Evening";
 
-    dateEl.innerText = now.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' });
+    dateEl.innerText = now.toLocaleDateString('en-US', {
+      weekday: 'long', month: 'long', day: 'numeric'
+    });
+
+    /* ================================
+       DATA LIBRARIES
+    ================================== */
+    const verses = [
+      { text: "I can do all things through Christ who strengthens me.", ref: "Philippians 4:13" },
+      { text: "The Lord is my shepherd; I shall not want.", ref: "Psalm 23:1" },
+      { text: "Fear not, for I am with you; be not dismayed, for I am your God.", ref: "Isaiah 41:10" },
+      { text: "For I know the plans I have for you, declares the Lord.", ref: "Jeremiah 29:11" },
+      { text: "And we know that all things work together for good to them that love God.", ref: "Romans 8:28" },
+      { text: "The Lord is my light and my salvation; whom shall I fear?", ref: "Psalm 27:1" },
+      { text: "Be strong and courageous. Do not be afraid; do not be discouraged.", ref: "Joshua 1:9" },
+      { text: "But they that wait upon the Lord shall renew their strength.", ref: "Isaiah 40:31" },
+      { text: "Trust in the Lord with all thine heart.", ref: "Proverbs 3:5" },
+      { text: "Cast all your anxiety on him because he cares for you.", ref: "1 Peter 5:7" }
+    ];
+
+    const prayers = [
+      { title: "Strength Today", text: "Lord, let Your strength carry me beyond my limits today." },
+      { title: "Peace of Heart", text: "Father, calm every storm in my mind and fill me with Your peace." },
+      { title: "Divine Guidance", text: "God, direct my steps today and help me walk in Your truth." },
+      { title: "The Provider", text: "Jehovah Jireh, I trust You for my resources and daily needs." },
+      { title: "Circle of Safety", text: "Lord, surround me with Your angels and keep me safe from harm." },
+      { title: "Healing Touch", text: "Father, restore my spirit and heal the broken areas of my heart." },
+      { title: "Clear Purpose", text: "God, reveal my path and help me use my gifts for Your glory." },
+      { title: "Grateful Heart", text: "Lord, help me see the beauty in small things. Thank You for mercy." },
+      { title: "Power to Forgive", text: "Father, grant me a heart that forgives as You have forgiven me." },
+      { title: "Love for Others", text: "God, let my actions today be a reflection of Your love." }
+    ];
+
+    let vIndex = 0;
+    let pIndex = 0;
+
+    const vContainer = document.getElementById('verse-container');
+    const pContainer = document.getElementById('prayer-container');
+
+    /* ================================
+       ROTATION LOGIC
+    ================================== */
+    function cycleVerse() {
+        vContainer.classList.add('fade-out');
+        setTimeout(() => {
+            const data = verses[vIndex];
+            vContainer.innerHTML = VerseCard.render(data.text, data.ref);
+            vContainer.classList.remove('fade-out');
+            vIndex = (vIndex + 1) % verses.length;
+        }, 500);
+    }
+
+    function cyclePrayer() {
+        pContainer.classList.add('fade-out');
+        setTimeout(() => {
+            const data = prayers[pIndex];
+            pContainer.innerHTML = PrayerCard.render(data.title, data.text);
+            pContainer.classList.remove('fade-out');
+            pIndex = (pIndex + 1) % prayers.length;
+        }, 500);
+    }
+
+    // Initial Load
+    cycleVerse();
+    cyclePrayer();
+
+    // Auto-Rotation
+    setInterval(cycleVerse, 8000);
+    setInterval(cyclePrayer, 10000);
   </script>
+
 </body>
 </html>
