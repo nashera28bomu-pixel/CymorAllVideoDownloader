@@ -3,95 +3,148 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Daily Prayer — Cymor Bible</title>
+  <title>Prayer Center — Cymor Bible</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Playfair+Display:ital,wght@0,600;1,400&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="./styles.css">
+  
+  <style>
+    body { font-family: 'Inter', sans-serif; }
+    .glass { background: rgba(30, 41, 59, 0.7); backdrop-filter: blur(14px); border: 1px solid rgba(255,255,255,0.05); }
+    .nav-active { color: #fbbf24; } /* Amber for prayer focus */
+    ::-webkit-scrollbar { width: 0px; background: transparent; }
+    
+    /* Animation for the prayer card */
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .animate-prayer { animation: fadeIn 0.8s ease forwards; }
+  </style>
 </head>
+
 <body class="bg-[#0F172A] text-slate-100 min-h-screen pb-24">
 
   <header class="sticky top-0 z-50 bg-[#0F172A]/90 backdrop-blur-md border-b border-slate-800 p-4">
     <div class="max-w-md mx-auto flex items-center justify-between">
-      <a href="./index.html" class="text-slate-400">← Home</a>
-      <h1 class="font-bold text-sm">Prayer Center</h1>
+      <a href="index.html" class="text-blue-400 text-xs font-bold uppercase tracking-widest">← Home</a>
+      <h1 class="font-bold text-sm tracking-tight">Prayer Center</h1>
       <div class="w-8"></div>
     </div>
   </header>
 
   <main class="max-w-md mx-auto px-4 py-8 space-y-8">
-    <section id="dailyPrayerContent" class="p-6 rounded-[32px] bg-gradient-to-br from-amber-500/10 to-transparent border border-amber-500/20 shadow-2xl">
-      <p class="text-[10px] uppercase tracking-widest text-amber-400 font-bold mb-4">Focus for Today</p>
-      <h2 id="prayerTitle" class="text-xl font-serif mb-4 text-white italic">Loading...</h2>
-      <p id="prayerText" class="text-slate-300 leading-relaxed italic"></p>
+    
+    <section id="dailyPrayerContent" class="animate-prayer p-8 rounded-[32px] bg-gradient-to-br from-amber-500/10 via-slate-900/40 to-transparent border border-amber-500/20 shadow-2xl">
+      <div class="flex items-center gap-2 mb-6">
+        <div class="w-10 h-1 bg-amber-500/50 rounded-full"></div>
+        <p class="text-[10px] uppercase tracking-[0.2em] text-amber-400 font-bold">Focus for Today</p>
+      </div>
+      
+      <h2 id="prayerTitle" class="text-2xl font-serif mb-4 text-white italic leading-tight">Finding Your Focus...</h2>
+      <p id="prayerText" class="text-slate-300 leading-relaxed italic text-lg font-light"></p>
+      
+      <div class="mt-8 pt-6 border-t border-amber-500/10 flex justify-between items-center">
+        <span class="text-[10px] text-amber-500/50 uppercase font-bold tracking-widest">Cymor Daily Devotion</span>
+        <button onclick="window.CymorBibleDebugBridge.share()" class="text-amber-400 text-xs font-bold">Share Prayer</button>
+      </div>
     </section>
 
     <section class="space-y-4">
-      <h3 class="text-sm font-bold text-slate-400 px-2 uppercase tracking-tight">Your Prayer Journal</h3>
-      <div class="bg-slate-900/50 border border-slate-800 rounded-3xl p-4">
-        <textarea id="journalInput" placeholder="Write your heart out here..." class="w-full h-40 bg-transparent border-none outline-none text-slate-200 resize-none text-sm leading-relaxed" spellcheck="false"></textarea>
+      <div class="flex items-center justify-between px-2">
+        <h3 class="text-xs font-bold text-slate-500 uppercase tracking-widest">Personal Prayer Journal</h3>
+        <span class="text-[9px] text-slate-600 uppercase">Auto-saving...</span>
       </div>
-      <p class="text-[10px] text-slate-500 text-center uppercase tracking-widest">Saved locally to your device</p>
+      
+      <div class="bg-slate-900/60 border border-slate-800 rounded-[32px] p-6 focus-within:border-blue-500/50 transition-all">
+        <textarea id="journalInput" 
+          placeholder="What are you praying for today? Write your heart out here..." 
+          class="w-full h-48 bg-transparent border-none outline-none text-slate-200 resize-none text-base leading-relaxed placeholder:text-slate-600" 
+          spellcheck="false"></textarea>
+      </div>
+      <p class="text-[10px] text-slate-500 text-center uppercase tracking-[0.15em]">This journal is private and stays on your device</p>
     </section>
+
   </main>
 
-    <script type="module">
-    import { CymorBibleDebugBridge } from './app.js';
+  <nav class="fixed bottom-0 left-0 right-0 glass border-t border-slate-800 px-8 py-4 flex justify-between items-center z-[100]">
+    <a href="index.html" class="flex flex-col items-center gap-1 text-slate-500">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z"/></svg>
+        <span class="text-[10px]">Home</span>
+    </a>
+    <a href="bible.html" class="flex flex-col items-center gap-1 text-slate-500">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path d="M9 4.804A7.968 7.968 0 005.5 4c-1.255 0-2.443.29-3.5.804v10A7.969 7.969 0 015.5 14c1.669 0 3.218.51 4.5 1.385A7.962 7.962 0 0114.5 14c1.255 0 2.443.29 3.5.804v-10A7.968 7.968 0 0014.5 4c-1.255 0-2.443.29-3.5.804V12a1 1 0 11-2 0V4.804z"/></svg>
+        <span class="text-[10px]">Bible</span>
+    </a>
+    <a href="prayer.html" class="flex flex-col items-center gap-1 nav-active">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z" clip-rule="evenodd"/></svg>
+        <span class="text-[10px]">Prayers</span>
+    </a>
+    <a href="favorites.html" class="flex flex-col items-center gap-1 text-slate-500">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path d="M5 4a2 2 0 012-2h6a2 2 0 012 2v14l-5-2.5L5 18V4z"/></svg>
+        <span class="text-[10px]">Saved</span>
+    </a>
+  </nav>
+
+  <script type="module">
+    import { } from './app.js'; 
 
     const journal = document.getElementById('journalInput');
     
-    // Load saved journal entry
+    // 1. Journal Logic
     journal.value = localStorage.getItem('cymorJournal') || "";
-
-    // Auto-save on typing
     journal.addEventListener('input', (e) => {
       localStorage.setItem('cymorJournal', e.target.value);
     });
 
-    // Populate Daily Prayer (30 Day Rotation)
-    window.addEventListener('load', () => {
-        const prayers = [
-            { title: "Strength for the Journey", content: "Heavenly Father, I come before You seeking the strength that only You can provide. When the world feels heavy and my energy fades, remind me that Your grace is sufficient and Your power is made perfect in my weakness. Guide my steps today, keep my heart focused on Your promises, and help me to be a light to those around me. Amen." },
-            { title: "Peace in the Storm", content: "Lord, I surrender every worry and anxiety to Your care. Even when life feels chaotic, I choose to trust in Your unchanging nature. Calm the storms in my mind and replace my fear with a peace that surpasses all human understanding. May Your presence be my anchor today and always. Amen." },
-            { title: "Divine Wisdom", content: "Father, I ask for a spirit of wisdom and discernment. Help me to make choices that honor You and lead toward the purpose You have designed for my life. Open my ears to hear Your whispers and my eyes to see the path You have set before me. Amen." },
-            { title: "A Heart of Gratitude", content: "God, thank You for the breath in my lungs and the gift of a new day. Help me to notice the small blessings that I often overlook. Teach me to live with a heart of thanksgiving, knowing that every good and perfect gift comes from Your hand. Amen." },
-            { title: "Healing and Restoration", content: "Lord, I bring my brokenness and pain to You. You are the Great Physician, capable of healing what is shattered and restoring what has been lost. Touch my body, mind, and spirit with Your restorative love, and lead me into a season of wholeness. Amen." },
-            { title: "Unwavering Faith", content: "Gracious God, increase my faith. When doubts creep in and the way forward seems unclear, help me to lean not on my own understanding but on Your eternal truth. Remind me of Your faithfulness in the past so I can face the future with confidence. Amen." },
-            { title: "Release from the Past", content: "Father, help me to let go of the mistakes and regrets that keep me tethered to yesterday. Your mercies are new every morning. Grant me the courage to forgive myself as You have forgiven me, and help me walk boldly into the new things You are doing in my life. Amen." },
-            { title: "Protection and Safety", content: "Lord, I ask for Your hedge of protection over my life and my loved ones today. Guard our coming and going, keep us safe from harm, and surround us with Your heavenly angels. We trust in You as our fortress and our refuge. Amen." },
-            { title: "Purpose and Vision", content: "God, I pray that You would clarify the vision You have for my life. Remove the distractions that blur my focus and give me the passion to pursue the work You've called me to do. May my life be a reflection of Your glory and intent. Amen." },
-            { title: "Patience and Timing", content: "Lord, teaching me to wait is difficult, but I trust Your timing. Help me to be patient while You work behind the scenes. Remind me that Your delays are not Your denials, and that You are making all things beautiful in their proper time. Amen." },
-            { title: "Joy in All Circumstances", content: "Father, Your Word says the joy of the Lord is my strength. I choose joy today, not based on my feelings, but on the fact that I am Your child. Let Your happiness bubble up within me and overflow to everyone I meet. Amen." },
-            { title: "Courage to Lead", content: "Lord, give me the courage to stand for what is right, even when it is unpopular. Empower me to lead with integrity, humility, and love. Let my influence be used to build others up and point them toward Your kingdom. Amen." },
-            { title: "Financial Provision", content: "God, You are Jehovah Jireh, my provider. I lift up my needs to You, trusting that You will supply all I require according to Your riches in glory. Give me wisdom to manage my resources well and a heart that remains generous in all seasons. Amen." },
-            { title: "Rest for the Weary", content: "Father, I feel tired in my soul. I come to You to find true rest. Quiet my heart, settle my thoughts, and refresh my spirit. Help me to find a rhythm of grace that allows me to serve You without burning out. Amen." },
-            { title: "Clarity of Mind", content: "Lord, remove the fog of confusion. Grant me clarity as I navigate complex decisions and relationships. Let Your Word be a lamp unto my feet and a light unto my path, showing me exactly where to step next. Amen." },
-            { title: "Gentleness and Love", content: "God, soften my heart. Help me to respond to others with the same grace and kindness You show me every day. Remove any bitterness or anger, and replace it with a genuine love that seeks the best for everyone. Amen." },
-            { title: "Overcoming Temptation", content: "Father, give me the strength to resist the things that pull me away from Your will. Shield my heart from distraction and strengthen my resolve to walk in purity and truth. I rely on Your Spirit to guide me through every trial. Amen." },
-            { title: "Hope for Tomorrow", content: "Lord, when the future looks bleak, remind me that my hope is built on You. You are the God of the impossible, and You hold my tomorrow in Your hands. Let hope rise up within me like the morning sun. Amen." },
-            { title: "Humility and Service", content: "God, keep me humble. Remind me that I am called to serve, not just to be served. Give me a heart that looks for opportunities to help others and eyes that see the needs of the hurting. Amen." },
-            { title: "Confidence in Identity", content: "Father, help me to remember who I am in You. I am loved, I am chosen, and I am Yours. Let my confidence come from Your approval alone, freeing me from the need to please people. Amen." },
-            { title: "Steadfast Commitment", content: "Lord, help me to be consistent in my walk with You. Give me the discipline to seek You daily through Your Word and prayer. Let my relationship with You be the foundation of everything I do. Amen." },
-            { title: "Grace for Growth", content: "God, I thank You that You aren't finished with me yet. Give me grace for the areas where I am still growing. Help me to be patient with the process of transformation and to celebrate the progress we are making together. Amen." },
-            { title: "Family Harmony", content: "Father, I lift up my family to You. Bring peace to our home, heal any broken relationships, and help us to love one another deeply. May our household be a place where Your presence is felt and honored. Amen." },
-            { title: "A Spirit of Excellence", content: "Lord, help me to do everything today as if I am doing it for You. Whether the task is big or small, give me a spirit of excellence and a heart of integrity. May my work bring honor to Your name. Amen." },
-            { title: "Light in Darkness", content: "God, use me as an instrument of Your light. In a world that often feels dark and broken, let my words and actions offer hope, healing, and the truth of Your Gospel. Amen." },
-            { title: "Renewal of Passion", content: "Father, if my heart has grown cold or indifferent, stir up the fire within me again. Renew my first love for You and give me a fresh hunger for Your presence and Your Word. Amen." },
-            { title: "Freedom from Fear", content: "Lord, You have not given me a spirit of fear, but of power, love, and a sound mind. I break agreement with fear today and choose to walk in the boldness of Your Spirit. Amen." },
-            { title: "Overflow of Compassion", content: "God, break my heart for what breaks Yours. Give me a deep compassion for the lost, the poor, and the forgotten. Move me to action so that Your love is demonstrated through my life. Amen." },
-            { title: "Safe Haven", content: "Father, thank You for being my safe place. When I feel overwhelmed by the demands of life, I run to You. Hide me in the shadow of Your wings and restore my soul in the quietness of Your love. Amen." },
-            { title: "The Finish Line", content: "Lord, give me the endurance to finish the race set before me. Help me to keep my eyes on the prize and to not grow weary in doing good. I trust that You will sustain me until the very end. Amen." }
-        ];
-        
-        // Use the current day of the month (1-31) to pick the prayer
-        // Subtract 1 because arrays start at index 0
-        const dayOfMonth = new Date().getDate();
-        const prayerIndex = (dayOfMonth - 1) % prayers.length;
-        const active = prayers[prayerIndex];
-        
-        document.getElementById('prayerTitle').textContent = active.title;
-        document.getElementById('prayerText').textContent = active.content;
-    });
-  </script>
+    // 2. Daily Prayer Rotation (30 Day Pool)
+    const prayers = [
+      { title: "Strength for the Journey", content: "Heavenly Father, I come before You seeking the strength that only You can provide. When the world feels heavy and my energy fades, remind me that Your grace is sufficient and Your power is made perfect in my weakness. Guide my steps today. Amen." },
+      { title: "Peace in the Storm", content: "Lord, I surrender every worry and anxiety to Your care. Even when life feels chaotic, I choose to trust in Your unchanging nature. Calm the storms in my mind and replace my fear with a peace that surpasses all human understanding. Amen." },
+      { title: "Divine Wisdom", content: "Father, I ask for a spirit of wisdom and discernment. Help me to make choices that honor You and lead toward the purpose You have designed for my life. Open my ears to hear Your whispers. Amen." },
+      { title: "A Heart of Gratitude", content: "God, thank You for the breath in my lungs and the gift of a new day. Help me to notice the small blessings that I often overlook. Teach me to live with a heart of thanksgiving. Amen." },
+      { title: "Healing and Restoration", content: "Lord, I bring my brokenness and pain to You. You are the Great Physician, capable of healing what is shattered and restoring what has been lost. Touch my body, mind, and spirit today. Amen." },
+      { title: "Unwavering Faith", content: "Gracious God, increase my faith. When doubts creep in and the way forward seems unclear, help me to lean not on my own understanding but on Your eternal truth. Amen." },
+      { title: "Release from the Past", content: "Father, help me to let go of the mistakes and regrets that keep me tethered to yesterday. Your mercies are new every morning. Grant me the courage to forgive myself as You have forgiven me. Amen." },
+      { title: "Protection and Safety", content: "Lord, I ask for Your hedge of protection over my life and my loved ones today. Guard our coming and going, keep us safe from harm, and surround us with Your heavenly angels. Amen." },
+      { title: "Purpose and Vision", content: "God, I pray that You would clarify the vision You have for my life. Remove the distractions that blur my focus and give me the passion to pursue the work You've called me to do. Amen." },
+      { title: "Patience and Timing", content: "Lord, teaching me to wait is difficult, but I trust Your timing. Help me to be patient while You work behind the scenes. Remind me that Your delays are not Your denials. Amen." },
+      { title: "Joy in All Circumstances", content: "Father, Your Word says the joy of the Lord is my strength. I choose joy today, not based on my feelings, but on the fact that I am Your child. Let Your happiness bubble up within me. Amen." },
+      { title: "Courage to Lead", content: "Lord, give me the courage to stand for what is right, even when it is unpopular. Empower me to lead with integrity, humility, and love. Let my influence be used to build others up. Amen." },
+      { title: "Financial Provision", content: "God, You are Jehovah Jireh, my provider. I lift up my needs to You, trusting that You will supply all I require according to Your riches in glory. Give me wisdom to manage well. Amen." },
+      { title: "Rest for the Weary", content: "Father, I feel tired in my soul. I come to You to find true rest. Quiet my heart, settle my thoughts, and refresh my spirit. Help me to find a rhythm of grace. Amen." },
+      { title: "Clarity of Mind", content: "Lord, remove the fog of confusion. Grant me clarity as I navigate complex decisions and relationships. Let Your Word be a lamp unto my feet and a light unto my path. Amen." },
+      { title: "Gentleness and Love", content: "God, soften my heart. Help me to respond to others with the same grace and kindness You show me every day. Remove any bitterness and replace it with genuine love. Amen." },
+      { title: "Overcoming Temptation", content: "Father, give me the strength to resist the things that pull me away from Your will. Shield my heart from distraction and strengthen my resolve to walk in purity. Amen." },
+      { title: "Hope for Tomorrow", content: "Lord, when the future looks bleak, remind me that my hope is built on You. You are the God of the impossible, and You hold my tomorrow in Your hands. Let hope rise. Amen." },
+      { title: "Humility and Service", content: "God, keep me humble. Remind me that I am called to serve, not just to be served. Give me a heart that looks for opportunities to help others. Amen." },
+      { title: "Confidence in Identity", content: "Father, help me to remember who I am in You. I am loved, I am chosen, and I am Yours. Let my confidence come from Your approval alone. Amen." },
+      { title: "Steadfast Commitment", content: "Lord, help me to be consistent in my walk with You. Give me the discipline to seek You daily through Your Word and prayer. Amen." },
+      { title: "Grace for Growth", content: "God, I thank You that You aren't finished with me yet. Give me grace for the areas where I am still growing. Help me to be patient with the process of transformation. Amen." },
+      { title: "Family Harmony", content: "Father, I lift up my family to You. Bring peace to our home, heal any broken relationships, and help us to love one another deeply. Amen." },
+      { title: "A Spirit of Excellence", content: "Lord, help me to do everything today as if I am doing it for You. Whether the task is big or small, give me a spirit of excellence and a heart of integrity. Amen." },
+      { title: "Light in Darkness", content: "God, use me as an instrument of Your light. In a world that often feels dark and broken, let my words and actions offer hope and healing. Amen." },
+      { title: "Renewal of Passion", content: "Father, if my heart has grown cold or indifferent, stir up the fire within me again. Renew my first love for You and give me a fresh hunger for Your presence. Amen." },
+      { title: "Freedom from Fear", content: "Lord, You have not given me a spirit of fear, but of power, love, and a sound mind. I break agreement with fear today and walk in boldness. Amen." },
+      { title: "Overflow of Compassion", content: "God, break my heart for what breaks Yours. Give me a deep compassion for the lost, the poor, and the forgotten. Move me to action. Amen." },
+      { title: "Safe Haven", content: "Father, thank You for being my safe place. When I feel overwhelmed by the demands of life, I run to You. Hide me in the shadow of Your wings. Amen." },
+      { title: "The Finish Line", content: "Lord, give me the endurance to finish the race set before me. Help me to keep my eyes on the prize and to not grow weary in doing good. Amen." }
+    ];
 
+    const dayOfMonth = new Date().getDate();
+    const prayerIndex = (dayOfMonth - 1) % prayers.length;
+    const active = prayers[prayerIndex];
+    
+    document.getElementById('prayerTitle').textContent = active.title;
+    document.getElementById('prayerText').textContent = active.content;
+
+    // 3. Share Helper
+    window.CymorBibleDebugBridge = {
+      share: () => {
+        const text = `🙏 *Daily Prayer: ${active.title}*\n\n"${active.content}"\n\nShared via Cymor Bible App`;
+        if (navigator.share) navigator.share({ text });
+        else window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`);
+      }
+    };
+  </script>
 </body>
 </html>
