@@ -3,224 +3,100 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Cymor Bible App</title>
+  <title>Cymor Bible Pro — Read</title>
 
   <meta name="theme-color" content="#0F172A"/>
   <script src="https://cdn.tailwindcss.com"></script>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
 
   <style>
-    body { font-family: Inter, sans-serif; }
+    body { font-family: 'Inter', sans-serif; }
+    .glass { background: rgba(30, 41, 59, 0.7); backdrop-filter: blur(14px); border: 1px solid rgba(255,255,255,0.05); }
     .verse:hover { background: rgba(59,130,246,0.08); }
-    .highlight { background: rgba(250, 204, 21, 0.2); }
-    .underline { text-decoration: underline; }
+    .highlight { background: rgba(250, 204, 21, 0.2); text-decoration: underline; text-underline-offset: 4px; }
     ::-webkit-scrollbar { width: 0px; background: transparent; }
   </style>
 </head>
 
-<body class="bg-[#0F172A] text-slate-100 min-h-screen flex flex-col">
+<body class="bg-[#0F172A] text-slate-100 min-h-screen flex flex-col pb-24">
 
-<header class="sticky top-0 z-50 bg-[#0F172A]/95 backdrop-blur border-b border-slate-800">
-  <div class="max-w-md mx-auto px-4 py-3 flex items-center justify-between">
-    <a href="./index.html" class="text-slate-400 text-sm">← Home</a>
-    <h1 class="text-sm font-semibold">Cymor Bible Pro</h1>
-    <button id="searchBtn" class="text-slate-400 text-sm">Search</button>
-  </div>
+<header class="sticky top-0 z-50 bg-[#0F172A]/95 backdrop-blur border-b border-slate-800 px-4 py-3">
+  <div class="max-w-md mx-auto space-y-3">
+    <div class="flex items-center justify-between">
+      <a href="index.html" class="text-blue-400 text-xs font-bold uppercase tracking-widest">← Back</a>
+      <h1 class="text-sm font-bold tracking-tight">Scripture Reader</h1>
+      <div class="w-8"></div> </div>
 
-  <div id="searchBox" class="hidden max-w-md mx-auto px-4 pb-3">
-    <input id="searchInput"
-      class="w-full px-3 py-2 rounded-xl bg-slate-900 border border-slate-700 text-sm"
-      placeholder="Search verses (e.g. love, faith)"
-    />
+    <div class="relative group">
+      <input id="searchInput" 
+        type="text" 
+        placeholder="Search keyword (e.g. Hope, Love)" 
+        class="w-full bg-slate-900 border border-slate-700 text-slate-100 text-sm rounded-xl px-4 py-3 outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500/50 transition-all"
+      />
+      <div class="absolute right-4 top-3.5 text-slate-500 pointer-events-none">🔍</div>
+    </div>
   </div>
 </header>
 
-<main class="max-w-md mx-auto w-full px-4 py-3 space-y-3 flex-1">
-  <div class="grid grid-cols-2 gap-2">
-    <select id="bookSelect" class="p-3 bg-slate-900 border border-slate-800 rounded-xl text-sm outline-none focus:border-blue-500"></select>
-    <select id="chapterSelect" class="p-3 bg-slate-900 border border-slate-800 rounded-xl text-sm outline-none focus:border-blue-500"></select>
+<main class="max-w-md mx-auto w-full px-4 py-6 space-y-6 flex-1">
+  
+  <section class="space-y-3">
+    <select id="testament-select" class="w-full p-4 bg-slate-900 border border-slate-800 rounded-2xl text-sm outline-none focus:border-blue-500 transition-all appearance-none cursor-pointer">
+        <option value="">Select Testament</option>
+        <option value="OT">Old Testament</option>
+        <option value="NT">New Testament</option>
+    </select>
+    
+    <div class="grid grid-cols-2 gap-3">
+      <select id="book-select" disabled class="p-4 bg-slate-900 border border-slate-800 rounded-2xl text-sm outline-none opacity-50 focus:border-blue-500 transition-all cursor-pointer">
+        <option>Select Book</option>
+      </select>
+      <select id="chapter-select" disabled class="p-4 bg-slate-900 border border-slate-800 rounded-2xl text-sm outline-none opacity-50 focus:border-blue-500 transition-all cursor-pointer">
+        <option>Select Chapter</option>
+      </select>
+    </div>
+
+    <button id="pwaInstallBtn" class="hidden w-full bg-gradient-to-r from-blue-600 to-blue-500 text-white p-4 rounded-2xl text-xs font-bold shadow-lg shadow-blue-500/20 active:scale-95 transition-all">
+        📥 DOWNLOAD OFFLINE VERSION
+    </button>
+  </section>
+
+  <div class="flex gap-3">
+    <button id="saveHistoryBtn" class="flex-1 bg-slate-800 border border-slate-700 p-4 rounded-2xl text-[10px] font-bold uppercase tracking-wider active:scale-95 transition-all">Save Progress</button>
+    <button id="whatsappBtn" class="flex-1 bg-green-600 p-4 rounded-2xl text-[10px] font-bold uppercase tracking-wider active:scale-95 transition-all shadow-lg shadow-green-600/10">WhatsApp Share</button>
   </div>
 
-  <div class="flex gap-2">
-    <button id="saveHistoryBtn" class="flex-1 bg-slate-800 p-3 rounded-xl text-xs font-semibold active:scale-95 transition-transform">Save Reading</button>
-    <button id="whatsappBtn" class="flex-1 bg-green-600 p-3 rounded-xl text-xs font-semibold active:scale-95 transition-transform">WhatsApp Share</button>
-  </div>
-
-  <section class="bg-slate-900/40 border border-slate-800 rounded-2xl p-5 mb-10">
-    <h2 id="reference" class="text-blue-400 font-bold text-sm mb-4 uppercase tracking-widest"></h2>
-    <div id="verseContainer" class="space-y-4 text-[15px] leading-relaxed">
-        <p class="text-slate-500 text-center animate-pulse py-10">Initializing scriptures...</p>
+  <section class="bg-slate-900/40 border border-slate-800 rounded-[32px] p-6 mb-12">
+    <h2 id="reference" class="text-blue-400 font-bold text-xs mb-6 uppercase tracking-[0.2em]">Select a Chapter</h2>
+    <div id="bible-display" class="space-y-5 text-[16px] leading-relaxed text-slate-200">
+        <div class="flex flex-col items-center justify-center py-12 text-slate-500 space-y-2">
+            <div class="w-8 h-8 border-2 border-blue-500/20 border-t-blue-500 rounded-full animate-spin"></div>
+            <p class="text-xs font-medium">Synchronizing Scriptures...</p>
+        </div>
     </div>
   </section>
 </main>
 
+<nav class="fixed bottom-0 left-0 right-0 glass border-t border-slate-800 px-8 py-4 flex justify-between items-center z-[100]">
+    <a href="index.html" class="flex flex-col items-center gap-1 text-slate-500">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z"/></svg>
+        <span class="text-[10px]">Home</span>
+    </a>
+    <a href="bible.html" class="flex flex-col items-center gap-1 nav-active">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path d="M9 4.804A7.968 7.968 0 005.5 4c-1.255 0-2.443.29-3.5.804v10A7.969 7.969 0 015.5 14c1.669 0 3.218.51 4.5 1.385A7.962 7.962 0 0114.5 14c1.255 0 2.443.29 3.5.804v-10A7.968 7.968 0 0014.5 4c-1.255 0-2.443.29-3.5.804V12a1 1 0 11-2 0V4.804z"/></svg>
+        <span class="text-[10px]">Bible</span>
+    </a>
+    <a href="prayer.html" class="flex flex-col items-center gap-1 text-slate-500">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z" clip-rule="evenodd"/></svg>
+        <span class="text-[10px]">Prayers</span>
+    </a>
+    <a href="favorites.html" class="flex flex-col items-center gap-1 text-slate-500">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path d="M5 4a2 2 0 012-2h6a2 2 0 012 2v14l-5-2.5L5 18V4z"/></svg>
+        <span class="text-[10px]">Saved</span>
+    </a>
+</nav>
+
 <script type="module" src="./app.js"></script>
 
-<script>
-let bible = [];
-let currentBook = 0;
-let currentChapter = 0;
-
-const bookSelect = document.getElementById("bookSelect");
-const chapterSelect = document.getElementById("chapterSelect");
-const verseContainer = document.getElementById("verseContainer");
-const reference = document.getElementById("reference");
-
-const historyKey = "cymorReadingHistory";
-const highlightsKey = "cymorHighlights";
-
-// Robust Connection Logic
-function connectToEngine() {
-    if (window.CymorBibleDebugBridge) {
-        const state = window.CymorBibleDebugBridge.inspectAppState();
-        if (state && state.bibleData && state.bibleData.length > 0) {
-            console.log("Engine Connected. Data loaded.");
-            bible = state.bibleData;
-            init();
-            return;
-        }
-    }
-    setTimeout(connectToEngine, 100);
-}
-
-window.addEventListener("load", connectToEngine);
-
-/* ========================
-   INIT
-======================== */
-function init() {
-  if(!bible || bible.length === 0) return;
-  bookSelect.innerHTML = bible.map((b,i)=>`<option value="${i}">${b.name}</option>`).join("");
-  loadChapters(0);
-}
-
-/* ========================
-   CHAPTERS
-======================== */
-function loadChapters(bookIndex) {
-  currentBook = parseInt(bookIndex);
-  const book = bible[currentBook];
-
-  chapterSelect.innerHTML = book.chapters.map((_,i)=>
-    `<option value="${i}">Chapter ${i+1}</option>`
-  ).join("");
-
-  render(currentBook, 0);
-}
-
-/* ========================
-   RENDER VERSES
-======================== */
-function render(bIndex, cIndex) {
-  currentChapter = parseInt(cIndex);
-  const book = bible[bIndex];
-  const chapter = book.chapters[currentChapter];
-  reference.textContent = `${book.name} ${currentChapter+1}`;
-
-  const highlights = JSON.parse(localStorage.getItem(highlightsKey) || "[]");
-
-  verseContainer.innerHTML = chapter.map((v,i)=>{
-    const id = `${book.name}-${currentChapter+1}-${i+1}`;
-    const isHighlighted = highlights.includes(id);
-
-    return `
-      <div class="verse p-2 rounded-lg cursor-pointer transition-colors ${isHighlighted ? 'highlight underline' : ''}"
-        onclick="toggleHighlight('${id}', this)">
-        <span class="text-blue-500 font-bold text-[10px] mr-2">${i+1}</span>
-        <span class="text-slate-200">${v}</span>
-      </div>
-    `;
-  }).join("");
-
-  saveHistory();
-  window.scrollTo({ top: 0, behavior: 'smooth' });
-}
-
-/* ========================
-   HIGHLIGHT SYSTEM
-======================== */
-window.toggleHighlight = function(id, el) {
-  let highlights = JSON.parse(localStorage.getItem(highlightsKey) || "[]");
-  if (highlights.includes(id)) {
-    highlights = highlights.filter(h => h !== id);
-    el.classList.remove("highlight","underline");
-  } else {
-    highlights.push(id);
-    el.classList.add("highlight","underline");
-  }
-  localStorage.setItem(highlightsKey, JSON.stringify(highlights));
-};
-
-/* ========================
-   SEARCH ENGINE
-======================== */
-document.getElementById("searchBtn").onclick = () => {
-  document.getElementById("searchBox").classList.toggle("hidden");
-};
-
-document.getElementById("searchInput").addEventListener("input", (e) => {
-  const query = e.target.value.toLowerCase();
-  if (query.length < 3) return;
-
-  let results = [];
-  bible.forEach(book=>{
-    book.chapters.forEach((ch,ci)=>{
-      ch.forEach((v,vi)=>{
-        if (v.toLowerCase().includes(query)) {
-          results.push({
-            book: book.name,
-            chapter: ci+1,
-            verse: vi+1,
-            text: v
-          });
-        }
-      });
-    });
-  });
-
-  if (results.length > 0) {
-    verseContainer.innerHTML = results.slice(0,30).map(r=>`
-        <div class="p-3 border-b border-slate-800 bg-slate-900/20 rounded-lg">
-        <div class="text-blue-400 font-bold text-xs mb-1">${r.book} ${r.chapter}:${r.verse}</div>
-        <div class="text-slate-300 text-sm">${r.text}</div>
-        </div>
-    `).join("");
-  }
-});
-
-/* ========================
-   READING HISTORY
-======================== */
-function saveHistory() {
-  const history = JSON.parse(localStorage.getItem(historyKey) || "[]");
-  const entry = {
-    book: bible[currentBook].name,
-    chapter: currentChapter+1,
-    date: new Date().toLocaleDateString()
-  };
-  if(history[0]?.book === entry.book && history[0]?.chapter === entry.chapter) return;
-  history.unshift(entry);
-  localStorage.setItem(historyKey, JSON.stringify(history.slice(0,10)));
-}
-
-/* ========================
-   WHATSAPP SHARE
-======================== */
-document.getElementById("whatsappBtn").onclick = () => {
-  const book = bible[currentBook].name;
-  const chapter = bible[currentBook].chapters[currentChapter];
-  const verseText = chapter.slice(0,3).join("\n\n");
-  const text = `📖 *${book} ${currentChapter+1}*\n\n${verseText}\n\nRead more on *Cymor Bible Pro*`;
-  window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`, "_blank");
-};
-
-/* ========================
-   EVENTS
-======================== */
-bookSelect.onchange = (e)=> loadChapters(e.target.value);
-chapterSelect.onchange = (e)=> render(currentBook, e.target.value);
-</script>
 </body>
 </html>
