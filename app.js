@@ -148,6 +148,8 @@ function setupBibleNavigation() {
     DOM.chapterSelect.innerHTML = '<option value="">Select Chapter</option>';
     DOM.chapterSelect.disabled = true;
 
+    if (!selectedT) return;
+
     const filteredBooks = state.bibleData.filter(book => 
       selectedT === 'OT' ? book.id <= 39 : book.id > 39
     );
@@ -170,10 +172,11 @@ function setupBibleNavigation() {
   DOM.chapterSelect.addEventListener('change', (e) => {
     const book = state.bibleData.find(b => b.name === DOM.bookSelect.value);
     if (book && e.target.value !== "") {
-      const verses = book.chapters[e.target.value];
+      const chapterIndex = parseInt(e.target.value);
+      const verses = book.chapters[chapterIndex];
       DOM.bibleDisplay.innerHTML = `
-        <h2 class="text-2xl font-serif text-white mb-6">${book.name} ${parseInt(e.target.value) + 1}</h2>
-        ${verses.map((v, i) => `<div class="mb-4 flex gap-4"><span class="text-blue-400 font-bold text-sm">${i + 1}</span><p class="text-slate-200">${v}</p></div>`).join('')}
+        <h2 class="text-blue-400 font-bold text-xs mb-6 uppercase tracking-[0.2em]">${book.name} ${chapterIndex + 1}</h2>
+        ${verses.map((v, i) => `<div class="mb-4 flex gap-4"><span class="text-blue-400 font-bold text-sm min-w-[20px]">${i + 1}</span><p class="text-slate-200">${v}</p></div>`).join('')}
       `;
     }
   });
@@ -185,11 +188,23 @@ function setupBibleNavigation() {
 async function loadBibleDataset() {
   try {
     const response = await fetch(BIBLE_PATH);
+    if (!response.ok) throw new Error("Network response was not ok");
     state.bibleData = await response.json();
     localStorage.setItem("cymorBibleCache", JSON.stringify(state.bibleData));
+    
+    // CRITICAL FIX: Clear loading state if on bible.html
+    if (DOM.bibleDisplay) {
+        DOM.bibleDisplay.innerHTML = `<p class="text-slate-500 text-center py-10 text-xs uppercase tracking-widest">Select a testament to begin</p>`;
+    }
   } catch (error) {
+    console.warn("Bible Load Error, attempting cache...", error);
     const cached = localStorage.getItem("cymorBibleCache");
-    if (cached) state.bibleData = JSON.parse(cached);
+    if (cached) {
+        state.bibleData = JSON.parse(cached);
+        if (DOM.bibleDisplay) DOM.bibleDisplay.innerHTML = `<p class="text-slate-500 text-center py-10 text-xs uppercase tracking-widest">Loaded from Cache</p>`;
+    } else if (DOM.bibleDisplay) {
+        DOM.bibleDisplay.innerHTML = `<p class="text-red-400 text-center py-10">Error loading scriptures. Please check connection.</p>`;
+    }
   }
 }
 
@@ -222,7 +237,13 @@ function initializePWAHook() {
 }
 
 async function registerCoreServiceWorker() {
-  if ("serviceWorker" in navigator) navigator.serviceWorker.register("./sw.js");
+  if ("serviceWorker" in navigator) {
+    try {
+        await navigator.serviceWorker.register("./sw.js");
+    } catch (e) {
+        console.warn("SW Registration Failed");
+    }
+  }
 }
 
 /* ==========================================================================
@@ -231,7 +252,7 @@ async function registerCoreServiceWorker() {
 window.CymorBibleDebugBridge = {
   share: async () => {
     const v = state.dailyVerse;
-    const text = `✨ *Verse of the Day*\n"${v.text}"\n— *${v.reference}*`;
+    const text = `✨ *Verse of the Day*\n"${v.text}"\n— *${v.reference}*\n\nShared via Cymor Bible App`;
     if (navigator.share) await navigator.share({ text });
     else window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`);
   },
