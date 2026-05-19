@@ -4,20 +4,45 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Cymor Bible — Home</title>
+  
   <script src="https://cdn.tailwindcss.com"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&family=Playfair+Display:ital,wght@1,400&display=swap" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=Playfair+Display:ital,wght@0,700;1,400&display=swap" rel="stylesheet">
   
   <style>
     body { font-family: 'Inter', sans-serif; }
     .glass { background: rgba(30, 41, 59, 0.7); backdrop-filter: blur(14px); border: 1px solid rgba(255,255,255,0.05); }
     .nav-active { color: #60a5fa; }
-    
-    /* Smooth Transition Utilities */
     .fade-out { opacity: 0; transform: translateY(10px); }
+
+    /* Hidden High-Quality Share Template */
+    #share-template {
+      position: absolute;
+      left: -9999px;
+      width: 1080px;
+      height: 1080px;
+      background: linear-gradient(135deg, #0F172A 0%, #1E293B 100%);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      padding: 80px;
+      text-align: center;
+    }
   </style>
 </head>
 
 <body class="bg-[#0F172A] text-slate-100 min-h-screen pb-24">
+
+  <div id="share-template">
+      <div style="border: 2px solid rgba(59,130,246,0.3); border-radius: 80px; padding: 80px; background: rgba(15, 23, 42, 0.4); border: 1px solid rgba(255,255,255,0.1); backdrop-filter: blur(20px); width: 100%;">
+          <p style="color: #60a5fa; text-transform: uppercase; letter-spacing: 0.6em; font-weight: 800; font-size: 28px; margin-bottom: 60px;">Cymor Bible App</p>
+          <div style="height: 4px; width: 100px; background: #60a5fa; margin: 0 auto 60px auto; border-radius: 2px;"></div>
+          <h2 id="share-content" style="font-family: 'Playfair Display', serif; color: white; font-style: italic; font-size: 54px; line-height: 1.5; margin-bottom: 50px; font-weight: 400;"></h2>
+          <p id="share-ref" style="color: #60a5fa; font-weight: 800; font-size: 36px; letter-spacing: 0.1em;"></p>
+      </div>
+  </div>
 
   <header class="p-6 flex justify-between items-center">
     <div class="flex items-center gap-3">
@@ -34,7 +59,7 @@
     <p class="text-slate-400 text-sm" id="currentDateStr"></p>
     
     <button id="pwaInstallBtn" class="hidden mt-4 w-full flex items-center justify-center gap-2 bg-blue-600 text-white p-4 rounded-2xl text-xs font-bold shadow-lg shadow-blue-500/20 active:scale-95 transition-all">
-      📥 INSTALL CYMOR BIBLE APP VERSION 1.0
+      📥 INSTALL CYMOR BIBLE APP
     </button>
   </section>
 
