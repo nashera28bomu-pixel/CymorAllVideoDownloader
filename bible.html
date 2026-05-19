@@ -7,33 +7,57 @@
 
   <meta name="theme-color" content="#0F172A"/>
   <script src="https://cdn.tailwindcss.com"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Playfair+Display:ital,wght@0,600;1,400&display=swap" rel="stylesheet">
 
   <style>
     body { font-family: 'Inter', sans-serif; }
     .glass { background: rgba(30, 41, 59, 0.7); backdrop-filter: blur(14px); border: 1px solid rgba(255,255,255,0.05); }
-    .verse:hover { background: rgba(59,130,246,0.08); }
-    .highlight { background: rgba(250, 204, 21, 0.2); text-decoration: underline; text-underline-offset: 4px; }
+    .nav-active { color: #3b82f6; }
     ::-webkit-scrollbar { width: 0px; background: transparent; }
+    
+    /* Hidden Share Template */
+    #share-template {
+      position: absolute;
+      left: -9999px;
+      width: 1080px;
+      height: 1080px;
+      background: linear-gradient(135deg, #0F172A 0%, #1E293B 100%);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      padding: 80px;
+      text-align: center;
+    }
   </style>
 </head>
 
 <body class="bg-[#0F172A] text-slate-100 min-h-screen flex flex-col pb-24">
 
+<div id="share-template">
+    <div style="border: 2px solid rgba(59,130,246,0.3); border-radius: 60px; padding: 60px; background: rgba(15, 23, 42, 0.5);">
+        <p style="color: #3b82f6; text-transform: uppercase; letter-spacing: 0.5em; font-weight: 800; font-size: 24px; margin-bottom: 40px;">Cymor Bible Daily</p>
+        <h2 id="share-content" style="font-family: 'Playfair Display', serif; color: white; font-style: italic; font-size: 48px; line-height: 1.4; margin-bottom: 40px;"></h2>
+        <p id="share-ref" style="color: #3b82f6; font-weight: bold; font-size: 32px;"></p>
+    </div>
+</div>
+
 <header class="sticky top-0 z-50 bg-[#0F172A]/95 backdrop-blur border-b border-slate-800 px-4 py-3">
   <div class="max-w-md mx-auto space-y-3">
     <div class="flex items-center justify-between">
-      <a href="index.html" class="text-blue-400 text-xs font-bold uppercase tracking-widest">← Back</a>
+      <a href="index.html" class="text-blue-400 text-xs font-bold uppercase tracking-widest">← Home</a>
       <h1 class="text-sm font-bold tracking-tight">Scripture Reader</h1>
-      <div class="w-8"></div> </div>
+      <div class="w-8"></div>
+    </div>
 
     <div class="relative group">
       <input id="searchInput" 
         type="text" 
         placeholder="Search keyword (e.g. Hope, Love)" 
-        class="w-full bg-slate-900 border border-slate-700 text-slate-100 text-sm rounded-xl px-4 py-3 outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500/50 transition-all"
+        class="w-full bg-slate-900 border border-slate-700 text-slate-100 text-sm rounded-xl px-4 py-3 outline-none focus:border-blue-500 transition-all"
       />
-      <div class="absolute right-4 top-3.5 text-slate-500 pointer-events-none">🔍</div>
+      <div class="absolute right-4 top-3.5 text-slate-500">🔍</div>
     </div>
   </div>
 </header>
@@ -41,18 +65,18 @@
 <main class="max-w-md mx-auto w-full px-4 py-6 space-y-6 flex-1">
   
   <section class="space-y-3">
-    <select id="testament-select" class="w-full p-4 bg-slate-900 border border-slate-800 rounded-2xl text-sm outline-none focus:border-blue-500 transition-all appearance-none cursor-pointer">
+    <select id="testament-select" class="w-full p-4 bg-slate-900 border border-slate-800 rounded-2xl text-sm outline-none focus:border-blue-500 appearance-none cursor-pointer">
         <option value="">Select Testament</option>
         <option value="OT">Old Testament</option>
         <option value="NT">New Testament</option>
     </select>
     
     <div class="grid grid-cols-2 gap-3">
-      <select id="book-select" disabled class="p-4 bg-slate-900 border border-slate-800 rounded-2xl text-sm outline-none opacity-50 focus:border-blue-500 transition-all cursor-pointer">
-        <option>Select Book</option>
+      <select id="book-select" disabled class="p-4 bg-slate-900 border border-slate-800 rounded-2xl text-sm outline-none opacity-50 focus:border-blue-500 cursor-pointer">
+        <option value="">Select Book</option>
       </select>
-      <select id="chapter-select" disabled class="p-4 bg-slate-900 border border-slate-800 rounded-2xl text-sm outline-none opacity-50 focus:border-blue-500 transition-all cursor-pointer">
-        <option>Select Chapter</option>
+      <select id="chapter-select" disabled class="p-4 bg-slate-900 border border-slate-800 rounded-2xl text-sm outline-none opacity-50 focus:border-blue-500 cursor-pointer">
+        <option value="">Select Chapter</option>
       </select>
     </div>
 
@@ -62,16 +86,15 @@
   </section>
 
   <div class="flex gap-3">
-    <button id="saveHistoryBtn" class="flex-1 bg-slate-800 border border-slate-700 p-4 rounded-2xl text-[10px] font-bold uppercase tracking-wider active:scale-95 transition-all">Save Progress</button>
-    <button id="whatsappBtn" class="flex-1 bg-green-600 p-4 rounded-2xl text-[10px] font-bold uppercase tracking-wider active:scale-95 transition-all shadow-lg shadow-green-600/10">WhatsApp Share</button>
+    <button onclick="window.CymorBibleDebugBridge.saveProgress()" class="flex-1 bg-slate-800 border border-slate-700 p-4 rounded-2xl text-[10px] font-bold uppercase tracking-wider active:scale-95 transition-all">Save Reading</button>
+    <button onclick="window.CymorBibleDebugBridge.shareAsImage()" class="flex-1 bg-green-600 p-4 rounded-2xl text-[10px] font-bold uppercase tracking-wider active:scale-95 transition-all shadow-lg shadow-green-600/10">Share Image</button>
   </div>
 
-  <section class="bg-slate-900/40 border border-slate-800 rounded-[32px] p-6 mb-12">
-    <h2 id="reference" class="text-blue-400 font-bold text-xs mb-6 uppercase tracking-[0.2em]">Select a Chapter</h2>
+  <section class="bg-slate-900/40 border border-slate-800 rounded-[32px] p-6 mb-12 min-h-[300px]">
     <div id="bible-display" class="space-y-5 text-[16px] leading-relaxed text-slate-200">
-        <div class="flex flex-col items-center justify-center py-12 text-slate-500 space-y-2">
-            <div class="w-8 h-8 border-2 border-blue-500/20 border-t-blue-500 rounded-full animate-spin"></div>
-            <p class="text-xs font-medium">Synchronizing Scriptures...</p>
+        <div class="flex flex-col items-center justify-center py-12 text-slate-500 space-y-4">
+            <div class="w-10 h-10 border-2 border-blue-500/20 border-t-blue-500 rounded-full animate-spin"></div>
+            <p class="text-xs uppercase tracking-widest font-bold">Synchronizing Scriptures...</p>
         </div>
     </div>
   </section>
