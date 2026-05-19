@@ -6,15 +6,13 @@
   <title>Cymor Bible — Home</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&family=Playfair+Display:ital,wght@1,400&display=swap" rel="stylesheet">
-  <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
-
+  
   <style>
     body { font-family: 'Inter', sans-serif; }
     .glass { background: rgba(30, 41, 59, 0.7); backdrop-filter: blur(14px); border: 1px solid rgba(255,255,255,0.05); }
     .nav-active { color: #60a5fa; }
     
-    /* Cross-Fade Animation */
-    .content-transition { transition: opacity 0.5s ease, transform 0.5s ease; }
+    /* Smooth Transition Utilities */
     .fade-out { opacity: 0; transform: translateY(10px); }
   </style>
 </head>
@@ -26,17 +24,23 @@
       <div class="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center font-bold text-xl shadow-lg shadow-blue-900/20">C</div>
       <h1 class="font-bold text-lg tracking-tight">Cymor Bible</h1>
     </div>
-    <a href="settings.html" class="p-2 bg-slate-800 rounded-xl text-xs">⚙️</a>
+    <a href="settings.html" class="px-4 py-2 bg-slate-800/50 border border-slate-700 rounded-xl text-xs font-medium hover:bg-slate-700 transition-colors">
+      Settings
+    </a>
   </header>
 
   <section class="px-6 mb-8">
-    <h2 class="text-3xl font-bold mb-1" id="greeting">Welcome</h2>
-    <p class="text-slate-400 text-sm" id="currentDate"></p>
+    <h2 class="text-3xl font-bold mb-1" id="greetingText">Welcome</h2>
+    <p class="text-slate-400 text-sm" id="currentDateStr"></p>
+    
+    <button id="pwaInstallBtn" class="hidden mt-4 w-full flex items-center justify-center gap-2 bg-blue-600 text-white p-4 rounded-2xl text-xs font-bold shadow-lg shadow-blue-500/20 active:scale-95 transition-all">
+      📥 INSTALL CYMOR BIBLE APP VERSION 1.0
+    </button>
   </section>
 
   <main class="px-4 space-y-6">
-    <div id="verse-container" class="content-transition"></div>
-    <div id="prayer-container" class="content-transition"></div>
+    <div id="verseCardAnchor" class="transition-all duration-500 transform"></div>
+    <div id="prayerCardAnchor" class="transition-all duration-500 transform"></div>
   </main>
 
   <nav class="fixed bottom-0 left-0 right-0 glass border-t border-slate-800 px-8 py-4 flex justify-between items-center z-[100]">
@@ -58,92 +62,7 @@
     </a>
   </nav>
 
-  <script type="module">
-    import { VerseCard } from './components/verse-card.js';
-    import { PrayerCard } from './components/prayer-card.js';
-
-    /* ================================
-       DATE & GREETING
-    ================================== */
-    const now = new Date();
-    const hours = now.getHours();
-    const greetingEl = document.getElementById('greeting');
-    const dateEl = document.getElementById('currentDate');
-
-    if (hours < 12) greetingEl.innerText = "Good Morning";
-    else if (hours < 18) greetingEl.innerText = "Good Afternoon";
-    else greetingEl.innerText = "Good Evening";
-
-    dateEl.innerText = now.toLocaleDateString('en-US', {
-      weekday: 'long', month: 'long', day: 'numeric'
-    });
-
-    /* ================================
-       DATA LIBRARIES
-    ================================== */
-    const verses = [
-      { text: "I can do all things through Christ who strengthens me.", ref: "Philippians 4:13" },
-      { text: "The Lord is my shepherd; I shall not want.", ref: "Psalm 23:1" },
-      { text: "Fear not, for I am with you; be not dismayed, for I am your God.", ref: "Isaiah 41:10" },
-      { text: "For I know the plans I have for you, declares the Lord.", ref: "Jeremiah 29:11" },
-      { text: "And we know that all things work together for good to them that love God.", ref: "Romans 8:28" },
-      { text: "The Lord is my light and my salvation; whom shall I fear?", ref: "Psalm 27:1" },
-      { text: "Be strong and courageous. Do not be afraid; do not be discouraged.", ref: "Joshua 1:9" },
-      { text: "But they that wait upon the Lord shall renew their strength.", ref: "Isaiah 40:31" },
-      { text: "Trust in the Lord with all thine heart.", ref: "Proverbs 3:5" },
-      { text: "Cast all your anxiety on him because he cares for you.", ref: "1 Peter 5:7" }
-    ];
-
-    const prayers = [
-      { title: "Strength Today", text: "Lord, let Your strength carry me beyond my limits today." },
-      { title: "Peace of Heart", text: "Father, calm every storm in my mind and fill me with Your peace." },
-      { title: "Divine Guidance", text: "God, direct my steps today and help me walk in Your truth." },
-      { title: "The Provider", text: "Jehovah Jireh, I trust You for my resources and daily needs." },
-      { title: "Circle of Safety", text: "Lord, surround me with Your angels and keep me safe from harm." },
-      { title: "Healing Touch", text: "Father, restore my spirit and heal the broken areas of my heart." },
-      { title: "Clear Purpose", text: "God, reveal my path and help me use my gifts for Your glory." },
-      { title: "Grateful Heart", text: "Lord, help me see the beauty in small things. Thank You for mercy." },
-      { title: "Power to Forgive", text: "Father, grant me a heart that forgives as You have forgiven me." },
-      { title: "Love for Others", text: "God, let my actions today be a reflection of Your love." }
-    ];
-
-    let vIndex = 0;
-    let pIndex = 0;
-
-    const vContainer = document.getElementById('verse-container');
-    const pContainer = document.getElementById('prayer-container');
-
-    /* ================================
-       ROTATION LOGIC
-    ================================== */
-    function cycleVerse() {
-        vContainer.classList.add('fade-out');
-        setTimeout(() => {
-            const data = verses[vIndex];
-            vContainer.innerHTML = VerseCard.render(data.text, data.ref);
-            vContainer.classList.remove('fade-out');
-            vIndex = (vIndex + 1) % verses.length;
-        }, 500);
-    }
-
-    function cyclePrayer() {
-        pContainer.classList.add('fade-out');
-        setTimeout(() => {
-            const data = prayers[pIndex];
-            pContainer.innerHTML = PrayerCard.render(data.title, data.text);
-            pContainer.classList.remove('fade-out');
-            pIndex = (pIndex + 1) % prayers.length;
-        }, 500);
-    }
-
-    // Initial Load
-    cycleVerse();
-    cyclePrayer();
-
-    // Auto-Rotation
-    setInterval(cycleVerse, 8000);
-    setInterval(cyclePrayer, 10000);
-  </script>
+  <script type="module" src="./app.js"></script>
 
 </body>
 </html>
