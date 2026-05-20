@@ -156,8 +156,8 @@ document.addEventListener("DOMContentLoaded", async () => {
   cycleVerse();
   cyclePrayer();
 
-  setInterval(cycleVerse, 40000);
-  setInterval(cyclePrayer, 40000);
+  setInterval(cycleVerse, 20000);
+  setInterval(cyclePrayer, 30000);
 });
 
 /* ==========================================================================
