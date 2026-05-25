@@ -51,7 +51,7 @@ const DOM = {
 
 const DAILY_VERSES = [
   { reference: "Jeremiah 29:11", text: "For I know the plans I have for you, declares the Lord, plans to prosper you and not to harm you, plans to give you hope and a future." },
-  { reference: "Philippians 4:13", text: "I can do all things through Christ which strengtheneth me." },
+  { reference: "Philippians 4:13", text: "I can do all things through Christ who strengtheneth me." },
   { reference: "Psalm 23:1", text: "The Lord is my shepherd; I shall not want." },
   { reference: "Isaiah 41:10", text: "Fear thou not; for I am with thee: be not dismayed; for I am thy God." },
   { reference: "Romans 8:28", text: "And we know that all things work together for good to them that love God." },
