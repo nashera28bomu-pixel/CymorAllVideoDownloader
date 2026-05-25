@@ -4,93 +4,514 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Cymor Bible — Settings</title>
+
   <link rel="manifest" href="./manifest.json">
 
   <script src="https://cdn.tailwindcss.com"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+
   <style>
-    body { font-family: 'Inter', sans-serif; }
-    .glass { background: rgba(30, 41, 59, 0.7); backdrop-filter: blur(14px); border: 1px solid rgba(255,255,255,0.05); }
-    .accent-card { background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%); border: 1px solid #1e293b; }
+    body {
+      font-family: 'Inter', sans-serif;
+      transition: all 0.3s ease;
+    }
+
+    .glass {
+      background: rgba(30, 41, 59, 0.7);
+      backdrop-filter: blur(14px);
+      border: 1px solid rgba(255,255,255,0.05);
+    }
+
+    .accent-card {
+      background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+      border: 1px solid #1e293b;
+    }
+
+    .setting-toggle {
+      width: 46px;
+      height: 24px;
+      appearance: none;
+      border-radius: 999px;
+      background: #334155;
+      position: relative;
+      transition: all 0.3s ease;
+      cursor: pointer;
+    }
+
+    .setting-toggle::before {
+      content: "";
+      position: absolute;
+      width: 18px;
+      height: 18px;
+      background: white;
+      border-radius: 999px;
+      top: 3px;
+      left: 3px;
+      transition: all 0.3s ease;
+    }
+
+    .setting-toggle:checked {
+      background: #2563eb;
+    }
+
+    .setting-toggle:checked::before {
+      left: 25px;
+    }
+
+    .theme-btn.active {
+      border-color: #3b82f6;
+      background: rgba(59,130,246,0.12);
+      color: #60a5fa;
+    }
+
+    .range-slider {
+      accent-color: #3b82f6;
+    }
+
+    .stat-card {
+      background: linear-gradient(135deg,#111827,#0f172a);
+      border: 1px solid rgba(255,255,255,0.05);
+    }
   </style>
 </head>
-<body class="bg-[#0F172A] text-slate-100 min-h-screen pb-24">
 
-  <header class="p-6 flex items-center gap-4 border-b border-slate-800/50">
+<body class="bg-[#0F172A] text-slate-100 min-h-screen pb-28">
+
+  <!-- HEADER -->
+  <header class="p-6 flex items-center gap-4 border-b border-slate-800/50 sticky top-0 bg-[#0F172A]/95 backdrop-blur z-50">
     <a href="index.html" class="text-slate-400 text-lg">←</a>
-    <h1 class="font-bold text-lg tracking-tight">App Settings</h1>
+
+    <div>
+      <h1 class="font-black text-lg tracking-tight">
+        Cymor Settings
+      </h1>
+
+      <p class="text-[10px] text-slate-500 uppercase tracking-[0.3em]">
+        Personalize Your Experience
+      </p>
+    </div>
   </header>
 
+  <!-- MAIN -->
   <main class="px-4 py-6 space-y-8">
-    
-    <section class="accent-card rounded-[32px] p-6 text-center shadow-2xl">
-        <div class="w-20 h-20 bg-blue-600 rounded-full mx-auto mb-4 flex items-center justify-center text-2xl font-bold border-4 border-slate-800">
-            SC
+
+    <!-- PROFILE -->
+    <section class="accent-card rounded-[32px] p-6 text-center shadow-2xl relative overflow-hidden">
+
+      <div class="absolute top-0 right-0 w-40 h-40 bg-blue-600/10 blur-3xl rounded-full"></div>
+
+      <div class="relative z-10">
+
+        <div class="w-24 h-24 bg-blue-600 rounded-full mx-auto mb-5 flex items-center justify-center text-3xl font-black border-4 border-slate-800 shadow-xl shadow-blue-900/30">
+          SC
         </div>
-        <h2 class="text-xl font-bold text-white">Legendary Smiley Cymor</h2>
-        <p class="text-blue-400 text-xs font-semibold uppercase tracking-widest mt-1">C.E.O of CymorTechServices</p>
-        
-        <div class="mt-6 flex justify-center gap-4">
-            <a href="https://wa.me/254113821327" class="bg-green-600/10 text-green-500 px-4 py-2 rounded-xl text-xs font-bold border border-green-600/20 hover:bg-green-600 hover:text-white transition-all">
-                Dm me on whatsapp
-            </a>
-            <button class="bg-slate-800 text-slate-300 px-4 py-2 rounded-xl text-xs font-bold border border-slate-700">
-                Portfolio
-            </button>
+
+        <h2 class="text-2xl font-black text-white">
+          Legendary Smiley Cymor
+        </h2>
+
+        <p class="text-blue-400 text-xs font-bold uppercase tracking-[0.3em] mt-2">
+          CEO • CymorTechServices
+        </p>
+
+        <p class="text-slate-400 text-sm mt-4 leading-relaxed">
+          Building powerful Christian experiences through technology, scripture and innovation.
+        </p>
+
+        <div class="mt-6 grid grid-cols-2 gap-3">
+
+          <a
+            href="https://wa.me/254113821327"
+            class="bg-green-600/10 text-green-400 px-4 py-3 rounded-2xl text-xs font-black border border-green-600/20 active:scale-95 transition-all"
+          >
+            WhatsApp
+          </a>
+
+          <button
+            class="bg-slate-800 text-slate-300 px-4 py-3 rounded-2xl text-xs font-black border border-slate-700 active:scale-95 transition-all"
+          >
+            Portfolio
+          </button>
+
         </div>
+      </div>
     </section>
 
+    <!-- DISPLAY -->
     <section class="space-y-3">
-        <h3 class="text-[10px] font-bold text-slate-500 uppercase tracking-[0.2em] px-4">Display & Interface</h3>
-        
-        <div class="glass rounded-3xl divide-y divide-slate-800/50">
-            <div class="p-5 flex justify-between items-center">
-                <div>
-                    <p class="text-sm font-semibold">Reading Mode</p>
-                    <p class="text-[10px] text-slate-400">Optimize font for long reading</p>
-                </div>
-                <input type="checkbox" class="w-10 h-5 bg-slate-700 rounded-full appearance-none checked:bg-blue-600 relative transition-all before:content-[''] before:absolute before:w-4 before:h-4 before:bg-white before:rounded-full before:top-0.5 before:left-0.5 checked:before:left-5 before:transition-all">
+
+      <h3 class="text-[10px] font-black text-slate-500 uppercase tracking-[0.25em] px-4">
+        Display & Interface
+      </h3>
+
+      <div class="glass rounded-[28px] divide-y divide-slate-800/60">
+
+        <div class="p-5 flex justify-between items-center">
+          <div>
+            <p class="text-sm font-bold">
+              Reading Mode
+            </p>
+
+            <p class="text-[10px] text-slate-400">
+              Optimized layout for long scripture reading
+            </p>
+          </div>
+
+          <input type="checkbox" id="readingMode" class="setting-toggle">
+        </div>
+
+        <div class="p-5 flex justify-between items-center">
+          <div>
+            <p class="text-sm font-bold">
+              Verse Animations
+            </p>
+
+            <p class="text-[10px] text-slate-400">
+              Enable smooth transitions and motion
+            </p>
+          </div>
+
+          <input type="checkbox" checked id="animations" class="setting-toggle">
+        </div>
+
+        <div class="p-5 space-y-4">
+
+          <div class="flex justify-between items-center">
+            <div>
+              <p class="text-sm font-bold">
+                Font Size
+              </p>
+
+              <p class="text-[10px] text-slate-400">
+                Adjust scripture reading size
+              </p>
             </div>
 
-            <div class="p-5 flex justify-between items-center">
-                <div>
-                    <p class="text-sm font-semibold">Verse Animations</p>
-                    <p class="text-[10px] text-slate-400">Enable smooth home transitions</p>
-                </div>
-                <input type="checkbox" checked class="w-10 h-5 bg-slate-700 rounded-full appearance-none checked:bg-blue-600 relative transition-all before:content-[''] before:absolute before:w-4 before:h-4 before:bg-white before:rounded-full before:top-0.5 before:left-0.5 checked:before:left-5 before:transition-all">
-            </div>
+            <span id="fontSizeValue" class="text-blue-400 text-xs font-bold">
+              18px
+            </span>
+          </div>
+
+          <input
+            type="range"
+            min="14"
+            max="30"
+            value="18"
+            id="fontSlider"
+            class="w-full range-slider"
+          />
+
         </div>
+
+      </div>
+
     </section>
 
+    <!-- THEMES -->
     <section class="space-y-3">
-        <h3 class="text-[10px] font-bold text-slate-500 uppercase tracking-[0.2em] px-4">Storage</h3>
-        
-        <div class="glass rounded-3xl">
-            <button onclick="clearCache()" class="w-full p-5 flex justify-between items-center text-left">
-                <div>
-                    <p class="text-sm font-semibold text-red-400">Clear Saved Highlights</p>
-                    <p class="text-[10px] text-slate-400">This will delete all marked verses</p>
-                </div>
-                <span class="text-slate-600">🗑️</span>
-            </button>
-        </div>
+
+      <h3 class="text-[10px] font-black text-slate-500 uppercase tracking-[0.25em] px-4">
+        App Themes
+      </h3>
+
+      <div class="grid grid-cols-2 gap-3">
+
+        <button onclick="setTheme('default',this)" class="theme-btn active glass rounded-3xl p-5 text-left border border-slate-700">
+          <div class="w-full h-16 rounded-2xl bg-[#0F172A] border border-slate-700 mb-3"></div>
+          <p class="font-bold text-sm">Default Dark</p>
+        </button>
+
+        <button onclick="setTheme('amoled',this)" class="theme-btn glass rounded-3xl p-5 text-left border border-slate-700">
+          <div class="w-full h-16 rounded-2xl bg-black mb-3"></div>
+          <p class="font-bold text-sm">AMOLED Black</p>
+        </button>
+
+      </div>
+
     </section>
 
-    <footer class="text-center pt-4">
-        <p class="text-[10px] text-slate-600 font-medium">Cymor Bible App v1.0.4 PRO</p>
-        <p class="text-[9px] text-slate-700 mt-1">© 2026 CymorTechServices. All Rights Reserved.</p>
-    </footer>
+    <!-- AUDIO -->
+    <section class="space-y-3">
+
+      <h3 class="text-[10px] font-black text-slate-500 uppercase tracking-[0.25em] px-4">
+        Audio Settings
+      </h3>
+
+      <div class="glass rounded-[28px] divide-y divide-slate-800/60">
+
+        <div class="p-5 flex justify-between items-center">
+          <div>
+            <p class="text-sm font-bold">
+              Background Playback
+            </p>
+
+            <p class="text-[10px] text-slate-400">
+              Continue audio while app is minimized
+            </p>
+          </div>
+
+          <input type="checkbox" checked class="setting-toggle">
+        </div>
+
+        <div class="p-5 flex justify-between items-center">
+          <div>
+            <p class="text-sm font-bold">
+              Auto Continue
+            </p>
+
+            <p class="text-[10px] text-slate-400">
+              Automatically play next chapter
+            </p>
+          </div>
+
+          <input type="checkbox" checked class="setting-toggle">
+        </div>
+
+      </div>
+
+    </section>
+
+    <!-- STATISTICS -->
+    <section class="space-y-3">
+
+      <h3 class="text-[10px] font-black text-slate-500 uppercase tracking-[0.25em] px-4">
+        Your Statistics
+      </h3>
+
+      <div class="grid grid-cols-2 gap-3">
+
+        <div class="stat-card rounded-3xl p-5">
+          <p class="text-3xl font-black text-blue-400">27</p>
+          <p class="text-[10px] uppercase tracking-widest text-slate-500 mt-2">
+            Chapters Read
+          </p>
+        </div>
+
+        <div class="stat-card rounded-3xl p-5">
+          <p class="text-3xl font-black text-amber-400">14🔥</p>
+          <p class="text-[10px] uppercase tracking-widest text-slate-500 mt-2">
+            Reading Streak
+          </p>
+        </div>
+
+        <div class="stat-card rounded-3xl p-5">
+          <p class="text-3xl font-black text-green-400">89</p>
+          <p class="text-[10px] uppercase tracking-widest text-slate-500 mt-2">
+            Saved Verses
+          </p>
+        </div>
+
+        <div class="stat-card rounded-3xl p-5">
+          <p class="text-3xl font-black text-purple-400">41</p>
+          <p class="text-[10px] uppercase tracking-widest text-slate-500 mt-2">
+            Trivia Score
+          </p>
+        </div>
+
+      </div>
+
+    </section>
+
+    <!-- SUPPORT -->
+    <section class="space-y-3">
+
+      <h3 class="text-[10px] font-black text-slate-500 uppercase tracking-[0.25em] px-4">
+        Support The Ministry
+      </h3>
+
+      <div class="accent-card rounded-[32px] p-6">
+
+        <div class="text-center mb-6">
+
+          <div class="text-5xl mb-4">
+            ☕
+          </div>
+
+          <h2 class="text-xl font-black">
+            Support Cymor Bible
+          </h2>
+
+          <p class="text-slate-400 text-sm mt-3 leading-relaxed">
+            Your support helps improve the app, expand features and spread God's word through technology.
+          </p>
+
+        </div>
+
+        <div class="space-y-3">
+
+          <button
+            onclick="copyMpesa()"
+            class="w-full bg-green-600 text-white p-4 rounded-2xl text-sm font-black active:scale-95 transition-all shadow-lg shadow-green-500/20"
+          >
+            💚 Support via M-Pesa
+          </button>
+
+          <button
+            class="w-full bg-blue-600 text-white p-4 rounded-2xl text-sm font-black active:scale-95 transition-all shadow-lg shadow-blue-500/20"
+          >
+            ⭐ Become Monthly Supporter
+          </button>
+
+        </div>
+
+        <div class="mt-5 bg-slate-900/50 rounded-2xl p-4 border border-slate-800">
+          <p class="text-slate-400 text-xs text-center leading-relaxed">
+            M-Pesa Number:
+          </p>
+
+          <p class="text-green-400 text-lg font-black text-center mt-2 tracking-widest">
+            0113821327
+          </p>
+        </div>
+
+      </div>
+
+    </section>
+
+    <!-- STORAGE -->
+    <section class="space-y-3">
+
+      <h3 class="text-[10px] font-black text-slate-500 uppercase tracking-[0.25em] px-4">
+        Storage & Data
+      </h3>
+
+      <div class="glass rounded-[28px] divide-y divide-slate-800/60">
+
+        <button onclick="clearCache()" class="w-full p-5 flex justify-between items-center text-left">
+          <div>
+            <p class="text-sm font-bold text-red-400">
+              Clear Saved Highlights
+            </p>
+
+            <p class="text-[10px] text-slate-400">
+              Delete highlights, history and cached data
+            </p>
+          </div>
+
+          <span class="text-xl">
+            🗑️
+          </span>
+        </button>
+
+        <button onclick="exportData()" class="w-full p-5 flex justify-between items-center text-left">
+          <div>
+            <p class="text-sm font-bold text-blue-400">
+              Export Backup
+            </p>
+
+            <p class="text-[10px] text-slate-400">
+              Backup your saved verses and settings
+            </p>
+          </div>
+
+          <span class="text-xl">
+            📦
+          </span>
+        </button>
+
+      </div>
+
+    </section>
+
+    <!-- ABOUT -->
+    <section class="glass rounded-[32px] p-6 text-center">
+
+      <div class="w-16 h-16 rounded-3xl bg-blue-600/20 flex items-center justify-center text-3xl mx-auto mb-5">
+        📖
+      </div>
+
+      <h2 class="text-xl font-black">
+        Cymor Bible
+      </h2>
+
+      <p class="text-blue-400 text-xs uppercase tracking-[0.3em] font-bold mt-2">
+        Version 2.0 PRO
+      </p>
+
+      <p class="text-slate-400 text-sm leading-relaxed mt-5">
+        A modern Christian experience combining scripture, worship, audio Bible and interactive Bible learning.
+      </p>
+
+      <div class="mt-6 text-[10px] text-slate-600 space-y-1">
+        <p>Built with ❤️ by CymorTechServices</p>
+        <p>© 2026 All Rights Reserved</p>
+      </div>
+
+    </section>
 
   </main>
 
   <script>
-    function clearCache() {
-        if(confirm("Are you sure you want to delete all highlights and history?")) {
-            localStorage.removeItem("cymorHighlights");
-            localStorage.removeItem("cymorReadingHistory");
-            alert("Data cleared successfully.");
-        }
+
+    // FONT SIZE
+    const slider = document.getElementById('fontSlider');
+    const fontText = document.getElementById('fontSizeValue');
+
+    slider.addEventListener('input', () => {
+      fontText.textContent = slider.value + 'px';
+      localStorage.setItem('cymorFontSize', slider.value);
+    });
+
+    // THEME
+    function setTheme(theme, btn) {
+
+      localStorage.setItem('cymorTheme', theme);
+
+      document.querySelectorAll('.theme-btn').forEach(b => {
+        b.classList.remove('active');
+      });
+
+      btn.classList.add('active');
+
+      if(theme === 'amoled') {
+        document.body.style.background = '#000000';
+      } else {
+        document.body.style.background = '#0F172A';
+      }
     }
+
+    // CLEAR CACHE
+    function clearCache() {
+
+      if(confirm("Delete all saved highlights, reading history and settings?")) {
+
+        localStorage.clear();
+
+        alert("Data cleared successfully.");
+
+        location.reload();
+      }
+    }
+
+    // EXPORT
+    function exportData() {
+
+      const data = JSON.stringify(localStorage, null, 2);
+
+      const blob = new Blob([data], {
+        type: "application/json"
+      });
+
+      const a = document.createElement("a");
+
+      a.href = URL.createObjectURL(blob);
+
+      a.download = "cymor-bible-backup.json";
+
+      a.click();
+
+      alert("Backup exported successfully.");
+    }
+
+    // MPESA
+    function copyMpesa() {
+
+      navigator.clipboard.writeText("0113821327");
+
+      alert("M-Pesa number copied successfully.");
+    }
+
   </script>
 
 </body>
