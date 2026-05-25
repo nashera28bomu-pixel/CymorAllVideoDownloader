@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Bible Trivia — Cymor Bible</title>
+  <link rel="manifest" href="./manifest.json">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=Playfair+Display:ital,wght@0,700;1,400&display=swap" rel="stylesheet">
+  <style>
+    body { font-family: 'Inter', sans-serif; }
+    .glass { background: rgba(30, 41, 59, 0.7); backdrop-filter: blur(14px); border: 1px solid rgba(255,255,255,0.05); }
+    ::-webkit-scrollbar { width: 0px; }
+
+    @keyframes fadeIn { from {opacity:0;transform:translateY(12px);} to {opacity:1;transform:translateY(0);} }
+    .fade-in { animation: fadeIn 0.4s ease forwards; }
+    @keyframes pop { 0%{transform:scale(1);} 50%{transform:scale(1.05);} 100%{transform:scale(1);} }
+    .pop { animation: pop 0.3s ease; }
+    @keyframes shake { 0%,100%{transform:translateX(0);} 25%{transform:translateX(-6px);} 75%{transform:translateX(6px);} }
+    .shake { animation: shake 0.4s ease; }
+    @keyframes countdown { from{stroke-dashoffset:0;} to{stroke-dashoffset:220;} }
+    .timer-ring { stroke-dasharray: 220; stroke-dashoffset: 0; }
+    .timer-ring.running { animation: countdown linear forwards; }
+
+    .option-btn {
+      transition: all 0.2s ease;
+    }
+    .option-btn:not(:disabled):active { transform: scale(0.97); }
+    .option-correct { background: rgba(34,197,94,0.2) !important; border-color: #22c55e !important; color: #86efac !important; }
+    .option-wrong { background: rgba(239,68,68,0.2) !important; border-color: #ef4444 !important; color: #fca5a5 !important; }
+    .option-reveal { background: rgba(34,197,94,0.1) !important; border-color: rgba(34,197,94,0.3) !important; }
+
+    .diff-btn.active { background: #f59e0b; color: #0f172a; border-color: #f59e0b; }
+    .cat-btn.active { background: #10b981; color: white; border-color: #10b981; }
+  </style>
+</head>
+
+<body class="bg-[#0F172A] text-slate-100 min-h-screen pb-28">
+
+  <header class="sticky top-0 z-50 bg-[#0F172A]/95 backdrop-blur border-b border-slate-800 px-4 py-3">
+    <div class="max-w-md mx-auto flex items-center justify-between">
+      <a href="index.html" class="text-blue-400 text-xs font-bold uppercase tracking-widest">← Home</a>
+      <h1 class="text-sm font-bold tracking-tight">❓ Bible Trivia</h1>
+      <div class="w-12"></div>
+    </div>
+  </header>
+
+  <main class="max-w-md mx-auto px-4 py-6 space-y-5" id="mainContent">
+
+    <!-- STATS BAR -->
+    <div class="grid grid-cols-3 gap-3">
+      <div class="rounded-2xl bg-slate-900/60 border border-slate-800 p-3 text-center">
+        <p class="text-xl font-black text-green-400" id="scoreDisplay">0</p>
+        <p class="text-[9px] uppercase tracking-widest text-slate-500 mt-0.5">Score</p>
+      </div>
+      <div class="rounded-2xl bg-slate-900/60 border border-slate-800 p-3 text-center">
+        <p class="text-xl font-black text-blue-400" id="streakDisplay">0🔥</p>
+        <p class="text-[9px] uppercase tracking-widest text-slate-500 mt-0.5">Streak</p>
+      </div>
+      <div class="rounded-2xl bg-slate-900/60 border border-slate-800 p-3 text-center">
+        <p class="text-xl font-black text-amber-400" id="bestDisplay">0</p>
+        <p class="text-[9px] uppercase tracking-widest text-slate-500 mt-0.5">Best</p>
+      </div>
+    </div>
+
+    <!-- FILTERS -->
+    <div class="space-y-3">
+      <div>
+        <p class="text-[10px] uppercase tracking-[0.25em] text-slate-500 font-bold mb-2 px-1">Difficulty</p>
+        <div class="flex gap-2">
+          <button class="diff-btn active px-4 py-2 rounded-xl bg-slate-800 border border-slate-700 text-xs font-bold transition-all" onclick="setDiff('all',this)">All</button>
+          <button class="diff-btn px-4 py-2 rounded-xl bg-slate-800 border border-slate-700 text-xs font-bold transition-all" onclick="setDiff('easy',this)">Easy</button>
+          <button class="diff-btn px-4 py-2 rounded-xl bg-slate-800 border border-slate-700 text-xs font-bold transition-all" onclick="setDiff('medium',this)">Medium</button>
+          <button class="diff-btn px-4 py-2 rounded-xl bg-slate-800 border border-slate-700 text-xs font-bold transition-all" onclick="setDiff('hard',this)">Hard</button>
+        </div>
+      </div>
+      <div>
+        <p class="text-[10px] uppercase tracking-[0.25em] text-slate-500 font-bold mb-2 px-1">Category</p>
+        <div class="flex gap-2 flex-wrap">
+          <button class="cat-btn active px-3 py-1.5 rounded-xl bg-slate-800 border border-slate-700 text-xs font-bold transition-all" onclick="setCat('all',this)">All</button>
+          <button class="cat-btn px-3 py-1.5 rounded-xl bg-slate-800 border border-slate-700 text-xs font-bold transition-all" onclick="setCat('OT',this)">Old Testament</button>
+          <button class="cat-btn px-3 py-1.5 rounded-xl bg-slate-800 border border-slate-700 text-xs font-bold transition-all" onclick="setCat('NT',this)">New Testament</button>
+          <button class="cat-btn px-3 py-1.5 rounded-xl bg-slate-800 border border-slate-700 text-xs font-bold transition-all" onclick="setCat('people',this)">People</button>
+          <button class="cat-btn px-3 py-1.5 rounded-xl bg-slate-800 border border-slate-700 text-xs font-bold transition-all" onclick="setCat('places',this)">Places</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- QUESTION CARD -->
+    <div id="questionArea" class="fade-in"></div>
+
+    <!-- ANSWER FEEDBACK -->
+    <div id="feedbackArea" class="hidden rounded-[24px] p-5"></div>
+
+    <!-- CONTROLS -->
+    <div class="flex gap-3">
+      <button onclick="loadQuestion()" id="nextBtn" class="flex-1 bg-emerald-600 text-white p-4 rounded-2xl text-xs font-bold uppercase tracking-wider active:scale-95 transition-all shadow-lg shadow-emerald-500/20">
+        Next Question ›
+      </button>
+      <button onclick="resetGame()" class="w-14 h-14 bg-slate-800 border border-slate-700 rounded-2xl flex items-center justify-center text-lg active:scale-95 transition-all">🔄</button>
+    </div>
+
+    <!-- LEADERBOARD / HISTORY -->
+    <div class="rounded-[24px] border border-slate-800 bg-slate-900/50 p-5">
+      <p class="text-[10px] uppercase tracking-[0.25em] text-slate-500 font-bold mb-3">Recent Answers</p>
+      <div id="historyList" class="space-y-2 max-h-40 overflow-y-auto">
+        <p class="text-slate-600 text-xs text-center py-3">Your answered questions will appear here</p>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- NAV -->
+  <nav class="fixed bottom-0 left-0 right-0 glass border-t border-slate-800 px-8 py-4 flex justify-between items-center z-[100]">
+    <a href="index.html" class="flex flex-col items-center gap-1 text-slate-500">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z"/></svg>
+      <span class="text-[10px]">Home</span>
+    </a>
+    <a href="bible.html" class="flex flex-col items-center gap-1 text-slate-500">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path d="M9 4.804A7.968 7.968 0 005.5 4c-1.255 0-2.443.29-3.5.804v10A7.969 7.969 0 015.5 14c1.669 0 3.218.51 4.5 1.385A7.962 7.962 0 0114.5 14c1.255 0 2.443.29 3.5.804v-10A7.968 7.968 0 0014.5 4c-1.255 0-2.443.29-3.5.804V12a1 1 0 11-2 0V4.804z"/></svg>
+      <span class="text-[10px]">Bible</span>
+    </a>
+    <a href="audio.html" class="flex flex-col items-center gap-1 text-slate-500">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M9.383 3.076A1 1 0 0110 4v12a1 1 0 01-1.707.707L4.586 13H2a1 1 0 01-1-1V8a1 1 0 011-1h2.586l3.707-3.707a1 1 0 011.09-.217zM14.657 2.929a1 1 0 011.414 0A9.972 9.972 0 0119 10a9.972 9.972 0 01-2.929 7.071 1 1 0 01-1.414-1.414A7.971 7.971 0 0017 10c0-2.21-.894-4.208-2.343-5.657a1 1 0 010-1.414zm-2.829 2.828a1 1 0 011.415 0A5.983 5.983 0 0115 10a5.984 5.984 0 01-1.757 4.243 1 1 0 01-1.415-1.415A3.984 3.984 0 0013 10a3.983 3.983 0 00-1.172-2.828 1 1 0 010-1.415z" clip-rule="evenodd"/></svg>
+      <span class="text-[10px]">Audio</span>
+    </a>
+    <a href="playlist.html" class="flex flex-col items-center gap-1 text-slate-500">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path d="M18 3a1 1 0 00-1.196-.98l-10 2A1 1 0 006 5v9.114A4.369 4.369 0 005 14c-1.657 0-3 .895-3 2s1.343 2 3 2 3-.895 3-2V7.82l8-1.6v5.894A4.37 4.37 0 0015 12c-1.657 0-3 .895-3 2s1.343 2 3 2 3-.895 3-2V3z"/></svg>
+      <span class="text-[10px]">Music</span>
+    </a>
+    <a href="trivia.html" class="flex flex-col items-center gap-1 text-amber-400">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-8-3a1 1 0 00-.867.5 1 1 0 11-1.731-1A3 3 0 0113 8a3.001 3.001 0 01-2 2.83V11a1 1 0 11-2 0v-1a1 1 0 011-1 1 1 0 100-2zm0 8a1 1 0 100-2 1 1 0 000 2z" clip-rule="evenodd"/></svg>
+      <span class="text-[10px]">Trivia</span>
+    </a>
+  </nav>
+
+  <script>
+    const QUESTIONS = [
+      // ── EASY (20) ──────────────────────────────────────────────────────────
+      { q: "How many days did God take to create the world?", opts: ["5","6","7","8"], ans: 1, diff: "easy", cat: "OT", ref: "Genesis 1", exp: "God created everything in 6 days and rested on the 7th." },
+      { q: "Who was the first man created by God?", opts: ["Noah","Moses","Adam","Abraham"], ans: 2, diff: "easy", cat: "OT", ref: "Genesis 2:7", exp: "God formed Adam from the dust of the ground and breathed life into him." },
+      { q: "What was the name of the garden where Adam and Eve lived?", opts: ["Eden","Gethsemane","Nazareth","Canaan"], ans: 0, diff: "easy", cat: "OT", ref: "Genesis 2:8", exp: "The Garden of Eden was the first home of humanity." },
+      { q: "Who built the ark in the Bible?", opts: ["Moses","Elijah","Noah","Abraham"], ans: 2, diff: "easy", cat: "OT", ref: "Genesis 6", exp: "God commanded Noah to build the ark to save his family and the animals." },
+      { q: "How many commandments did God give Moses?", opts: ["5","8","10","12"], ans: 2, diff: "easy", cat: "OT", ref: "Exodus 20", exp: "The Ten Commandments were given to Moses on Mount Sinai." },
+      { q: "What giant did David defeat with a sling?", opts: ["Samson","Goliath","Gideon","Absalom"], ans: 1, diff: "easy", cat: "OT", ref: "1 Samuel 17", exp: "The young shepherd David defeated the Philistine giant Goliath with a single stone." },
+      { q: "What is the first book of the Bible?", opts: ["Exodus","Psalms","Genesis","Matthew"], ans: 2, diff: "easy", cat: "OT", ref: "Genesis 1:1", exp: "Genesis means 'beginning' and is the very first book of the Bible." },
+      { q: "Who was swallowed by a great fish?", opts: ["Elijah","Jonah","Daniel","Isaiah"], ans: 1, diff: "easy", cat: "OT", ref: "Jonah 1:17", exp: "Jonah was swallowed by a large fish for three days and nights after fleeing from God." },
+      { q: "Who was the mother of Jesus?", opts: ["Elizabeth","Martha","Mary","Ruth"], ans: 2, diff: "easy", cat: "NT", ref: "Luke 1:31", exp: "The angel Gabriel announced to Mary that she would bear the Son of God." },
+      { q: "In what city was Jesus born?", opts: ["Jerusalem","Nazareth","Bethlehem","Jericho"], ans: 2, diff: "easy", cat: "NT", ref: "Luke 2:4-7", exp: "Jesus was born in Bethlehem of Judea, fulfilling Micah's prophecy." },
+      { q: "How many disciples did Jesus choose?", opts: ["7","10","12","15"], ans: 2, diff: "easy", cat: "NT", ref: "Luke 6:13", exp: "Jesus chose 12 disciples to follow Him and spread the gospel." },
+      { q: "Who baptized Jesus?", opts: ["Peter","Paul","John the Baptist","Elijah"], ans: 2, diff: "easy", cat: "NT", ref: "Matthew 3:13", exp: "John the Baptist baptized Jesus in the Jordan River." },
+      { q: "What is the last book of the Bible?", opts: ["Jude","Acts","Hebrews","Revelation"], ans: 3, diff: "easy", cat: "NT", ref: "Revelation 22:21", exp: "Revelation, written by John, is the final book of the Bible." },
+      { q: "How many books are in the Bible?", opts: ["60","66","72","73"], ans: 1, diff: "easy", cat: "OT", ref: "Canon of Scripture", exp: "The Protestant Bible contains 66 books — 39 Old Testament and 27 New Testament." },
+      { q: "What did God create on the first day?", opts: ["Sun and moon","Animals","Light","Sky"], ans: 2, diff: "easy", cat: "OT", ref: "Genesis 1:3", exp: "On the first day God said 'Let there be light' and separated light from darkness." },
+      { q: "Who was thrown into the lions' den?", opts: ["Elijah","Shadrach","Daniel","Ezekiel"], ans: 2, diff: "easy", cat: "OT", ref: "Daniel 6:16", exp: "Daniel was thrown into the lions' den for praying to God and was miraculously protected." },
+      { q: "Which river did Moses part to lead Israel out of Egypt?", opts: ["Jordan","Nile","Red Sea","Euphrates"], ans: 2, diff: "easy", cat: "OT", ref: "Exodus 14:21", exp: "God used Moses to part the Red Sea so Israel could cross on dry ground." },
+      { q: "How many days and nights did it rain during Noah's flood?", opts: ["7","20","40","100"], ans: 2, diff: "easy", cat: "OT", ref: "Genesis 7:12", exp: "Rain fell for 40 days and 40 nights, flooding the entire earth." },
+      { q: "Who was the first woman in the Bible?", opts: ["Ruth","Mary","Sarah","Eve"], ans: 3, diff: "easy", cat: "OT", ref: "Genesis 2:22", exp: "Eve was created from Adam's rib and was the first woman." },
+      { q: "What sign did God put in the sky after Noah's flood?", opts: ["A dove","A star","A rainbow","A cloud"], ans: 2, diff: "easy", cat: "OT", ref: "Genesis 9:13", exp: "God set a rainbow in the clouds as His covenant never to flood the earth again." },
+
+      // ── MEDIUM (30) ────────────────────────────────────────────────────────
+      { q: "What were the names of Noah's three sons?", opts: ["Shem, Ham, Japheth","Cain, Abel, Seth","Isaac, Ishmael, Jacob","Reuben, Simeon, Levi"], ans: 0, diff: "medium", cat: "OT", ref: "Genesis 6:10", exp: "Noah's three sons — Shem, Ham, and Japheth — repopulated the earth after the flood." },
+      { q: "How many years did the Israelites wander in the desert?", opts: ["20","30","40","50"], ans: 2, diff: "medium", cat: "OT", ref: "Numbers 14:33", exp: "The Israelites wandered 40 years in the wilderness as a consequence of their faithlessness." },
+      { q: "What was the name of Abraham's wife?", opts: ["Rachel","Leah","Ruth","Sarah"], ans: 3, diff: "medium", cat: "OT", ref: "Genesis 17:15", exp: "God renamed Sarai to Sarah, meaning 'princess of a multitude.'" },
+      { q: "Who interpreted Pharaoh's dream about seven fat and seven thin cows?", opts: ["Moses","Daniel","Joseph","Ezekiel"], ans: 2, diff: "medium", cat: "OT", ref: "Genesis 41", exp: "Joseph interpreted Pharaoh's dream — 7 years of plenty followed by 7 years of famine." },
+      { q: "What was the name of Moses' sister?", opts: ["Deborah","Miriam","Esther","Ruth"], ans: 1, diff: "medium", cat: "OT", ref: "Exodus 15:20", exp: "Miriam was the sister of Moses and Aaron, and a prophetess who led worship." },
+      { q: "How many days was Jesus in the wilderness being tempted?", opts: ["3","7","30","40"], ans: 3, diff: "medium", cat: "NT", ref: "Matthew 4:2", exp: "Jesus fasted and was tempted by the devil for 40 days in the wilderness." },
+      { q: "What was the last meal Jesus shared with His disciples called?", opts: ["Passover","The Last Supper","Communion","The Breaking of Bread"], ans: 1, diff: "medium", cat: "NT", ref: "Matthew 26:17-30", exp: "The Last Supper was the Passover meal Jesus shared the night before His crucifixion." },
+      { q: "On what day did Jesus rise from the dead?", opts: ["1st day","3rd day","7th day","40th day"], ans: 1, diff: "medium", cat: "NT", ref: "Luke 24:7", exp: "Jesus rose on the third day, fulfilling Old Testament prophecy." },
+      { q: "Who denied Jesus three times?", opts: ["Judas","Thomas","Peter","James"], ans: 2, diff: "medium", cat: "NT", ref: "Matthew 26:75", exp: "Peter denied knowing Jesus three times before the rooster crowed, just as Jesus predicted." },
+      { q: "Who was the father of John the Baptist?", opts: ["Simeon","Zacharias","Joseph","Aaron"], ans: 1, diff: "medium", cat: "NT", ref: "Luke 1:13", exp: "Zacharias, a priest, was the father of John the Baptist. His wife was Elizabeth." },
+      { q: "What is the shortest verse in the Bible?", opts: ["God is love","Jesus wept","Amen","Pray always"], ans: 1, diff: "medium", cat: "NT", ref: "John 11:35", exp: "'Jesus wept' — two words in English — is the shortest verse, showing His humanity." },
+      { q: "How many plagues did God send on Egypt?", opts: ["7","8","10","12"], ans: 2, diff: "medium", cat: "OT", ref: "Exodus 7-12", exp: "God sent 10 plagues on Egypt to compel Pharaoh to release the Israelites." },
+      { q: "What instrument did David play for King Saul?", opts: ["Flute","Trumpet","Harp","Drum"], ans: 2, diff: "medium", cat: "OT", ref: "1 Samuel 16:23", exp: "David played the harp to soothe King Saul when an evil spirit troubled him." },
+      { q: "Who was sold into slavery by his brothers?", opts: ["Moses","Benjamin","Joseph","Reuben"], ans: 2, diff: "medium", cat: "OT", ref: "Genesis 37:28", exp: "Joseph's brothers sold him to Ishmaelite traders for 20 pieces of silver." },
+      { q: "What did the wise men follow to find baby Jesus?", opts: ["An angel","A star","A cloud","A dove"], ans: 1, diff: "medium", cat: "NT", ref: "Matthew 2:2", exp: "The Magi followed a star in the east that led them to the birthplace of Jesus." },
+      { q: "What were the two great commandments Jesus named?", opts: ["Pray and fast","Love God and love your neighbour","Honour parents and keep Sabbath","Tithe and worship"], ans: 1, diff: "medium", cat: "NT", ref: "Matthew 22:37-39", exp: "Jesus said love God with all your heart and love your neighbour as yourself." },
+      { q: "Who wrote most of the Psalms?", opts: ["Solomon","Moses","David","Asaph"], ans: 2, diff: "medium", cat: "OT", ref: "Book of Psalms", exp: "King David is credited with writing approximately 73 of the 150 Psalms." },
+      { q: "How many books did Paul write in the New Testament?", opts: ["9","11","13","15"], ans: 2, diff: "medium", cat: "NT", ref: "Pauline Epistles", exp: "Paul wrote 13 books of the New Testament, from Romans to Philemon." },
+      { q: "What happened at Pentecost after Jesus ascended?", opts: ["Jesus returned","An earthquake struck","The Holy Spirit descended","The temple was destroyed"], ans: 2, diff: "medium", cat: "NT", ref: "Acts 2:1-4", exp: "The Holy Spirit fell on the disciples like tongues of fire and they spoke in other languages." },
+      { q: "Which disciple betrayed Jesus for 30 pieces of silver?", opts: ["Thomas","Judas Iscariot","Bartholomew","Simon"], ans: 1, diff: "medium", cat: "NT", ref: "Matthew 26:15", exp: "Judas Iscariot agreed to betray Jesus to the chief priests for 30 pieces of silver." },
+      { q: "What city's walls fell after Israel marched around it?", opts: ["Jerusalem","Jericho","Ai","Hebron"], ans: 1, diff: "medium", cat: "OT", ref: "Joshua 6:20", exp: "The walls of Jericho collapsed after Israel marched around them for 7 days." },
+      { q: "Who was the first martyr of the Christian church?", opts: ["Paul","James","Stephen","Philip"], ans: 2, diff: "medium", cat: "NT", ref: "Acts 7:59", exp: "Stephen was stoned to death and is recognised as the first Christian martyr." },
+      { q: "In what book does the story of Job appear?", opts: ["Psalms","Proverbs","Job","Lamentations"], ans: 2, diff: "medium", cat: "OT", ref: "Job 1:1", exp: "The Book of Job recounts the story of a righteous man tested through severe suffering." },
+      { q: "What river did Joshua lead the Israelites across into Canaan?", opts: ["Nile","Euphrates","Jordan","Tigris"], ans: 2, diff: "medium", cat: "OT", ref: "Joshua 3:17", exp: "God parted the Jordan River so Joshua could lead Israel into the Promised Land." },
+      { q: "Who anointed David as king?", opts: ["Moses","Eli","Nathan","Samuel"], ans: 3, diff: "medium", cat: "OT", ref: "1 Samuel 16:13", exp: "The prophet Samuel anointed David with oil in the presence of his brothers." },
+      { q: "What was the name of the valley where David fought Goliath?", opts: ["Valley of Elah","Valley of Jezreel","Valley of Kidron","Valley of Hinnom"], ans: 0, diff: "medium", cat: "OT", ref: "1 Samuel 17:2", exp: "The battle took place in the Valley of Elah between the Israelites and Philistines." },
+      { q: "Who wrote the Book of Revelation?", opts: ["Paul","Peter","Luke","John"], ans: 3, diff: "medium", cat: "NT", ref: "Revelation 1:1", exp: "The apostle John wrote Revelation while exiled on the island of Patmos." },
+      { q: "How many lepers did Jesus heal at one time in Luke 17?", opts: ["3","5","10","12"], ans: 2, diff: "medium", cat: "NT", ref: "Luke 17:12-14", exp: "Jesus healed 10 lepers, but only one — a Samaritan — returned to give thanks." },
+      { q: "What gift did Salome's dancing earn from King Herod?", opts: ["Gold","The head of John the Baptist","A kingdom","A palace"], ans: 1, diff: "medium", cat: "NT", ref: "Matthew 14:8", exp: "Prompted by her mother Herodias, Salome asked for John the Baptist's head on a platter." },
+      { q: "Which prophet was taken to heaven in a whirlwind?", opts: ["Isaiah","Elisha","Elijah","Ezekiel"], ans: 2, diff: "medium", cat: "OT", ref: "2 Kings 2:11", exp: "Elijah was taken up to heaven in a whirlwind with a chariot and horses of fire." },
+
+      // ── EXTREMELY HARD (50) ────────────────────────────────────────────────
+      { q: "What was the name of the giant Goliath's brother who was killed by Elhanan?", opts: ["Lahmi","Ishbi-benob","Saph","Sippai"], ans: 0, diff: "hard", cat: "people", ref: "2 Samuel 21:19 / 1 Chronicles 20:5", exp: "Elhanan son of Jair killed Lahmi, the brother of Goliath the Gittite." },
+      { q: "How many years did Methuselah live?", opts: ["777","900","930","969"], ans: 3, diff: "hard", cat: "people", ref: "Genesis 5:27", exp: "Methuselah lived 969 years — the longest lifespan recorded in Scripture." },
+      { q: "Which judge of Israel had 70 sons from many wives?", opts: ["Samson","Gideon","Jephthah","Tola"], ans: 1, diff: "hard", cat: "people", ref: "Judges 8:30", exp: "Gideon had 70 sons because he had many wives, plus Abimelech born of a concubine." },
+      { q: "Who was the first king of Israel?", opts: ["David","Solomon","Saul","Rehoboam"], ans: 2, diff: "hard", cat: "people", ref: "1 Samuel 10:1", exp: "Saul was anointed by Samuel as the first king over Israel." },
+      { q: "What was Paul's original name before his conversion?", opts: ["Simon","Bartholomew","Saul","Silas"], ans: 2, diff: "hard", cat: "people", ref: "Acts 9:4", exp: "Paul was born Saul of Tarsus, a zealous Pharisee who persecuted early Christians." },
+      { q: "On which mountain did Moses receive the Ten Commandments?", opts: ["Mount Carmel","Mount Zion","Mount Sinai","Mount Nebo"], ans: 2, diff: "hard", cat: "places", ref: "Exodus 19:20", exp: "God spoke to Moses on Mount Sinai and gave him the two tablets of the law." },
+      { q: "In which city was the apostle Paul born?", opts: ["Jerusalem","Antioch","Tarsus","Corinth"], ans: 2, diff: "hard", cat: "places", ref: "Acts 22:3", exp: "Paul declared 'I am a Jew, born in Tarsus of Cilicia.' It was the capital of Cilicia." },
+      { q: "What is the name of the garden where Jesus was arrested?", opts: ["Eden","Gethsemane","Siloam","Kedron"], ans: 1, diff: "hard", cat: "places", ref: "Matthew 26:36", exp: "Jesus withdrew to Gethsemane to pray before His arrest. The name means 'olive press.'" },
+      { q: "What was the exact weight of the gold that came to Solomon in one year?", opts: ["500 talents","666 talents","777 talents","1000 talents"], ans: 1, diff: "hard", cat: "OT", ref: "1 Kings 10:14", exp: "666 talents of gold came to Solomon yearly — a staggering sum highlighting his great wealth." },
+      { q: "Which prophet married a prostitute as a sign of Israel's unfaithfulness to God?", opts: ["Amos","Micah","Hosea","Nahum"], ans: 2, diff: "hard", cat: "people", ref: "Hosea 1:2", exp: "God commanded Hosea to marry Gomer, a symbol of Israel's spiritual adultery against God." },
+      { q: "How many years was the tabernacle at Shiloh before the temple was built?", opts: ["100","200","300","400"], ans: 2, diff: "hard", cat: "OT", ref: "1 Kings 6:1 / Judges 18:31", exp: "The tabernacle remained at Shiloh approximately 300 years from Joshua until Solomon's temple." },
+      { q: "What were the Urim and Thummim used for?", opts: ["Making sacrifices","Determining God's will","Purifying priests","Measuring temple dimensions"], ans: 1, diff: "hard", cat: "OT", ref: "Exodus 28:30", exp: "Urim and Thummim were objects in the high priest's breastplate used to discern God's will." },
+      { q: "In which epistle does Paul list the armor of God?", opts: ["Colossians","Philippians","Ephesians","Romans"], ans: 2, diff: "hard", cat: "NT", ref: "Ephesians 6:11", exp: "Paul describes the full armor of God in Ephesians 6: belt of truth, breastplate, shield, helmet, sword." },
+      { q: "Who was Barnabas' cousin who accompanied Paul on his first journey then caused a dispute?", opts: ["Silas","Titus","Mark","Luke"], ans: 2, diff: "hard", cat: "people", ref: "Colossians 4:10 / Acts 15:37", exp: "John Mark was Barnabas' cousin. His departure from the first mission caused Paul and Barnabas to separate." },
+      { q: "What was the name of the well where Abraham's servant found Rebekah?", opts: ["Well of Sirah","Well at Nahor","En Hakkore","Beer-sheba"], ans: 1, diff: "hard", cat: "places", ref: "Genesis 24:10-11", exp: "The servant met Rebekah drawing water at a well outside the city of Nahor in Mesopotamia." },
+      { q: "How many elders surround the throne of God in Revelation?", opts: ["7","12","24","72"], ans: 2, diff: "hard", cat: "NT", ref: "Revelation 4:4", exp: "24 elders dressed in white with golden crowns surround the throne of God in Revelation 4." },
+      { q: "What was the name of the high priest whose servant's ear Peter cut off?", opts: ["Annas","Caiaphas","Ananias","Eli"], ans: 1, diff: "hard", cat: "people", ref: "John 18:10", exp: "Peter cut off the ear of Malchus, a servant of the high priest Caiaphas, in Gethsemane." },
+      { q: "Who killed Sisera by driving a tent peg through his temple?", opts: ["Deborah","Jael","Rahab","Abigail"], ans: 1, diff: "hard", cat: "people", ref: "Judges 4:21", exp: "Jael drove a tent peg through Sisera's temple while he slept, fulfilling Deborah's prophecy." },
+      { q: "How many silver pieces was the field of blood (Akeldama) purchased for?", opts: ["20","30","50","100"], ans: 1, diff: "hard", cat: "NT", ref: "Matthew 27:6-8 / Acts 1:18", exp: "The 30 pieces of silver Judas returned were used to buy the potter's field called Akeldama." },
+      { q: "In Ezekiel's vision, how many faces did each living creature have?", opts: ["2","3","4","6"], ans: 2, diff: "hard", cat: "OT", ref: "Ezekiel 1:6", exp: "Each creature had four faces: a man, a lion, an ox, and an eagle — symbols of creation's fullness." },
+      { q: "What was the name of the Ethiopian eunuch baptized by Philip?", opts: ["His name is not given","Simeon","Cornelius","Niger"], ans: 0, diff: "hard", cat: "NT", ref: "Acts 8:27-38", exp: "The Ethiopian eunuch's name is never mentioned in Scripture. He was a court official of Queen Candace." },
+      { q: "How many times did Elijah stretch himself over the widow's dead son before he revived?", opts: ["1","2","3","7"], ans: 2, diff: "hard", cat: "OT", ref: "1 Kings 17:21", exp: "Elijah stretched himself over the child three times and cried to God, and the child revived." },
+      { q: "What is the Hebrew name for the first five books of the Bible?", opts: ["Septuagint","Talmud","Torah","Midrash"], ans: 2, diff: "hard", cat: "OT", ref: "Genesis-Deuteronomy", exp: "The Torah (meaning 'instruction' or 'law') refers to the five books of Moses." },
+      { q: "Who was the king of Babylon that saw the writing on the wall?", opts: ["Nebuchadnezzar","Darius","Cyrus","Belshazzar"], ans: 3, diff: "hard", cat: "people", ref: "Daniel 5:1", exp: "Belshazzar held a great feast and saw a hand write 'MENE MENE TEKEL UPHARSIN' on the wall." },
+      { q: "Which Old Testament woman hid two spies under flax stalks on her roof?", opts: ["Deborah","Jael","Rahab","Tamar"], ans: 2, diff: "hard", cat: "people", ref: "Joshua 2:6", exp: "Rahab hid the two Israelite spies under bundles of flax stalks on her rooftop in Jericho." },
+      { q: "What is the number of the beast in Revelation?", opts: ["616","666","777","999"], ans: 1, diff: "hard", cat: "NT", ref: "Revelation 13:18", exp: "Revelation 13:18 identifies the number of the beast as 666, the number of a man." },
+      { q: "How many languages did the disciples speak on the day of Pentecost?", opts: ["7","10","At least 15","40"], ans: 2, diff: "hard", cat: "NT", ref: "Acts 2:8-11", exp: "Acts 2 lists at least 15 language groups who heard the disciples speaking in their own tongues." },
+      { q: "What was the name of Abraham before God renamed him?", opts: ["Abram","Aram","Nahor","Terah"], ans: 0, diff: "hard", cat: "people", ref: "Genesis 17:5", exp: "God changed Abram's name to Abraham, meaning 'father of many nations.'" },
+      { q: "Which sea did the prophet Isaiah call 'the sea of the Philistines'?", opts: ["Red Sea","Dead Sea","Mediterranean Sea","Sea of Galilee"], ans: 2, diff: "hard", cat: "places", ref: "Exodus 23:31 / Isaiah", exp: "The Mediterranean Sea was called the sea of the Philistines as they occupied its eastern coast." },
+      { q: "How many years did Solomon spend building the temple in Jerusalem?", opts: ["3","5","7","10"], ans: 2, diff: "hard", cat: "OT", ref: "1 Kings 6:38", exp: "Solomon spent seven years building the temple, which was completed in the 11th year of his reign." },
+      { q: "What was the profession of Matthew (Levi) before he followed Jesus?", opts: ["Fisherman","Carpenter","Tax collector","Pharisee"], ans: 2, diff: "hard", cat: "people", ref: "Matthew 9:9", exp: "Matthew was a tax collector sitting at the tax booth when Jesus called him to 'Follow Me.'" },
+      { q: "How many years was the apostle Paul in Arabia after his conversion before going to Jerusalem?", opts: ["1","3","5","7"], ans: 1, diff: "hard", cat: "NT", ref: "Galatians 1:17-18", exp: "Paul spent three years in Arabia after his conversion before visiting Peter in Jerusalem." },
+      { q: "What river ran through the Garden of Eden that split into four?", opts: ["Pishon","Gihon","Euphrates","Perat"], ans: 2, diff: "hard", cat: "places", ref: "Genesis 2:10-14", exp: "The river from Eden split into four: Pishon, Gihon, Tigris (Hiddekel), and Euphrates." },
+      { q: "How many sons did Jacob have?", opts: ["10","11","12","13"], ans: 2, diff: "hard", cat: "people", ref: "Genesis 35:22", exp: "Jacob had 12 sons who became the fathers of the 12 tribes of Israel." },
+      { q: "Which apostle was called 'the Twin'?", opts: ["Philip","Bartholomew","Thomas","Thaddaeus"], ans: 2, diff: "hard", cat: "people", ref: "John 11:16", exp: "Thomas was called Didymus, which means 'the Twin' in Greek." },
+      { q: "What is the name of the angel who announced the birth of Jesus to Mary?", opts: ["Michael","Raphael","Gabriel","Uriel"], ans: 2, diff: "hard", cat: "NT", ref: "Luke 1:26", exp: "Gabriel was sent from God to Nazareth to announce to the virgin Mary that she would bear the Son of God." },
+      { q: "Who was the first person to see Jesus after His resurrection?", opts: ["Peter","Mary Magdalene","John","Mary the mother of Jesus"], ans: 1, diff: "hard", cat: "NT", ref: "John 20:14-16", exp: "Mary Magdalene was the first to see the risen Jesus. He appeared to her outside the tomb." },
+      { q: "What was the name of the woman who hid baby Moses in the Nile?", opts: ["Miriam","Zipporah","Jochebed","Shiprah"], ans: 2, diff: "hard", cat: "people", ref: "Exodus 2:3", exp: "Jochebed, Moses' mother, placed him in a basket among the reeds of the Nile to save his life." },
+      { q: "In what book of the Bible is the story of the Tower of Babel?", opts: ["Exodus","Numbers","Deuteronomy","Genesis"], ans: 3, diff: "hard", cat: "OT", ref: "Genesis 11:1-9", exp: "The Tower of Babel account is in Genesis 11. God confused the languages to scatter humanity." },
+      { q: "Who was Saul's son that was Jonathan's closest friend to David?", opts: ["Jonathan was Saul's son who befriended David","Mephibosheth","Ish-bosheth","Malchishua"], ans: 0, diff: "hard", cat: "people", ref: "1 Samuel 18:1", exp: "Jonathan was Saul's son whose soul was knit to David's. He made a covenant of friendship with him." },
+      { q: "What two cities were destroyed by fire and brimstone in Genesis?", opts: ["Jericho and Ai","Sodom and Gomorrah","Nineveh and Babylon","Tyre and Sidon"], ans: 1, diff: "hard", cat: "places", ref: "Genesis 19:24", exp: "God rained burning sulfur on Sodom and Gomorrah, destroying them for their wickedness." },
+      { q: "How many chapters are in the book of Psalms?", opts: ["100","120","150","175"], ans: 2, diff: "hard", cat: "OT", ref: "Psalms", exp: "The book of Psalms contains 150 chapters, making it the longest book in the Bible by chapters." },
+      { q: "What are the four Gospels in order?", opts: ["Matthew, Mark, Luke, John","Mark, Luke, Matthew, John","Luke, John, Matthew, Mark","John, Matthew, Luke, Mark"], ans: 0, diff: "hard", cat: "NT", ref: "New Testament Canon", exp: "The four Gospels appear in this canonical order: Matthew, Mark, Luke, and John." },
+      { q: "What king of Persia allowed the Jews to return from Babylonian exile?", opts: ["Darius","Xerxes","Artaxerxes","Cyrus"], ans: 3, diff: "hard", cat: "people", ref: "Ezra 1:1-2", exp: "Cyrus the Great of Persia issued a decree allowing the Jewish exiles to return to Jerusalem." },
+      { q: "How many times did God call Samuel by name before Eli understood it was God?", opts: ["1","2","3","4"], ans: 2, diff: "hard", cat: "OT", ref: "1 Samuel 3:8", exp: "God called Samuel three times in the night before Eli recognised it was the Lord speaking." },
+      { q: "What was the name of the pool where Jesus healed the paralysed man?", opts: ["Pool of Siloam","Pool of Bethesda","Pool of Gibeon","Spring of Elisha"], ans: 1, diff: "hard", cat: "places", ref: "John 5:2", exp: "The Pool of Bethesda (meaning 'house of mercy') had five porches where the sick waited to be healed." },
+      { q: "Which son of David committed adultery with his half-sister Tamar?", opts: ["Absalom","Solomon","Adonijah","Amnon"], ans: 3, diff: "hard", cat: "people", ref: "2 Samuel 13:14", exp: "Amnon violated his half-sister Tamar, which led to Absalom killing him in revenge." },
+      { q: "How many books are in the New Testament?", opts: ["25","27","29","30"], ans: 1, diff: "hard", cat: "NT", ref: "New Testament Canon", exp: "The New Testament contains exactly 27 books, from Matthew through Revelation." },
+      { q: "What was the sign given to Gideon by God involving a fleece?", opts: ["Fire consumed it","Dew on fleece but dry ground, then dry fleece but wet ground","It turned white","An angel stood on it"], ans: 1, diff: "hard", cat: "OT", ref: "Judges 6:37-40", exp: "Gideon asked God to put dew only on the fleece first, then only on the ground — both were granted." },
+      { q: "In which chapter of Romans does Paul write about nothing separating us from the love of God?", opts: ["Chapter 5","Chapter 6","Chapter 8","Chapter 10"], ans: 2, diff: "hard", cat: "NT", ref: "Romans 8:38-39", exp: "In Romans 8:38-39 Paul declares that nothing in all creation can separate us from God's love in Christ." },
+      { q: "What was the name of the centurion whose servant Jesus healed from a distance?", opts: ["Cornelius","Julius","Longinus","His name is not given in Matthew"], ans: 3, diff: "hard", cat: "NT", ref: "Matthew 8:5-13", exp: "The centurion of Capernaum is not named in Matthew or Luke. He showed remarkable faith and humility." },
+    ];
+
+    // ── NO-REPEAT SHUFFLE ENGINE ───────────────────────────────────────────
+    let score = 0;
+    let streak = 0;
+    let best = parseInt(localStorage.getItem('cymorTriviaScore') || '0');
+    let currentQ = null;
+    let answered = false;
+    let diffFilter = 'all';
+    let catFilter = 'all';
+    let history = [];
+    let questionQueue = [];   // shuffled pool — questions drawn from front, no repeats until exhausted
+    let sessionTotal = 0;     // total questions attempted this session
+
+    document.getElementById('bestDisplay').textContent = best;
+
+    function getFiltered() {
+      return QUESTIONS.filter(q =>
+        (diffFilter === 'all' || q.diff === diffFilter) &&
+        (catFilter === 'all' || q.cat === catFilter)
+      );
+    }
+
+    // Fisher-Yates shuffle
+    function shuffle(arr) {
+      const a = [...arr];
+      for (let i = a.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [a[i], a[j]] = [a[j], a[i]];
+      }
+      return a;
+    }
+
+    function buildQueue() {
+      questionQueue = shuffle(getFiltered());
+    }
+
+    function loadQuestion() {
+      // Rebuild queue if empty or filters changed
+      if (!questionQueue.length) {
+        buildQueue();
+        if (!questionQueue.length) {
+          document.getElementById('questionArea').innerHTML = `<div class="text-center py-8 text-slate-400 text-sm">No questions match these filters. Try different settings.</div>`;
+          return;
+        }
+        // Show "all done" banner once before restarting
+        if (sessionTotal > 0 && sessionTotal % getFiltered().length === 0) {
+          document.getElementById('questionArea').innerHTML = `
+            <div class="text-center py-8 fade-in">
+              <p class="text-2xl mb-3">🎉</p>
+              <p class="text-white font-bold text-lg mb-1">All questions complete!</p>
+              <p class="text-slate-400 text-sm mb-4">Starting a new shuffled round...</p>
+            </div>`;
+          setTimeout(() => { drawQuestion(); }, 2000);
+          return;
+        }
+      }
+      drawQuestion();
+    }
+
+    function drawQuestion() {
+      if (!questionQueue.length) buildQueue();
+      currentQ = questionQueue.shift();
+      sessionTotal++;
+      answered = false;
+      document.getElementById('feedbackArea').classList.add('hidden');
+      renderQuestion();
+    }
+
+    function renderQuestion() {
+      const diffColors = { easy: 'text-green-400', medium: 'text-amber-400', hard: 'text-red-400' };
+      const catEmoji = { OT: '📜', NT: '✝️', people: '👤', places: '📍' };
+      document.getElementById('questionArea').innerHTML = `
+        <div class="fade-in rounded-[28px] border border-slate-800 bg-slate-900/70 p-6 space-y-5">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-bold ${diffColors[currentQ.diff]} uppercase">${currentQ.diff}</span>
+            <span class="text-xs text-slate-500">${catEmoji[currentQ.cat] || '📖'} ${currentQ.cat.toUpperCase()}</span>
+          </div>
+          <p class="text-white text-lg font-bold leading-snug">${currentQ.q}</p>
+          <div class="space-y-3" id="optionsList">
+            ${currentQ.opts.map((opt, i) => `
+              <button onclick="answer(${i})" class="option-btn w-full text-left p-4 rounded-2xl border border-slate-700 bg-slate-800/50 text-slate-200 text-sm font-medium active:scale-[0.98]">
+                <span class="font-bold text-slate-500 mr-2">${['A','B','C','D'][i]}.</span> ${opt}
+              </button>
+            `).join('')}
+          </div>
+          <p class="text-[10px] text-slate-600 uppercase tracking-widest text-center">${currentQ.ref}</p>
+        </div>
+      `;
+    }
+
+    function answer(idx) {
+      if (answered) return;
+      answered = true;
+      const correct = idx === currentQ.ans;
+
+      // Update stats
+      if (correct) {
+        score++;
+        streak++;
+        if (streak > best) {
+          best = streak;
+          localStorage.setItem('cymorTriviaScore', best);
+        }
+      } else {
+        streak = 0;
+      }
+      document.getElementById('scoreDisplay').textContent = score;
+      document.getElementById('streakDisplay').textContent = streak + (streak >= 3 ? '🔥' : '');
+      document.getElementById('bestDisplay').textContent = best;
+
+      // Style options
+      const btns = document.querySelectorAll('.option-btn');
+      btns.forEach((btn, i) => {
+        btn.disabled = true;
+        if (i === currentQ.ans) btn.classList.add('option-correct');
+        else if (i === idx && !correct) btn.classList.add('option-wrong');
+      });
+
+      // Feedback card
+      const fb = document.getElementById('feedbackArea');
+      fb.className = `rounded-[24px] p-5 border fade-in ${correct ? 'bg-green-900/20 border-green-500/30' : 'bg-red-900/20 border-red-500/30'}`;
+      fb.innerHTML = `
+        <div class="flex items-start gap-3">
+          <span class="text-2xl">${correct ? '✅' : '❌'}</span>
+          <div>
+            <p class="font-bold text-sm mb-1 ${correct ? 'text-green-300' : 'text-red-300'}">${correct ? 'Correct! +1 point' : `Wrong. The answer is: ${currentQ.opts[currentQ.ans]}`}</p>
+            <p class="text-slate-300 text-xs leading-relaxed">${currentQ.exp}</p>
+            <p class="text-blue-400 text-xs font-bold mt-2">${currentQ.ref}</p>
+          </div>
+        </div>
+      `;
+      fb.classList.remove('hidden');
+
+      // Add to history
+      history.unshift({ q: currentQ.q, correct, ref: currentQ.ref });
+      renderHistory();
+      // Track for analytics
+      trackEvent('trivia_answer', { correct, diff: currentQ.diff, cat: currentQ.cat });
+    }
+
+    function renderHistory() {
+      const container = document.getElementById('historyList');
+      if (!history.length) { container.innerHTML = '<p class="text-slate-600 text-xs text-center py-3">No answers yet</p>'; return; }
+      container.innerHTML = history.slice(0, 10).map(h => `
+        <div class="flex items-center gap-2 p-2 rounded-xl bg-slate-900/50">
+          <span class="text-sm">${h.correct ? '✅' : '❌'}</span>
+          <p class="text-slate-400 text-xs flex-1 truncate">${h.q}</p>
+          <span class="text-blue-400 text-[10px] font-bold shrink-0">${h.ref}</span>
+        </div>
+      `).join('');
+    }
+
+    function setDiff(val, btn) {
+      diffFilter = val;
+      document.querySelectorAll('.diff-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      questionQueue = [];
+      loadQuestion();
+    }
+
+    function setCat(val, btn) {
+      catFilter = val;
+      document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      questionQueue = [];
+      loadQuestion();
+    }
+
+    function resetGame() {
+      score = 0; streak = 0; sessionTotal = 0;
+      document.getElementById('scoreDisplay').textContent = 0;
+      document.getElementById('streakDisplay').textContent = '0';
+      history = [];
+      questionQueue = [];
+      renderHistory();
+      loadQuestion();
+    }
+
+    // Analytics bridge — posts events to localStorage for admin.html to read
+    function trackEvent(name, data = {}) {
+      try {
+        const events = JSON.parse(localStorage.getItem('cymorAnalytics') || '[]');
+        events.push({ event: name, data, ts: Date.now() });
+        if (events.length > 500) events.splice(0, events.length - 500);
+        localStorage.setItem('cymorAnalytics', JSON.stringify(events));
+      } catch(e) {}
+    }
+
+    // Start
+    trackEvent('trivia_open');
+    buildQueue();
+    loadQuestion();
+  </script>
+</body>
+</html>

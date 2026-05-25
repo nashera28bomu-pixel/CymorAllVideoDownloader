@@ -1,0 +1,727 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Admin — Cymor Bible</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+  <style>
+    body { font-family: 'Inter', sans-serif; }
+    ::-webkit-scrollbar { width: 4px; }
+    ::-webkit-scrollbar-track { background: #0F172A; }
+    ::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
+    @keyframes fadeIn { from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:translateY(0);} }
+    .fade-in { animation: fadeIn 0.35s ease forwards; }
+    .tab-active { background: #3b82f6; color: white; }
+    .stat-card { background: rgba(30,41,59,0.6); border: 1px solid rgba(255,255,255,0.06); }
+    .section-hidden { display: none; }
+    input[type=range] { accent-color: #3b82f6; }
+    .log-item:nth-child(odd) { background: rgba(30,41,59,0.3); }
+  </style>
+</head>
+
+<body class="bg-[#0F172A] text-slate-100 min-h-screen">
+
+  <!-- LOGIN GATE -->
+  <div id="loginGate" class="fixed inset-0 bg-[#0F172A] z-50 flex items-center justify-center px-6">
+    <div class="w-full max-w-sm space-y-6 fade-in">
+      <div class="text-center">
+        <div class="w-16 h-16 bg-blue-600 rounded-2xl flex items-center justify-center text-2xl font-black mx-auto mb-4 shadow-lg shadow-blue-500/30">C</div>
+        <h1 class="text-2xl font-black text-white mb-1">Admin Panel</h1>
+        <p class="text-slate-500 text-sm">Cymor Bible • CymorTechServices</p>
+      </div>
+      <div class="space-y-3">
+        <input id="adminUser" type="text" placeholder="Username"
+          class="w-full bg-slate-900 border border-slate-700 text-slate-200 text-sm rounded-2xl px-4 py-4 outline-none focus:border-blue-500 transition-all"/>
+        <input id="adminPass" type="password" placeholder="Password"
+          class="w-full bg-slate-900 border border-slate-700 text-slate-200 text-sm rounded-2xl px-4 py-4 outline-none focus:border-blue-500 transition-all"/>
+        <p id="loginErr" class="text-red-400 text-xs text-center hidden">Invalid credentials. Try again.</p>
+        <button onclick="attemptLogin()" class="w-full bg-blue-600 text-white p-4 rounded-2xl text-sm font-bold active:scale-95 transition-all shadow-lg shadow-blue-500/20">
+          Sign In
+        </button>
+      </div>
+      <p class="text-center text-slate-600 text-xs">Protected area — authorised access only</p>
+    </div>
+  </div>
+
+  <!-- ADMIN SHELL (shown after login) -->
+  <div id="adminShell" class="hidden">
+
+    <!-- TOP BAR -->
+    <header class="sticky top-0 z-40 bg-[#0F172A]/95 backdrop-blur border-b border-slate-800 px-4 py-3">
+      <div class="max-w-2xl mx-auto flex items-center justify-between">
+        <div class="flex items-center gap-3">
+          <div class="w-8 h-8 bg-blue-600 rounded-xl flex items-center justify-center text-sm font-black">C</div>
+          <div>
+            <p class="text-xs font-bold text-white leading-none">Cymor Bible Admin</p>
+            <p class="text-[10px] text-slate-500 leading-none mt-0.5">v2.0.0 • CymorTechServices</p>
+          </div>
+        </div>
+        <div class="flex items-center gap-3">
+          <div id="liveIndicator" class="flex items-center gap-1.5 px-2 py-1 rounded-lg bg-green-500/10 border border-green-500/20">
+            <div class="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse"></div>
+            <span class="text-[10px] text-green-400 font-bold">LIVE</span>
+          </div>
+          <button onclick="logout()" class="text-slate-500 text-xs hover:text-red-400 transition-colors font-bold">Sign Out</button>
+        </div>
+      </div>
+    </header>
+
+    <!-- TAB NAV -->
+    <div class="sticky top-[57px] z-30 bg-[#0F172A]/95 backdrop-blur border-b border-slate-800 px-4 py-2">
+      <div class="max-w-2xl mx-auto flex gap-2 overflow-x-auto pb-1">
+        <button onclick="showTab('overview')" class="tab-btn tab-active px-4 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition-all" data-tab="overview">📊 Overview</button>
+        <button onclick="showTab('analytics')" class="tab-btn px-4 py-2 rounded-xl text-xs font-bold whitespace-nowrap bg-slate-800 text-slate-400 transition-all" data-tab="analytics">📈 Analytics</button>
+        <button onclick="showTab('trivia')" class="tab-btn px-4 py-2 rounded-xl text-xs font-bold whitespace-nowrap bg-slate-800 text-slate-400 transition-all" data-tab="trivia">❓ Trivia Stats</button>
+        <button onclick="showTab('users')" class="tab-btn px-4 py-2 rounded-xl text-xs font-bold whitespace-nowrap bg-slate-800 text-slate-400 transition-all" data-tab="users">👤 User Data</button>
+        <button onclick="showTab('content')" class="tab-btn px-4 py-2 rounded-xl text-xs font-bold whitespace-nowrap bg-slate-800 text-slate-400 transition-all" data-tab="content">✏️ Content</button>
+        <button onclick="showTab('system')" class="tab-btn px-4 py-2 rounded-xl text-xs font-bold whitespace-nowrap bg-slate-800 text-slate-400 transition-all" data-tab="system">⚙️ System</button>
+        <button onclick="showTab('logs')" class="tab-btn px-4 py-2 rounded-xl text-xs font-bold whitespace-nowrap bg-slate-800 text-slate-400 transition-all" data-tab="logs">📋 Event Log</button>
+      </div>
+    </div>
+
+    <main class="max-w-2xl mx-auto px-4 py-6 space-y-6 pb-16">
+
+      <!-- ══ OVERVIEW TAB ══════════════════════════════════════════════════ -->
+      <section id="tab-overview" class="space-y-5 fade-in">
+
+        <div class="grid grid-cols-2 gap-3">
+          <div class="stat-card rounded-[20px] p-4">
+            <p class="text-[10px] uppercase tracking-widest text-slate-500 mb-1">Total Events</p>
+            <p class="text-3xl font-black text-white" id="totalEvents">—</p>
+            <p class="text-[10px] text-slate-600 mt-1">All tracked interactions</p>
+          </div>
+          <div class="stat-card rounded-[20px] p-4">
+            <p class="text-[10px] uppercase tracking-widest text-slate-500 mb-1">Trivia Sessions</p>
+            <p class="text-3xl font-black text-blue-400" id="triviaSessions">—</p>
+            <p class="text-[10px] text-slate-600 mt-1">Times trivia opened</p>
+          </div>
+          <div class="stat-card rounded-[20px] p-4">
+            <p class="text-[10px] uppercase tracking-widest text-slate-500 mb-1">Saved Verses</p>
+            <p class="text-3xl font-black text-amber-400" id="savedVerses">—</p>
+            <p class="text-[10px] text-slate-600 mt-1">Bookmarked by user</p>
+          </div>
+          <div class="stat-card rounded-[20px] p-4">
+            <p class="text-[10px] uppercase tracking-widest text-slate-500 mb-1">Best Streak</p>
+            <p class="text-3xl font-black text-green-400" id="bestStreak">—</p>
+            <p class="text-[10px] text-slate-600 mt-1">Trivia correct streak</p>
+          </div>
+        </div>
+
+        <!-- App version info -->
+        <div class="stat-card rounded-[20px] p-5 space-y-3">
+          <p class="text-[10px] uppercase tracking-widest text-slate-500 font-bold">App Status</p>
+          <div class="grid grid-cols-2 gap-y-3 text-sm">
+            <div><p class="text-slate-500 text-xs">Version</p><p class="font-bold text-white">v2.0.0</p></div>
+            <div><p class="text-slate-500 text-xs">Bible Data</p><p class="font-bold text-green-400" id="bibleStatus">Checking...</p></div>
+            <div><p class="text-slate-500 text-xs">Service Worker</p><p class="font-bold text-white" id="swStatus">Checking...</p></div>
+            <div><p class="text-slate-500 text-xs">PWA Installed</p><p class="font-bold text-white" id="pwaStatus">Checking...</p></div>
+            <div><p class="text-slate-500 text-xs">Journal Entries</p><p class="font-bold text-white" id="journalStatus">—</p></div>
+            <div><p class="text-slate-500 text-xs">Custom Tracks</p><p class="font-bold text-white" id="tracksStatus">—</p></div>
+          </div>
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="stat-card rounded-[20px] p-5 space-y-3">
+          <p class="text-[10px] uppercase tracking-widest text-slate-500 font-bold">Quick Actions</p>
+          <div class="grid grid-cols-2 gap-3">
+            <button onclick="clearAnalytics()" class="p-3 bg-red-900/20 border border-red-500/20 rounded-xl text-xs font-bold text-red-400 active:scale-95 transition-all">🗑 Clear Event Log</button>
+            <button onclick="clearFavorites()" class="p-3 bg-amber-900/20 border border-amber-500/20 rounded-xl text-xs font-bold text-amber-400 active:scale-95 transition-all">🔖 Clear Saved Verses</button>
+            <button onclick="clearJournal()" class="p-3 bg-slate-800 border border-slate-700 rounded-xl text-xs font-bold text-slate-400 active:scale-95 transition-all">📓 Clear Journal</button>
+            <button onclick="clearTriviaScore()" class="p-3 bg-slate-800 border border-slate-700 rounded-xl text-xs font-bold text-slate-400 active:scale-95 transition-all">🏆 Reset Trivia Score</button>
+            <button onclick="exportData()" class="p-3 bg-blue-900/20 border border-blue-500/20 rounded-xl text-xs font-bold text-blue-400 active:scale-95 transition-all col-span-2">📥 Export All Data (JSON)</button>
+          </div>
+        </div>
+
+      </section>
+
+      <!-- ══ ANALYTICS TAB ═════════════════════════════════════════════════ -->
+      <section id="tab-analytics" class="section-hidden space-y-5 fade-in">
+
+        <div class="stat-card rounded-[20px] p-5 space-y-4">
+          <p class="text-[10px] uppercase tracking-widest text-slate-500 font-bold">Event Breakdown</p>
+          <div id="eventBreakdown" class="space-y-3"></div>
+        </div>
+
+        <div class="stat-card rounded-[20px] p-5 space-y-4">
+          <p class="text-[10px] uppercase tracking-widest text-slate-500 font-bold">Activity by Hour (Last 24h)</p>
+          <div id="hourlyChart" class="flex items-end gap-1 h-24"></div>
+          <div class="flex justify-between text-[9px] text-slate-600">
+            <span>12am</span><span>6am</span><span>12pm</span><span>6pm</span><span>Now</span>
+          </div>
+        </div>
+
+        <div class="stat-card rounded-[20px] p-5 space-y-3">
+          <p class="text-[10px] uppercase tracking-widest text-slate-500 font-bold">Storage Usage</p>
+          <div id="storageStats" class="space-y-2"></div>
+        </div>
+
+      </section>
+
+      <!-- ══ TRIVIA STATS TAB ══════════════════════════════════════════════ -->
+      <section id="tab-trivia" class="section-hidden space-y-5 fade-in">
+
+        <div class="grid grid-cols-3 gap-3">
+          <div class="stat-card rounded-[20px] p-4 text-center">
+            <p class="text-2xl font-black text-white" id="tTotal">—</p>
+            <p class="text-[10px] text-slate-500 mt-1">Total Answered</p>
+          </div>
+          <div class="stat-card rounded-[20px] p-4 text-center">
+            <p class="text-2xl font-black text-green-400" id="tCorrect">—</p>
+            <p class="text-[10px] text-slate-500 mt-1">Correct</p>
+          </div>
+          <div class="stat-card rounded-[20px] p-4 text-center">
+            <p class="text-2xl font-black text-red-400" id="tWrong">—</p>
+            <p class="text-[10px] text-slate-500 mt-1">Wrong</p>
+          </div>
+        </div>
+
+        <div class="stat-card rounded-[20px] p-5 space-y-3">
+          <p class="text-[10px] uppercase tracking-widest text-slate-500 font-bold">Accuracy Rate</p>
+          <div class="w-full h-3 bg-slate-800 rounded-full overflow-hidden">
+            <div id="accuracyBar" class="h-full bg-green-500 rounded-full transition-all" style="width:0%"></div>
+          </div>
+          <p id="accuracyLabel" class="text-white font-black text-2xl">—%</p>
+        </div>
+
+        <div class="stat-card rounded-[20px] p-5 space-y-3">
+          <p class="text-[10px] uppercase tracking-widest text-slate-500 font-bold">Performance by Difficulty</p>
+          <div id="diffBreakdown" class="space-y-3"></div>
+        </div>
+
+        <div class="stat-card rounded-[20px] p-5 space-y-3">
+          <p class="text-[10px] uppercase tracking-widest text-slate-500 font-bold">Performance by Category</p>
+          <div id="catBreakdown" class="space-y-3"></div>
+        </div>
+
+      </section>
+
+      <!-- ══ USER DATA TAB ═════════════════════════════════════════════════ -->
+      <section id="tab-users" class="section-hidden space-y-5 fade-in">
+
+        <div class="stat-card rounded-[20px] p-5 space-y-4">
+          <p class="text-[10px] uppercase tracking-widest text-slate-500 font-bold">Saved Verses (Bookmarks)</p>
+          <div id="favList" class="space-y-2 max-h-64 overflow-y-auto"></div>
+        </div>
+
+        <div class="stat-card rounded-[20px] p-5 space-y-3">
+          <p class="text-[10px] uppercase tracking-widest text-slate-500 font-bold">Prayer Journal Preview</p>
+          <div id="journalPreview" class="text-slate-300 text-sm leading-relaxed bg-slate-900/50 rounded-xl p-4 max-h-40 overflow-y-auto"></div>
+        </div>
+
+        <div class="stat-card rounded-[20px] p-5 space-y-3">
+          <p class="text-[10px] uppercase tracking-widest text-slate-500 font-bold">Reading Progress</p>
+          <div id="readingProgress" class="text-sm space-y-2"></div>
+        </div>
+
+        <div class="stat-card rounded-[20px] p-5 space-y-3">
+          <p class="text-[10px] uppercase tracking-widest text-slate-500 font-bold">Custom Music Tracks</p>
+          <div id="customTracks" class="space-y-2 max-h-48 overflow-y-auto"></div>
+        </div>
+
+      </section>
+
+      <!-- ══ CONTENT TAB ════════════════════════════════════════════════════ -->
+      <section id="tab-content" class="section-hidden space-y-5 fade-in">
+
+        <div class="stat-card rounded-[20px] p-5 space-y-4">
+          <p class="text-[10px] uppercase tracking-widest text-slate-500 font-bold">📢 Broadcast Announcement</p>
+          <p class="text-slate-400 text-xs">Write a message that will appear as a toast banner when users open the app.</p>
+          <textarea id="announcementText" rows="3" placeholder="e.g. New devotional content added for this week..."
+            class="w-full bg-slate-900 border border-slate-700 text-slate-200 text-sm rounded-xl px-3 py-3 outline-none focus:border-blue-500 resize-none transition-all"></textarea>
+          <button onclick="broadcastAnnouncement()" class="w-full bg-blue-600 text-white p-3 rounded-xl text-xs font-bold active:scale-95 transition-all">
+            📢 Save Announcement
+          </button>
+          <div id="announcementStatus" class="hidden text-green-400 text-xs text-center font-bold">✅ Announcement saved! Users will see it on next visit.</div>
+        </div>
+
+        <div class="stat-card rounded-[20px] p-5 space-y-4">
+          <p class="text-[10px] uppercase tracking-widest text-slate-500 font-bold">🌟 Feature Spotlight</p>
+          <p class="text-slate-400 text-xs">Highlight a feature on the home screen for users.</p>
+          <select id="spotlightFeature" class="w-full bg-slate-900 border border-slate-700 text-slate-200 text-sm rounded-xl px-3 py-3 outline-none">
+            <option value="">No spotlight</option>
+            <option value="audio">🎙 Audio Bible</option>
+            <option value="playlist">🎵 Music Center</option>
+            <option value="trivia">❓ Bible Trivia</option>
+            <option value="prayer">🙏 Daily Prayer</option>
+          </select>
+          <button onclick="saveSpotlight()" class="w-full bg-purple-600 text-white p-3 rounded-xl text-xs font-bold active:scale-95 transition-all">
+            Save Spotlight
+          </button>
+        </div>
+
+        <div class="stat-card rounded-[20px] p-5 space-y-4">
+          <p class="text-[10px] uppercase tracking-widest text-slate-500 font-bold">📖 Manual Verse Override</p>
+          <p class="text-slate-400 text-xs">Force a specific verse to show as Verse of the Day.</p>
+          <input id="overrideRef" type="text" placeholder="Reference e.g. John 3:16"
+            class="w-full bg-slate-900 border border-slate-700 text-slate-200 text-sm rounded-xl px-3 py-3 outline-none focus:border-blue-500 transition-all"/>
+          <textarea id="overrideText" rows="2" placeholder="Verse text..."
+            class="w-full bg-slate-900 border border-slate-700 text-slate-200 text-sm rounded-xl px-3 py-3 outline-none focus:border-blue-500 resize-none transition-all"></textarea>
+          <button onclick="saveVerseOverride()" class="w-full bg-amber-600 text-white p-3 rounded-xl text-xs font-bold active:scale-95 transition-all">
+            Set Override Verse
+          </button>
+          <button onclick="clearVerseOverride()" class="w-full bg-slate-800 border border-slate-700 text-slate-400 p-3 rounded-xl text-xs font-bold active:scale-95 transition-all">
+            Clear Override
+          </button>
+        </div>
+
+      </section>
+
+      <!-- ══ SYSTEM TAB ═════════════════════════════════════════════════════ -->
+      <section id="tab-system" class="section-hidden space-y-5 fade-in">
+
+        <div class="stat-card rounded-[20px] p-5 space-y-4">
+          <p class="text-[10px] uppercase tracking-widest text-slate-500 font-bold">Cache Management</p>
+          <div class="space-y-3">
+            <div class="flex items-center justify-between p-3 bg-slate-900/50 rounded-xl">
+              <div>
+                <p class="text-sm font-bold text-white">Service Worker</p>
+                <p class="text-xs text-slate-500" id="swVersion">Checking...</p>
+              </div>
+              <div class="w-2 h-2 rounded-full bg-green-400" id="swDot"></div>
+            </div>
+            <div class="flex items-center justify-between p-3 bg-slate-900/50 rounded-xl">
+              <div>
+                <p class="text-sm font-bold text-white">Cache Version</p>
+                <p class="text-xs text-slate-500">cymor-bible-cache-v2.0</p>
+              </div>
+              <div class="w-2 h-2 rounded-full bg-blue-400"></div>
+            </div>
+          </div>
+          <button onclick="forceSwUpdate()" class="w-full bg-blue-600 text-white p-3 rounded-xl text-xs font-bold active:scale-95 transition-all">
+            🔄 Force SW Update Check
+          </button>
+        </div>
+
+        <div class="stat-card rounded-[20px] p-5 space-y-4">
+          <p class="text-[10px] uppercase tracking-widest text-slate-500 font-bold">App Maintenance Mode</p>
+          <p class="text-slate-400 text-xs">When enabled, users will see a maintenance message instead of the app content.</p>
+          <div class="flex items-center justify-between">
+            <span class="text-sm font-bold text-white">Maintenance Mode</span>
+            <button onclick="toggleMaintenance(this)" id="maintBtn"
+              class="px-4 py-2 rounded-xl text-xs font-bold bg-slate-800 border border-slate-700 text-slate-400 transition-all active:scale-95">
+              OFF
+            </button>
+          </div>
+          <input id="maintMessage" type="text" placeholder="Maintenance message for users..."
+            class="w-full bg-slate-900 border border-slate-700 text-slate-200 text-sm rounded-xl px-3 py-3 outline-none focus:border-blue-500 transition-all"/>
+          <button onclick="saveMaintenance()" class="w-full bg-red-600/80 text-white p-3 rounded-xl text-xs font-bold active:scale-95 transition-all">
+            Save Maintenance Settings
+          </button>
+        </div>
+
+        <div class="stat-card rounded-[20px] p-5 space-y-4">
+          <p class="text-[10px] uppercase tracking-widest text-slate-500 font-bold">Admin Password</p>
+          <input id="newPass" type="password" placeholder="New password"
+            class="w-full bg-slate-900 border border-slate-700 text-slate-200 text-sm rounded-xl px-3 py-3 outline-none focus:border-blue-500 transition-all"/>
+          <input id="confirmPass" type="password" placeholder="Confirm new password"
+            class="w-full bg-slate-900 border border-slate-700 text-slate-200 text-sm rounded-xl px-3 py-3 outline-none focus:border-blue-500 transition-all"/>
+          <button onclick="changePassword()" class="w-full bg-slate-700 text-white p-3 rounded-xl text-xs font-bold active:scale-95 transition-all">
+            Update Password
+          </button>
+          <p id="passMsg" class="text-xs text-center hidden"></p>
+        </div>
+
+        <div class="stat-card rounded-[20px] p-5 space-y-3">
+          <p class="text-[10px] uppercase tracking-widest text-red-500 font-bold">⚠️ Danger Zone</p>
+          <button onclick="nukeAllData()" class="w-full bg-red-900/30 border border-red-500/30 text-red-400 p-3 rounded-xl text-xs font-bold active:scale-95 transition-all">
+            💥 Wipe ALL App Data (localStorage)
+          </button>
+        </div>
+
+      </section>
+
+      <!-- ══ EVENT LOG TAB ══════════════════════════════════════════════════ -->
+      <section id="tab-logs" class="section-hidden space-y-5 fade-in">
+
+        <div class="flex gap-2 items-center">
+          <input id="logSearch" type="text" placeholder="Filter events..."
+            class="flex-1 bg-slate-900 border border-slate-700 text-slate-200 text-sm rounded-xl px-3 py-3 outline-none focus:border-blue-500 transition-all"
+            oninput="renderLogs()"/>
+          <button onclick="clearAnalytics()" class="px-3 py-3 bg-red-900/20 border border-red-500/20 rounded-xl text-xs font-bold text-red-400 active:scale-95 transition-all">Clear</button>
+        </div>
+
+        <div class="stat-card rounded-[20px] overflow-hidden">
+          <div class="px-4 py-3 border-b border-slate-800 flex items-center justify-between">
+            <p class="text-[10px] uppercase tracking-widest text-slate-500 font-bold">Raw Event Stream</p>
+            <p id="logCount" class="text-[10px] text-slate-600">0 events</p>
+          </div>
+          <div id="logContainer" class="max-h-[500px] overflow-y-auto text-xs font-mono"></div>
+        </div>
+
+      </section>
+
+    </main>
+  </div>
+
+  <script>
+    /* ── AUTH ─────────────────────────────────────────────────────────────── */
+    const DEFAULT_USER = 'cymor_admin';
+    const DEFAULT_PASS = 'cymor2024!';
+
+    function getAdminCreds() {
+      return {
+        user: localStorage.getItem('adminUser') || DEFAULT_USER,
+        pass: localStorage.getItem('adminPass') || DEFAULT_PASS
+      };
+    }
+
+    function attemptLogin() {
+      const u = document.getElementById('adminUser').value.trim();
+      const p = document.getElementById('adminPass').value;
+      const creds = getAdminCreds();
+      if (u === creds.user && p === creds.pass) {
+        localStorage.setItem('cymorAdminSession', '1');
+        document.getElementById('loginGate').classList.add('hidden');
+        document.getElementById('adminShell').classList.remove('hidden');
+        initAdmin();
+      } else {
+        document.getElementById('loginErr').classList.remove('hidden');
+        document.getElementById('adminPass').value = '';
+      }
+    }
+
+    document.getElementById('adminPass').addEventListener('keydown', e => { if(e.key==='Enter') attemptLogin(); });
+
+    function logout() {
+      localStorage.removeItem('cymorAdminSession');
+      location.reload();
+    }
+
+    // Auto-login if session exists
+    if (localStorage.getItem('cymorAdminSession') === '1') {
+      document.getElementById('loginGate').classList.add('hidden');
+      document.getElementById('adminShell').classList.remove('hidden');
+      window.addEventListener('DOMContentLoaded', initAdmin);
+    }
+
+    /* ── TABS ─────────────────────────────────────────────────────────────── */
+    function showTab(name) {
+      document.querySelectorAll('[id^="tab-"]').forEach(s => s.classList.add('section-hidden'));
+      document.querySelectorAll('.tab-btn').forEach(b => {
+        b.classList.remove('tab-active');
+        b.classList.add('bg-slate-800','text-slate-400');
+      });
+      const sec = document.getElementById('tab-' + name);
+      if (sec) { sec.classList.remove('section-hidden'); sec.classList.add('fade-in'); }
+      const btn = document.querySelector(`[data-tab="${name}"]`);
+      if (btn) { btn.classList.add('tab-active'); btn.classList.remove('bg-slate-800','text-slate-400'); }
+      refreshTab(name);
+    }
+
+    /* ── INIT ─────────────────────────────────────────────────────────────── */
+    function initAdmin() {
+      checkSystemStatus();
+      refreshTab('overview');
+      setInterval(() => { checkSystemStatus(); refreshTab(currentTab()); }, 5000);
+    }
+
+    function currentTab() {
+      const active = document.querySelector('.tab-btn.tab-active');
+      return active ? active.dataset.tab : 'overview';
+    }
+
+    function refreshTab(name) {
+      switch(name) {
+        case 'overview': renderOverview(); break;
+        case 'analytics': renderAnalytics(); break;
+        case 'trivia': renderTriviaStats(); break;
+        case 'users': renderUsers(); break;
+        case 'logs': renderLogs(); break;
+      }
+    }
+
+    /* ── OVERVIEW ─────────────────────────────────────────────────────────── */
+    function renderOverview() {
+      const events = getEvents();
+      document.getElementById('totalEvents').textContent = events.length;
+      document.getElementById('triviaSessions').textContent = events.filter(e=>e.event==='trivia_open').length;
+      const favs = JSON.parse(localStorage.getItem('cymorFavorites')||'[]');
+      document.getElementById('savedVerses').textContent = favs.length;
+      document.getElementById('bestStreak').textContent = localStorage.getItem('cymorTriviaScore') || '0';
+      const journal = localStorage.getItem('cymorJournal') || '';
+      document.getElementById('journalStatus').textContent = journal.length ? `${journal.length} chars` : 'Empty';
+      const tracks = JSON.parse(localStorage.getItem('cymorCustomTracks')||'[]');
+      document.getElementById('tracksStatus').textContent = tracks.length ? `${tracks.length} track(s)` : 'None';
+    }
+
+    /* ── ANALYTICS ────────────────────────────────────────────────────────── */
+    function renderAnalytics() {
+      const events = getEvents();
+
+      // Event type counts
+      const counts = {};
+      events.forEach(e => { counts[e.event] = (counts[e.event]||0) + 1; });
+      const breakdown = document.getElementById('eventBreakdown');
+      const total = events.length || 1;
+      breakdown.innerHTML = Object.entries(counts).sort((a,b)=>b[1]-a[1]).map(([k,v])=>`
+        <div>
+          <div class="flex justify-between text-xs mb-1">
+            <span class="text-slate-300 font-bold">${k}</span>
+            <span class="text-slate-500">${v} (${Math.round(v/total*100)}%)</span>
+          </div>
+          <div class="w-full h-2 bg-slate-800 rounded-full overflow-hidden">
+            <div class="h-full bg-blue-500 rounded-full" style="width:${Math.round(v/total*100)}%"></div>
+          </div>
+        </div>
+      `).join('') || '<p class="text-slate-500 text-xs">No events recorded yet. Use the app to generate data.</p>';
+
+      // Hourly chart (last 24h)
+      const now = Date.now();
+      const hours = Array(24).fill(0);
+      events.filter(e => now - e.ts < 86400000).forEach(e => {
+        const h = new Date(e.ts).getHours();
+        hours[h]++;
+      });
+      const maxH = Math.max(...hours, 1);
+      document.getElementById('hourlyChart').innerHTML = hours.map((v, i) => `
+        <div class="flex-1 flex flex-col items-center gap-1">
+          <div class="w-full bg-blue-500/70 rounded-sm" style="height:${Math.round((v/maxH)*96)}px; min-height:2px"></div>
+        </div>
+      `).join('');
+
+      // Storage usage
+      let storageHTML = '';
+      const keys = ['cymorFavorites','cymorJournal','cymorAnalytics','cymorCustomTracks','cymorBibleProgress','cymorTriviaScore','cymorLastVersion'];
+      keys.forEach(k => {
+        const val = localStorage.getItem(k);
+        const bytes = val ? new Blob([val]).size : 0;
+        storageHTML += `
+          <div class="flex justify-between items-center text-xs">
+            <span class="text-slate-400 font-mono">${k}</span>
+            <span class="text-slate-500">${bytes > 1024 ? (bytes/1024).toFixed(1)+'KB' : bytes+'B'}</span>
+          </div>`;
+      });
+      document.getElementById('storageStats').innerHTML = storageHTML;
+    }
+
+    /* ── TRIVIA STATS ─────────────────────────────────────────────────────── */
+    function renderTriviaStats() {
+      const events = getEvents().filter(e => e.event === 'trivia_answer');
+      const total = events.length;
+      const correct = events.filter(e => e.data?.correct).length;
+      const wrong = total - correct;
+      const acc = total ? Math.round(correct/total*100) : 0;
+
+      document.getElementById('tTotal').textContent = total;
+      document.getElementById('tCorrect').textContent = correct;
+      document.getElementById('tWrong').textContent = wrong;
+      document.getElementById('accuracyBar').style.width = acc + '%';
+      document.getElementById('accuracyLabel').textContent = acc + '%';
+
+      // By difficulty
+      const diffs = ['easy','medium','hard'];
+      document.getElementById('diffBreakdown').innerHTML = diffs.map(d => {
+        const de = events.filter(e=>e.data?.diff===d);
+        const dc = de.filter(e=>e.data?.correct).length;
+        const da = de.length ? Math.round(dc/de.length*100) : 0;
+        const colors = {easy:'bg-green-500',medium:'bg-amber-500',hard:'bg-red-500'};
+        return `
+          <div>
+            <div class="flex justify-between text-xs mb-1">
+              <span class="text-slate-300 capitalize font-bold">${d}</span>
+              <span class="text-slate-500">${dc}/${de.length} correct (${da}%)</span>
+            </div>
+            <div class="w-full h-2 bg-slate-800 rounded-full overflow-hidden">
+              <div class="h-full ${colors[d]} rounded-full" style="width:${da}%"></div>
+            </div>
+          </div>`;
+      }).join('');
+
+      // By category
+      const cats = ['OT','NT','people','places'];
+      document.getElementById('catBreakdown').innerHTML = cats.map(c => {
+        const ce = events.filter(e=>e.data?.cat===c);
+        const cc = ce.filter(e=>e.data?.correct).length;
+        const ca = ce.length ? Math.round(cc/ce.length*100) : 0;
+        return `
+          <div>
+            <div class="flex justify-between text-xs mb-1">
+              <span class="text-slate-300 font-bold">${c}</span>
+              <span class="text-slate-500">${cc}/${ce.length} correct (${ca}%)</span>
+            </div>
+            <div class="w-full h-2 bg-slate-800 rounded-full overflow-hidden">
+              <div class="h-full bg-purple-500 rounded-full" style="width:${ca}%"></div>
+            </div>
+          </div>`;
+      }).join('');
+    }
+
+    /* ── USERS ────────────────────────────────────────────────────────────── */
+    function renderUsers() {
+      const favs = JSON.parse(localStorage.getItem('cymorFavorites')||'[]');
+      document.getElementById('favList').innerHTML = favs.length
+        ? favs.map(f=>`<div class="p-3 rounded-xl bg-slate-900/50 text-xs"><p class="text-blue-400 font-bold mb-1">${f.reference}</p><p class="text-slate-300 italic">"${f.text?.substring(0,80)}..."</p></div>`).join('')
+        : '<p class="text-slate-500 text-xs">No saved verses.</p>';
+
+      const journal = localStorage.getItem('cymorJournal') || '';
+      document.getElementById('journalPreview').textContent = journal || 'No journal entries yet.';
+
+      const progress = JSON.parse(localStorage.getItem('cymorBibleProgress')||'{}');
+      document.getElementById('readingProgress').innerHTML = progress.book
+        ? `<p class="text-slate-300">📖 Last reading: <strong>${progress.book}, Chapter ${parseInt(progress.chapter)+1}</strong></p><p class="text-slate-500 text-xs">Saved at: ${new Date(progress.savedAt||Date.now()).toLocaleString()}</p>`
+        : '<p class="text-slate-500 text-xs">No reading progress saved.</p>';
+
+      const tracks = JSON.parse(localStorage.getItem('cymorCustomTracks')||'[]');
+      document.getElementById('customTracks').innerHTML = tracks.length
+        ? tracks.map(t=>`<div class="flex items-center gap-3 p-3 rounded-xl bg-slate-900/50"><span class="text-lg">${t.emoji||'🎵'}</span><div><p class="text-sm font-bold text-white">${t.name}</p><p class="text-xs text-slate-500 capitalize">${t.category}</p></div></div>`).join('')
+        : '<p class="text-slate-500 text-xs">No custom tracks added.</p>';
+    }
+
+    /* ── LOGS ─────────────────────────────────────────────────────────────── */
+    function renderLogs() {
+      const events = getEvents();
+      const q = (document.getElementById('logSearch')?.value||'').toLowerCase();
+      const filtered = q ? events.filter(e => JSON.stringify(e).toLowerCase().includes(q)) : events;
+      document.getElementById('logCount').textContent = `${filtered.length} events`;
+      document.getElementById('logContainer').innerHTML = filtered.slice().reverse().map((e,i) => `
+        <div class="log-item px-4 py-2 border-b border-slate-800/50 flex items-start gap-3">
+          <span class="text-slate-600 w-12 shrink-0">${new Date(e.ts).toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'})}</span>
+          <span class="text-blue-400 font-bold w-28 shrink-0">${e.event}</span>
+          <span class="text-slate-400 break-all">${Object.keys(e.data||{}).length ? JSON.stringify(e.data) : '—'}</span>
+        </div>
+      `).join('') || '<div class="px-4 py-8 text-center text-slate-600 text-xs">No events yet.</div>';
+    }
+
+    /* ── SYSTEM STATUS ────────────────────────────────────────────────────── */
+    function checkSystemStatus() {
+      // SW
+      if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.getRegistration().then(reg => {
+          const el = document.getElementById('swStatus');
+          const dot = document.getElementById('swDot');
+          const ver = document.getElementById('swVersion');
+          if (reg) {
+            if(el) el.textContent = 'Active ✓';
+            if(dot) dot.className = 'w-2 h-2 rounded-full bg-green-400';
+            if(ver) ver.textContent = 'Registered: ' + reg.scope;
+          } else {
+            if(el) el.textContent = 'Not registered';
+            if(dot) dot.className = 'w-2 h-2 rounded-full bg-red-400';
+          }
+        });
+      }
+      const pwaEl = document.getElementById('pwaStatus');
+      if(pwaEl) pwaEl.textContent = window.matchMedia('(display-mode: standalone)').matches ? 'Yes ✓' : 'Browser mode';
+      const bibleEl = document.getElementById('bibleStatus');
+      if(bibleEl) {
+        fetch('./en_kjv.json', {method:'HEAD'}).then(r=>{ bibleEl.textContent = r.ok ? 'Loaded ✓' : 'Missing ✗'; bibleEl.className = r.ok ? 'font-bold text-green-400':'font-bold text-red-400'; }).catch(()=>{ bibleEl.textContent = 'Offline / Error'; bibleEl.className = 'font-bold text-amber-400'; });
+      }
+    }
+
+    /* ── QUICK ACTIONS ────────────────────────────────────────────────────── */
+    function clearAnalytics() {
+      if(!confirm('Clear all event logs?')) return;
+      localStorage.removeItem('cymorAnalytics');
+      renderOverview(); renderLogs(); renderAnalytics();
+    }
+    function clearFavorites() {
+      if(!confirm('Clear all saved verses?')) return;
+      localStorage.setItem('cymorFavorites','[]');
+      renderOverview(); renderUsers();
+    }
+    function clearJournal() {
+      if(!confirm('Clear prayer journal?')) return;
+      localStorage.removeItem('cymorJournal');
+      renderUsers();
+    }
+    function clearTriviaScore() {
+      if(!confirm('Reset trivia score?')) return;
+      localStorage.removeItem('cymorTriviaScore');
+      renderOverview();
+    }
+    function exportData() {
+      const data = {};
+      for(let i=0;i<localStorage.length;i++) {
+        const k = localStorage.key(i);
+        try { data[k] = JSON.parse(localStorage.getItem(k)); } catch { data[k] = localStorage.getItem(k); }
+      }
+      const blob = new Blob([JSON.stringify(data, null, 2)], {type:'application/json'});
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = `cymor_data_${new Date().toISOString().slice(0,10)}.json`;
+      a.click();
+    }
+
+    /* ── CONTENT ACTIONS ──────────────────────────────────────────────────── */
+    function broadcastAnnouncement() {
+      const text = document.getElementById('announcementText').value.trim();
+      if(!text) return;
+      localStorage.setItem('cymorAnnouncement', JSON.stringify({ text, ts: Date.now() }));
+      document.getElementById('announcementStatus').classList.remove('hidden');
+      setTimeout(()=>document.getElementById('announcementStatus').classList.add('hidden'), 3000);
+    }
+    function saveSpotlight() {
+      const val = document.getElementById('spotlightFeature').value;
+      localStorage.setItem('cymorSpotlight', val);
+      alert('Spotlight saved: ' + (val || 'None'));
+    }
+    function saveVerseOverride() {
+      const ref = document.getElementById('overrideRef').value.trim();
+      const text = document.getElementById('overrideText').value.trim();
+      if(!ref || !text) { alert('Please fill both fields.'); return; }
+      localStorage.setItem('cymorVerseOverride', JSON.stringify({reference: ref, text}));
+      alert('Verse override saved! It will appear on next home screen load.');
+    }
+    function clearVerseOverride() {
+      localStorage.removeItem('cymorVerseOverride');
+      document.getElementById('overrideRef').value = '';
+      document.getElementById('overrideText').value = '';
+      alert('Verse override cleared.');
+    }
+
+    /* ── SYSTEM ACTIONS ───────────────────────────────────────────────────── */
+    function forceSwUpdate() {
+      if('serviceWorker' in navigator) {
+        navigator.serviceWorker.getRegistration().then(reg => {
+          if(reg) { reg.update().then(()=>alert('SW update check triggered.')); }
+          else { alert('No service worker registered.'); }
+        });
+      }
+    }
+    function toggleMaintenance(btn) {
+      const current = btn.textContent.trim() === 'ON';
+      btn.textContent = current ? 'OFF' : 'ON';
+      btn.className = current
+        ? 'px-4 py-2 rounded-xl text-xs font-bold bg-slate-800 border border-slate-700 text-slate-400 transition-all active:scale-95'
+        : 'px-4 py-2 rounded-xl text-xs font-bold bg-red-600 text-white transition-all active:scale-95';
+    }
+    function saveMaintenance() {
+      const on = document.getElementById('maintBtn').textContent.trim() === 'ON';
+      const msg = document.getElementById('maintMessage').value;
+      localStorage.setItem('cymorMaintenance', JSON.stringify({on, msg}));
+      alert(`Maintenance mode ${on ? 'enabled' : 'disabled'}.`);
+    }
+    function changePassword() {
+      const np = document.getElementById('newPass').value;
+      const cp = document.getElementById('confirmPass').value;
+      const msg = document.getElementById('passMsg');
+      if(!np) { showMsg(msg,'Password cannot be empty.','text-red-400'); return; }
+      if(np !== cp) { showMsg(msg,'Passwords do not match.','text-red-400'); return; }
+      localStorage.setItem('adminPass', np);
+      showMsg(msg,'Password updated successfully!','text-green-400');
+      document.getElementById('newPass').value = '';
+      document.getElementById('confirmPass').value = '';
+    }
+    function nukeAllData() {
+      if(!confirm('⚠️ This will delete ALL app data for this device. Are you absolutely sure?')) return;
+      if(!confirm('Final confirmation: wipe all localStorage data?')) return;
+      localStorage.clear();
+      alert('All data wiped. Reloading...');
+      location.reload();
+    }
+
+    /* ── HELPERS ──────────────────────────────────────────────────────────── */
+    function getEvents() {
+      try { return JSON.parse(localStorage.getItem('cymorAnalytics')||'[]'); } catch { return []; }
+    }
+    function showMsg(el, text, color) {
+      el.textContent = text;
+      el.className = `text-xs text-center ${color}`;
+      el.classList.remove('hidden');
+      setTimeout(()=>el.classList.add('hidden'), 3000);
+    }
+  </script>
+</body>
+</html>
