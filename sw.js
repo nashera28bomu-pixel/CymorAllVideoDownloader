@@ -1,133 +1,104 @@
-/* ==========================================================================
-   CYMOR BIBLE APP — SERVICE WORKER v2.0.0
-   Strategy: Stale-While-Revalidate + Update Notification
-   ========================================================================== */
+/* Cymor Bible — Service Worker
+   Cache-first for the app shell + Bible text, network-first for anything dynamic.
+   Register from cymor-shared.js: CYMOR.registerServiceWorker()
+*/
 
-const CACHE_NAME = "cymor-bible-cache-v2.0";
-const APP_VERSION = "2.0.0";
+const SHELL_CACHE = "cymor-shell-v1";
+const VERSE_CACHE = "cymor-verses-v1";
 
-const STATIC_ASSETS = [
-  "/",
-  "/index.html",
-  "/bible.html",
-  "/prayer.html",
-  "/favorites.html",
-  "/audio.html",
-  "/playlist.html",
-  "/trivia.html",
-  "/styles.css",
-  "/app.js",
-  "/manifest.json",
-  "/en_kjv.json",
-  "/icon.svg"
+const SHELL_FILES = [
+  "./index.html",
+  "./bible.html",
+  "./trivia.html",
+  "./prayer.html",
+  "./settings.html",
+  "./manifest.json",
+  "./cymor-shared.js"
 ];
 
-/* ==========================================================================
-   INSTALL — Pre-cache all v2.0 assets
-   ========================================================================== */
 self.addEventListener("install", (event) => {
+  self.skipWaiting();
   event.waitUntil(
-    caches.open(CACHE_NAME).then((cache) => {
-      console.log("⚙️ [Cymor SW v2.0] Pre-caching assets...");
-      return Promise.all(
-        STATIC_ASSETS.map(url =>
-          cache.add(url).catch(err => console.warn(`Asset failed: ${url}`, err))
-        )
-      );
-    }).then(() => self.skipWaiting())
+    caches.open(SHELL_CACHE).then((cache) => cache.addAll(SHELL_FILES).catch(() => {}))
   );
 });
 
-/* ==========================================================================
-   ACTIVATE — Clear old caches and notify clients of v2.0 update
-   ========================================================================== */
 self.addEventListener("activate", (event) => {
   event.waitUntil(
-    caches.keys().then((keys) => {
-      return Promise.all(
-        keys.map((k) => {
-          if (k !== CACHE_NAME) {
-            console.log(`🗑️ [Cymor SW] Deleting old cache: ${k}`);
-            return caches.delete(k);
-          }
-        })
-      );
-    }).then(() => self.clients.claim()).then(() => {
-      // Broadcast update notification to all open tabs
-      self.clients.matchAll({ type: "window" }).then((clients) => {
-        clients.forEach((client) => {
-          client.postMessage({
-            type: "CYMOR_UPDATE",
-            version: APP_VERSION,
-            message: "Cymor Bible v2.0 is here! Audio Bible, Music Center & Trivia are now available.",
-            features: ["🎙 Audio Bible", "🎵 Music Playlist Center", "❓ Bible Trivia Game"]
-          });
-        });
-      });
-    })
+    caches.keys().then((keys) =>
+      Promise.all(
+        keys
+          .filter((k) => k !== SHELL_CACHE && k !== VERSE_CACHE)
+          .map((k) => caches.delete(k))
+      )
+    )
   );
+  self.clients.claim();
 });
 
-/* ==========================================================================
-   FETCH — Stale-while-revalidate strategy
-   ========================================================================== */
 self.addEventListener("fetch", (event) => {
-  // Network-first for Bible JSON (large, needs freshness)
-  if (event.request.url.includes("en_kjv.json")) {
+  const url = event.request.url;
+  const isVerseApi = url.includes("jsdelivr.net/gh/wldeh/bible-api") || url.includes("bible-api.com");
+  const isShellFile = SHELL_FILES.some((f) => url.endsWith(f.replace("./", "")));
+
+  if (isVerseApi) {
+    // Cache-first: scripture text never changes, so once fetched it's free to reuse forever offline.
     event.respondWith(
-      fetch(event.request)
-        .then((res) => {
-          const clone = res.clone();
-          caches.open(CACHE_NAME).then((cache) => cache.put(event.request, clone));
-          return res;
-        })
-        .catch(() => caches.match(event.request))
+      caches.open(VERSE_CACHE).then((cache) =>
+        cache.match(event.request).then(
+          (cached) =>
+            cached ||
+            fetch(event.request).then((response) => {
+              if (response.ok) cache.put(event.request, response.clone());
+              return response;
+            }).catch(() => cached)
+        )
+      )
     );
     return;
   }
 
-  // Cache-first for all other assets
-  event.respondWith(
-    caches.match(event.request).then((cached) => {
-      const networkFetch = fetch(event.request).then((res) => {
-        if (res && res.status === 200) {
-          caches.open(CACHE_NAME).then((cache) => cache.put(event.request, res.clone()));
-        }
-        return res;
-      }).catch(() => cached);
-      return cached || networkFetch;
+  if (isShellFile || event.request.mode === "navigate") {
+    event.respondWith(
+      caches.match(event.request).then(
+        (cached) =>
+          cached ||
+          fetch(event.request)
+            .then((response) => {
+              const copy = response.clone();
+              caches.open(SHELL_CACHE).then((cache) => cache.put(event.request, copy));
+              return response;
+            })
+            .catch(() => caches.match("./index.html"))
+      )
+    );
+  }
+});
+
+// ---------- PUSH NOTIFICATIONS ----------
+self.addEventListener("push", (event) => {
+  let data = { title: "Cymor Bible", body: "You have a new message.", url: "./index.html" };
+  try { data = Object.assign(data, event.data.json()); } catch (e) {}
+
+  event.waitUntil(
+    self.registration.showNotification(data.title, {
+      body: data.body,
+      icon: "./icons/icon-192.png",
+      badge: "./icons/icon-192.png",
+      data: { url: data.url }
     })
   );
 });
 
-/* ==========================================================================
-   PUSH — Handle push notifications (for future server-side pushes)
-   ========================================================================== */
-self.addEventListener("push", (event) => {
-  const data = event.data ? event.data.json() : {};
-  const title = data.title || "Cymor Bible";
-  const options = {
-    body: data.body || "You have a new update.",
-    icon: "./icon.svg",
-    badge: "./icon.svg",
-    vibrate: [100, 50, 100],
-    data: { url: data.url || "./index.html" }
-  };
-  event.waitUntil(self.registration.showNotification(title, options));
-});
-
-/* ==========================================================================
-   NOTIFICATION CLICK — Open the app on notification tap
-   ========================================================================== */
 self.addEventListener("notificationclick", (event) => {
   event.notification.close();
-  const targetUrl = event.notification.data?.url || "./index.html";
+  const url = (event.notification.data && event.notification.data.url) || "./index.html";
   event.waitUntil(
-    clients.matchAll({ type: "window", includeUncontrolled: true }).then((clientList) => {
+    clients.matchAll({ type: "window" }).then((clientList) => {
       for (const client of clientList) {
-        if (client.url.includes(targetUrl) && "focus" in client) return client.focus();
+        if (client.url.includes(url) && "focus" in client) return client.focus();
       }
-      if (clients.openWindow) return clients.openWindow(targetUrl);
+      if (clients.openWindow) return clients.openWindow(url);
     })
   );
 });
