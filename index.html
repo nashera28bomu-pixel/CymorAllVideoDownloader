@@ -3,429 +3,224 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Cymor Bible — Home</title>
-
+  <title>Cymor Bible</title>
   <link rel="manifest" href="./manifest.json">
-
+  <meta name="theme-color" content="#0F172A">
   <script src="https://cdn.tailwindcss.com"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=Playfair+Display:ital,wght@0,700;1,400&display=swap" rel="stylesheet">
-
   <style>
-    body {
-      font-family: 'Inter', sans-serif;
-    }
+    body { font-family: 'Inter', sans-serif; }
+    .serif { font-family: 'Playfair Display', serif; }
+    .glass { background: rgba(30, 41, 59, 0.7); backdrop-filter: blur(14px); border: 1px solid rgba(255,255,255,0.05); }
+    ::-webkit-scrollbar { width: 0px; }
 
-    .glass {
-      background: rgba(30, 41, 59, 0.7);
-      backdrop-filter: blur(14px);
-      border: 1px solid rgba(255,255,255,0.05);
+    /* Signature element: illuminated-manuscript style gold shimmer on the verse card border */
+    @keyframes shimmer { 0%,100% { opacity: 0.5; } 50% { opacity: 1; } }
+    .gold-edge {
+      position: relative;
+      border: 1px solid rgba(245,158,11,0.25);
     }
-
-    .nav-active {
-      color: #60a5fa;
-    }
-
-    .fade-out {
-      opacity: 0;
-      transform: translateY(10px);
-    }
-
-    .tab-active {
-      background: rgba(59,130,246,0.18);
-      border-color: rgba(59,130,246,0.4);
-      color: #60a5fa;
-      box-shadow: 0 10px 30px rgba(37,99,235,0.15);
-    }
-
-    #updateToast {
-      position: fixed;
-      top: 20px;
-      left: 16px;
-      right: 16px;
-      z-index: 9999;
-      opacity: 0;
-      transform: translateY(-20px);
-      transition: all 0.4s ease;
+    .gold-edge::before {
+      content: "";
+      position: absolute; inset: -1px;
+      border-radius: inherit;
+      padding: 1px;
+      background: linear-gradient(120deg, transparent, rgba(245,158,11,0.6), transparent);
+      -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+      -webkit-mask-composite: xor; mask-composite: exclude;
+      animation: shimmer 3.5s ease-in-out infinite;
       pointer-events: none;
     }
-
-    #updateToast.show {
-      opacity: 1;
-      transform: translateY(0);
-      pointer-events: auto;
-    }
-
-    /* Hidden Share Template */
-    #share-template {
-      position: absolute;
-      left: -9999px;
-      width: 1080px;
-      height: 1080px;
-      background: linear-gradient(135deg, #0F172A 0%, #1E293B 100%);
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      padding: 80px;
-      text-align: center;
-    }
-
-    .feature-card {
-      transition: all 0.25s ease;
-    }
-
-    .feature-card:active {
-      transform: scale(0.95);
-    }
-
-    .feature-card:hover {
-      transform: translateY(-3px);
-    }
-
-    .hero-glow {
-      position: absolute;
-      inset: 0;
-      overflow: hidden;
-      border-radius: 32px;
-      pointer-events: none;
-    }
-
-    .hero-glow::before {
-      content: "";
-      position: absolute;
-      width: 250px;
-      height: 250px;
-      background: rgba(59,130,246,0.15);
-      filter: blur(80px);
-      top: -60px;
-      right: -40px;
-    }
-
-    .hero-glow::after {
-      content: "";
-      position: absolute;
-      width: 180px;
-      height: 180px;
-      background: rgba(168,85,247,0.12);
-      filter: blur(70px);
-      bottom: -60px;
-      left: -40px;
-    }
+    @keyframes fadeIn { from {opacity:0;transform:translateY(10px);} to {opacity:1;transform:translateY(0);} }
+    .fade-in { animation: fadeIn 0.5s ease forwards; }
   </style>
 </head>
+<body class="bg-[#0F172A] text-slate-100 min-h-screen pb-28">
 
-<body class="bg-[#0F172A] text-slate-100 min-h-screen pb-28 overflow-x-hidden">
-
-  <!-- SHARE TEMPLATE -->
-  <div id="share-template">
-    <div style="border: 2px solid rgba(59,130,246,0.3); border-radius: 80px; padding: 80px; background: rgba(15, 23, 42, 0.4); border: 1px solid rgba(255,255,255,0.1); backdrop-filter: blur(20px); width: 100%;">
-      <p style="color: #60a5fa; text-transform: uppercase; letter-spacing: 0.6em; font-weight: 800; font-size: 28px; margin-bottom: 60px;">Cymor Bible App</p>
-
-      <div style="height: 4px; width: 100px; background: #60a5fa; margin: 0 auto 60px auto; border-radius: 2px;"></div>
-
-      <h2 id="share-content" style="font-family: 'Playfair Display', serif; color: white; font-style: italic; font-size: 54px; line-height: 1.5; margin-bottom: 50px; font-weight: 400;"></h2>
-
-      <p id="share-ref" style="color: #60a5fa; font-weight: 800; font-size: 36px; letter-spacing: 0.1em;"></p>
-    </div>
-  </div>
-
-  <!-- HEADER -->
-  <header class="p-6 flex justify-between items-center">
-    <div class="flex items-center gap-3">
-      <div class="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center font-bold text-xl shadow-lg shadow-blue-900/20">
-        C
-      </div>
-
+  <header class="sticky top-0 z-50 bg-[#0F172A]/95 backdrop-blur border-b border-slate-800 px-4 py-4">
+    <div class="max-w-md mx-auto flex items-center justify-between">
       <div>
-        <h1 class="font-bold text-lg tracking-tight">
-          Cymor Bible
-        </h1>
-
-        <p class="text-[10px] uppercase tracking-[0.3em] text-slate-500">
-          v2.0
-        </p>
+        <p class="text-[10px] uppercase tracking-[0.3em] text-amber-400 font-bold" id="greetingLabel">Good morning</p>
+        <h1 class="serif text-xl font-bold text-white" id="greetingName">Welcome</h1>
       </div>
+      <a href="settings.html" class="w-10 h-10 rounded-full bg-slate-800 border border-slate-700 flex items-center justify-center active:scale-95 transition">
+        <span id="streakFlame" class="text-sm font-bold text-amber-400">🔥0</span>
+      </a>
     </div>
-
-    <a
-      href="settings.html"
-      class="px-4 py-2 bg-slate-800/50 border border-slate-700 rounded-xl text-xs font-medium hover:bg-slate-700 transition-colors"
-    >
-      Settings
-    </a>
   </header>
 
-  <!-- GREETING -->
-  <section class="px-6 mb-6">
-    <div class="relative overflow-hidden rounded-[32px] border border-slate-800 bg-slate-900/80 p-6 shadow-2xl">
+  <main class="max-w-md mx-auto px-4 py-6 space-y-5">
 
-      <div class="hero-glow"></div>
-
-      <div class="relative z-10">
-        <h2 class="text-3xl font-black mb-2 leading-tight" id="greetingText">
-          Welcome
-        </h2>
-
-        <p class="text-slate-400 text-sm mb-5" id="currentDateStr"></p>
-
-        <button
-          id="pwaInstallBtn"
-          class="hidden w-full flex items-center justify-center gap-2 bg-blue-600 text-white p-4 rounded-2xl text-xs font-bold shadow-lg shadow-blue-500/20 active:scale-95 transition-all"
-        >
-          📥 INSTALL CYMOR BIBLE APP
+    <!-- VERSE OF THE DAY -->
+    <section class="gold-edge rounded-[28px] bg-gradient-to-b from-slate-900 to-slate-900/60 p-6 fade-in">
+      <p class="text-[10px] uppercase tracking-[0.3em] text-amber-400 font-bold mb-4">Verse of the Day</p>
+      <p id="verseText" class="serif italic text-xl leading-relaxed text-slate-100 min-h-[4rem]">Loading today's verse…</p>
+      <p id="verseRef" class="text-amber-400 text-sm font-bold mt-4"></p>
+      <div class="flex gap-3 mt-5">
+        <button onclick="shareVerse()" class="flex-1 bg-amber-500/10 border border-amber-500/30 text-amber-300 text-xs font-bold uppercase tracking-wider py-3 rounded-xl active:scale-95 transition">
+          Share ✦
         </button>
-
-        <!-- QUICK FEATURE TABS -->
-        <div class="grid grid-cols-4 gap-3 mt-6">
-
-          <a
-            href="audio.html"
-            class="tab-active feature-card flex flex-col items-center justify-center gap-2 p-4 rounded-2xl border border-blue-500/30 bg-slate-900/70"
-          >
-            <div class="w-11 h-11 rounded-2xl bg-blue-600/20 flex items-center justify-center text-xl">
-              🎙
-            </div>
-
-            <p class="text-[10px] font-bold text-center leading-tight">
-              Audio
-            </p>
-          </a>
-
-          <a
-            href="playlist.html"
-            class="feature-card flex flex-col items-center justify-center gap-2 p-4 rounded-2xl border border-purple-500/20 bg-slate-900/70"
-          >
-            <div class="w-11 h-11 rounded-2xl bg-purple-600/20 flex items-center justify-center text-xl">
-              🎵
-            </div>
-
-            <p class="text-[10px] font-bold text-slate-300 text-center leading-tight">
-              Playlist
-            </p>
-          </a>
-
-          <a
-            href="trivia.html"
-            class="feature-card flex flex-col items-center justify-center gap-2 p-4 rounded-2xl border border-amber-500/20 bg-slate-900/70"
-          >
-            <div class="w-11 h-11 rounded-2xl bg-amber-600/20 flex items-center justify-center text-xl">
-              ❓
-            </div>
-
-            <p class="text-[10px] font-bold text-slate-300 text-center leading-tight">
-              Trivia
-            </p>
-          </a>
-
-          <a
-            href="favorites.html"
-            class="feature-card flex flex-col items-center justify-center gap-2 p-4 rounded-2xl border border-emerald-500/20 bg-slate-900/70"
-          >
-            <div class="w-11 h-11 rounded-2xl bg-emerald-600/20 flex items-center justify-center text-xl">
-              ❤️
-            </div>
-
-            <p class="text-[10px] font-bold text-slate-300 text-center leading-tight">
-              Saved
-            </p>
-          </a>
-
-        </div>
+        <button onclick="location.href='bible.html'" class="flex-1 bg-slate-800 border border-slate-700 text-xs font-bold uppercase tracking-wider py-3 rounded-xl active:scale-95 transition">
+          Read in context
+        </button>
       </div>
+    </section>
 
-    </div>
-  </section>
-
-  <!-- MAIN CONTENT -->
-  <main class="px-4 space-y-6">
-
-    <!-- DAILY VERSE -->
-    <div
-      id="verseCardAnchor"
-      class="transition-all duration-500 transform"
-    ></div>
-
-    <!-- DAILY PRAYER -->
-    <div
-      id="prayerCardAnchor"
-      class="transition-all duration-500 transform"
-    ></div>
-
-    <!-- FEATURE GRID -->
-    <section class="space-y-4">
-
-      <div class="flex items-center justify-between px-2">
+    <!-- CONTINUE READING -->
+    <section class="rounded-[24px] border border-slate-800 bg-slate-900/50 p-5 fade-in" id="continueCard">
+      <p class="text-[10px] uppercase tracking-[0.25em] text-slate-500 font-bold mb-2">Continue Reading</p>
+      <div class="flex items-center justify-between">
         <div>
-          <p class="text-[10px] uppercase tracking-[0.35em] text-blue-400 font-black">
-            Explore
-          </p>
-
-          <h3 class="text-xl font-black mt-1">
-            Cymor Bible Features
-          </h3>
+          <p class="text-white font-bold" id="continueBook">Genesis 1</p>
+          <p class="text-slate-500 text-xs mt-0.5">Pick up where you left off</p>
         </div>
+        <a href="bible.html" class="w-10 h-10 rounded-full bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400 active:scale-95 transition">›</a>
+      </div>
+    </section>
 
-        <div class="text-[10px] text-slate-500 font-bold">
-          Powered by CymorTechServices
+    <!-- QUICK ACTIONS -->
+    <section class="grid grid-cols-3 gap-3 fade-in">
+      <a href="trivia.html" class="rounded-2xl bg-slate-900/60 border border-slate-800 p-4 flex flex-col items-center gap-2 active:scale-95 transition">
+        <span class="text-2xl">❓</span>
+        <span class="text-[10px] uppercase tracking-wider text-slate-400 font-bold">Trivia</span>
+      </a>
+      <a href="prayer.html" class="rounded-2xl bg-slate-900/60 border border-slate-800 p-4 flex flex-col items-center gap-2 active:scale-95 transition">
+        <span class="text-2xl">🙏</span>
+        <span class="text-[10px] uppercase tracking-wider text-slate-400 font-bold">Prayer</span>
+      </a>
+      <a href="bible.html" class="rounded-2xl bg-slate-900/60 border border-slate-800 p-4 flex flex-col items-center gap-2 active:scale-95 transition">
+        <span class="text-2xl">🔖</span>
+        <span class="text-[10px] uppercase tracking-wider text-slate-400 font-bold">Bookmarks</span>
+      </a>
+    </section>
+
+    <!-- TODAY'S PROGRESS -->
+    <section class="rounded-[24px] border border-slate-800 bg-slate-900/50 p-5 fade-in">
+      <p class="text-[10px] uppercase tracking-[0.25em] text-slate-500 font-bold mb-3">Today</p>
+      <div class="space-y-3">
+        <div class="flex items-center justify-between text-sm">
+          <span class="text-slate-300">📖 Reading streak</span>
+          <span class="font-bold text-amber-400" id="readStreakVal">0 days</span>
+        </div>
+        <div class="flex items-center justify-between text-sm">
+          <span class="text-slate-300">❓ Trivia streak</span>
+          <span class="font-bold text-amber-400" id="triviaStreakVal">0 days</span>
+        </div>
+        <div class="flex items-center justify-between text-sm">
+          <span class="text-slate-300">🙏 Prayer streak</span>
+          <span class="font-bold text-amber-400" id="prayerStreakVal">0 days</span>
         </div>
       </div>
+    </section>
 
-      <div class="grid grid-cols-2 gap-4">
-
-        <!-- AUDIO -->
-        <a
-          href="audio.html"
-          class="feature-card relative overflow-hidden rounded-[28px] border border-blue-500/15 bg-gradient-to-br from-slate-900 to-slate-800 p-5"
-        >
-          <div class="absolute top-0 right-0 w-24 h-24 bg-blue-600/10 blur-3xl rounded-full"></div>
-
-          <div class="relative z-10">
-            <div class="w-14 h-14 rounded-2xl bg-blue-600/20 flex items-center justify-center text-2xl mb-5">
-              🎙
-            </div>
-
-            <h3 class="font-black text-lg mb-2">
-              Audio Bible
-            </h3>
-
-            <p class="text-slate-400 text-xs leading-relaxed mb-4">
-              Listen to scripture beautifully with immersive playback.
-            </p>
-
-            <div class="flex items-center gap-2 text-blue-400 text-xs font-bold">
-              Open Audio
-              <span>→</span>
-            </div>
-          </div>
-        </a>
-
-        <!-- PLAYLIST -->
-        <a
-          href="playlist.html"
-          class="feature-card relative overflow-hidden rounded-[28px] border border-purple-500/15 bg-gradient-to-br from-slate-900 to-slate-800 p-5"
-        >
-          <div class="absolute bottom-0 left-0 w-24 h-24 bg-purple-600/10 blur-3xl rounded-full"></div>
-
-          <div class="relative z-10">
-            <div class="w-14 h-14 rounded-2xl bg-purple-600/20 flex items-center justify-center text-2xl mb-5">
-              🎵
-            </div>
-
-            <h3 class="font-black text-lg mb-2">
-              Music Center
-            </h3>
-
-            <p class="text-slate-400 text-xs leading-relaxed mb-4">
-              Worship playlists and spiritual music experiences.
-            </p>
-
-            <div class="flex items-center gap-2 text-purple-400 text-xs font-bold">
-              Open Playlist
-              <span>→</span>
-            </div>
-          </div>
-        </a>
-
-        <!-- TRIVIA -->
-        <a
-          href="trivia.html"
-          class="feature-card relative overflow-hidden rounded-[28px] border border-amber-500/15 bg-gradient-to-br from-slate-900 to-slate-800 p-5"
-        >
-          <div class="absolute top-0 left-0 w-24 h-24 bg-amber-600/10 blur-3xl rounded-full"></div>
-
-          <div class="relative z-10">
-            <div class="w-14 h-14 rounded-2xl bg-amber-600/20 flex items-center justify-center text-2xl mb-5">
-              ❓
-            </div>
-
-            <h3 class="font-black text-lg mb-2">
-              Bible Trivia
-            </h3>
-
-            <p class="text-slate-400 text-xs leading-relaxed mb-4">
-              Challenge yourself with fun scripture-based questions.
-            </p>
-
-            <div class="flex items-center gap-2 text-amber-400 text-xs font-bold">
-              Play Trivia
-              <span>→</span>
-            </div>
-          </div>
-        </a>
-
-        <!-- FAVORITES -->
-        <a
-          href="favorites.html"
-          class="feature-card relative overflow-hidden rounded-[28px] border border-emerald-500/15 bg-gradient-to-br from-slate-900 to-slate-800 p-5"
-        >
-          <div class="absolute bottom-0 right-0 w-24 h-24 bg-emerald-600/10 blur-3xl rounded-full"></div>
-
-          <div class="relative z-10">
-            <div class="w-14 h-14 rounded-2xl bg-emerald-600/20 flex items-center justify-center text-2xl mb-5">
-              ❤️
-            </div>
-
-            <h3 class="font-black text-lg mb-2">
-              Saved Verses
-            </h3>
-
-            <p class="text-slate-400 text-xs leading-relaxed mb-4">
-              Access your favorite scriptures instantly offline.
-            </p>
-
-            <div class="flex items-center gap-2 text-emerald-400 text-xs font-bold">
-              Open Saved
-              <span>→</span>
-            </div>
-          </div>
-        </a>
-
-      </div>
-
+    <!-- ENABLE NOTIFICATIONS NUDGE -->
+    <section id="notifyNudge" class="rounded-[24px] border border-amber-500/20 bg-amber-500/5 p-5 fade-in hidden">
+      <p class="text-sm text-amber-200 font-bold mb-1">Never miss your verse</p>
+      <p class="text-xs text-slate-400 mb-3">Turn on notifications for your daily verse and prayer reminders.</p>
+      <button onclick="enableNotifications()" class="w-full bg-amber-500 text-slate-900 text-xs font-bold uppercase tracking-wider py-3 rounded-xl active:scale-95 transition">
+        Enable Notifications
+      </button>
     </section>
 
   </main>
 
-  <!-- BOTTOM NAV -->
-  <nav class="fixed bottom-0 left-0 right-0 glass border-t border-slate-800 px-8 py-4 flex justify-between items-center z-[100]">
-
-    <a href="index.html" class="flex flex-col items-center gap-1 nav-active">
-      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-        <path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z"/>
-      </svg>
-
+  <!-- NAV -->
+  <nav class="fixed bottom-0 left-0 right-0 glass border-t border-slate-800 px-6 py-4 flex justify-between items-center z-[100]">
+    <a href="index.html" class="flex flex-col items-center gap-1 text-amber-400">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z"/></svg>
       <span class="text-[10px]">Home</span>
     </a>
-
     <a href="bible.html" class="flex flex-col items-center gap-1 text-slate-500">
-      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-        <path d="M9 4.804A7.968 7.968 0 005.5 4c-1.255 0-2.443.29-3.5.804v10A7.969 7.969 0 015.5 14c1.669 0 3.218.51 4.5 1.385A7.962 7.962 0 0114.5 14c1.255 0 2.443.29 3.5.804v-10A7.968 7.968 0 0014.5 4c-1.255 0-2.443.29-3.5.804V12a1 1 0 11-2 0V4.804z"/>
-      </svg>
-
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path d="M9 4.804A7.968 7.968 0 005.5 4c-1.255 0-2.443.29-3.5.804v10A7.969 7.969 0 015.5 14c1.669 0 3.218.51 4.5 1.385A7.962 7.962 0 0114.5 14c1.255 0 2.443.29 3.5.804v-10A7.968 7.968 0 0014.5 4c-1.255 0-2.443.29-3.5.804V12a1 1 0 11-2 0V4.804z"/></svg>
       <span class="text-[10px]">Bible</span>
     </a>
-
+    <a href="trivia.html" class="flex flex-col items-center gap-1 text-slate-500">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-8-3a1 1 0 00-.867.5 1 1 0 11-1.731-1A3 3 0 0113 8a3.001 3.001 0 01-2 2.83V11a1 1 0 11-2 0v-1a1 1 0 011-1 1 1 0 100-2zm0 8a1 1 0 100-2 1 1 0 000 2z" clip-rule="evenodd"/></svg>
+      <span class="text-[10px]">Trivia</span>
+    </a>
     <a href="prayer.html" class="flex flex-col items-center gap-1 text-slate-500">
-      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-        <path fill-rule="evenodd" d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z" clip-rule="evenodd"/>
-      </svg>
-
-      <span class="text-[10px]">Prayers</span>
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd"/></svg>
+      <span class="text-[10px]">Prayer</span>
     </a>
-
-    <a href="favorites.html" class="flex flex-col items-center gap-1 text-slate-500">
-      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-        <path d="M5 4a2 2 0 012-2h6a2 2 0 012 2v14l-5-2.5L5 18V4z"/>
-      </svg>
-
-      <span class="text-[10px]">Saved</span>
+    <a href="settings.html" class="flex flex-col items-center gap-1 text-slate-500">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M11.49 3.17c-.38-1.56-2.6-1.56-2.98 0a1.532 1.532 0 01-2.286.948c-1.372-.836-2.942.734-2.106 2.106.54.886.061 2.042-.947 2.287-1.561.379-1.561 2.6 0 2.978a1.532 1.532 0 01.947 2.287c-.836 1.372.734 2.942 2.106 2.106a1.532 1.532 0 012.287.947c.379 1.561 2.6 1.561 2.978 0a1.533 1.533 0 012.287-.947c1.372.836 2.942-.734 2.106-2.106a1.533 1.533 0 01.947-2.287c1.561-.379 1.561-2.6 0-2.978a1.532 1.532 0 01-.947-2.287c.836-1.372-.734-2.942-2.106-2.106a1.532 1.532 0 01-2.287-.947zM10 13a3 3 0 100-6 3 3 0 000 6z" clip-rule="evenodd"/></svg>
+      <span class="text-[10px]">Settings</span>
     </a>
-
   </nav>
 
-  <script type="module" src="./app.js"></script>
+  <script src="./cymor-shared.js"></script>
+  <script>
+    let currentVerse = null;
 
+    function greet() {
+      const settings = CYMOR.getSettings();
+      const hour = new Date().getHours();
+      const label = hour < 12 ? "Good morning" : hour < 18 ? "Good afternoon" : "Good evening";
+      document.getElementById('greetingLabel').textContent = label;
+      document.getElementById('greetingName').textContent = settings.name ? settings.name : "Welcome back";
+    }
+
+    function loadStreaks() {
+      document.getElementById('readStreakVal').textContent = CYMOR.getStreak('reading') + ' days';
+      document.getElementById('triviaStreakVal').textContent = CYMOR.getStreak('trivia') + ' days';
+      document.getElementById('prayerStreakVal').textContent = CYMOR.getStreak('prayer') + ' days';
+      const total = CYMOR.getStreak('reading') + CYMOR.getStreak('trivia') + CYMOR.getStreak('prayer');
+      document.getElementById('streakFlame').textContent = '🔥' + total;
+    }
+
+    function loadContinue() {
+      const last = JSON.parse(localStorage.getItem('cymorLastRead') || 'null');
+      if (last) document.getElementById('continueBook').textContent = last.bookLabel + ' ' + last.chapter;
+    }
+
+    async function loadDailyVerse() {
+      const [book, chapter, verse] = CYMOR.getTodayVerseRef();
+      const settings = CYMOR.getSettings();
+      const versionId = CYMOR.EN_VERSIONS[settings.version] ? settings.version : 'kjv';
+      try {
+        const data = await CYMOR.fetchVerse(book, chapter, verse, 'en');
+        currentVerse = data;
+        const bookLabel = (CYMOR.BOOKS.find(b => b[0] === book) || [, book])[1];
+        document.getElementById('verseText').textContent = '"' + data.text + '"';
+        document.getElementById('verseRef').textContent = bookLabel + ' ' + chapter + ':' + verse;
+      } catch (e) {
+        document.getElementById('verseText').textContent = "\"Trust in the Lord with all thine heart; and lean not unto thine own understanding.\"";
+        document.getElementById('verseRef').textContent = "Proverbs 3:5";
+      }
+    }
+
+    async function shareVerse() {
+      if (!currentVerse) return;
+      await CYMOR.shareAsImage({
+        title: "Verse of the Day",
+        body: currentVerse.text,
+        reference: document.getElementById('verseRef').textContent
+      });
+    }
+
+    function enableNotifications() {
+      if (!("Notification" in window)) { alert("Notifications aren't supported on this browser."); return; }
+      Notification.requestPermission().then(perm => {
+        if (perm === 'granted') {
+          CYMOR.registerServiceWorker();
+          document.getElementById('notifyNudge').classList.add('hidden');
+          localStorage.setItem('cymorNotifyEnabled', '1');
+        }
+      });
+    }
+
+    function checkNotifyNudge() {
+      if (!localStorage.getItem('cymorNotifyEnabled')) {
+        document.getElementById('notifyNudge').classList.remove('hidden');
+      }
+    }
+
+    greet();
+    loadStreaks();
+    loadContinue();
+    loadDailyVerse();
+    checkNotifyNudge();
+    CYMOR.registerServiceWorker();
+  </script>
 </body>
 </html>
