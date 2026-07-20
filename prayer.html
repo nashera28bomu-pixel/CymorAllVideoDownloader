@@ -3,150 +3,232 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Prayer Center — Cymor Bible</title>
+  <title>Prayer — Cymor Bible</title>
   <link rel="manifest" href="./manifest.json">
-
+  <meta name="theme-color" content="#0F172A">
   <script src="https://cdn.tailwindcss.com"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Playfair+Display:ital,wght@0,600;1,400&display=swap" rel="stylesheet">
-  
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=Playfair+Display:ital,wght@0,700;1,400&display=swap" rel="stylesheet">
   <style>
     body { font-family: 'Inter', sans-serif; }
+    .serif { font-family: 'Playfair Display', serif; }
     .glass { background: rgba(30, 41, 59, 0.7); backdrop-filter: blur(14px); border: 1px solid rgba(255,255,255,0.05); }
-    .nav-active { color: #fbbf24; } /* Amber for prayer focus */
-    ::-webkit-scrollbar { width: 0px; background: transparent; }
-    
-    /* Animation for the prayer card */
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(10px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-    .animate-prayer { animation: fadeIn 0.8s ease forwards; }
+    ::-webkit-scrollbar { width: 0px; }
+    @keyframes fadeIn { from {opacity:0;transform:translateY(10px);} to {opacity:1;transform:translateY(0);} }
+    .fade-in { animation: fadeIn 0.4s ease forwards; }
+    .tab-btn.active { background: #f59e0b; color: #0f172a; border-color: #f59e0b; }
+    textarea { resize: none; }
   </style>
 </head>
+<body class="bg-[#0F172A] text-slate-100 min-h-screen pb-28">
 
-<body class="bg-[#0F172A] text-slate-100 min-h-screen pb-24">
-
-  <header class="sticky top-0 z-50 bg-[#0F172A]/90 backdrop-blur-md border-b border-slate-800 p-4">
+  <header class="sticky top-0 z-50 bg-[#0F172A]/95 backdrop-blur border-b border-slate-800 px-4 py-3">
     <div class="max-w-md mx-auto flex items-center justify-between">
       <a href="index.html" class="text-blue-400 text-xs font-bold uppercase tracking-widest">← Home</a>
-      <h1 class="font-bold text-sm tracking-tight">Prayer Center</h1>
-      <div class="w-8"></div>
+      <h1 class="text-sm font-bold tracking-tight">🙏 Prayer</h1>
+      <div class="w-12"></div>
     </div>
   </header>
 
-  <main class="max-w-md mx-auto px-4 py-8 space-y-8">
-    
-    <section id="dailyPrayerContent" class="animate-prayer p-8 rounded-[32px] bg-gradient-to-br from-amber-500/10 via-slate-900/40 to-transparent border border-amber-500/20 shadow-2xl">
-      <div class="flex items-center gap-2 mb-6">
-        <div class="w-10 h-1 bg-amber-500/50 rounded-full"></div>
-        <p class="text-[10px] uppercase tracking-[0.2em] text-amber-400 font-bold">Focus for Today</p>
-      </div>
-      
-      <h2 id="prayerTitle" class="text-2xl font-serif mb-4 text-white italic leading-tight">Finding Your Focus...</h2>
-      <p id="prayerText" class="text-slate-300 leading-relaxed italic text-lg font-light"></p>
-      
-      <div class="mt-8 pt-6 border-t border-amber-500/10 flex justify-between items-center">
-        <span class="text-[10px] text-amber-500/50 uppercase font-bold tracking-widest">Cymor Daily Devotion</span>
-        <button onclick="window.CymorBibleDebugBridge.share()" class="text-amber-400 text-xs font-bold">Share Prayer</button>
-      </div>
-    </section>
+  <main class="max-w-md mx-auto px-4 py-6 space-y-5">
 
-    <section class="space-y-4">
-      <div class="flex items-center justify-between px-2">
-        <h3 class="text-xs font-bold text-slate-500 uppercase tracking-widest">Personal Prayer Journal</h3>
-        <span class="text-[9px] text-slate-600 uppercase">Auto-saving...</span>
+    <!-- STREAK -->
+    <div class="rounded-2xl bg-slate-900/60 border border-slate-800 p-4 flex items-center justify-between">
+      <div>
+        <p class="text-[10px] uppercase tracking-widest text-slate-500 font-bold">Prayer Streak</p>
+        <p class="text-lg font-black text-amber-400" id="prayerStreak">0 days</p>
       </div>
-      
-      <div class="bg-slate-900/60 border border-slate-800 rounded-[32px] p-6 focus-within:border-blue-500/50 transition-all">
-        <textarea id="journalInput" 
-          placeholder="What are you praying for today? Write your heart out here..." 
-          class="w-full h-48 bg-transparent border-none outline-none text-slate-200 resize-none text-base leading-relaxed placeholder:text-slate-600" 
-          spellcheck="false"></textarea>
+      <span class="text-2xl">🔥</span>
+    </div>
+
+    <!-- TABS -->
+    <div class="flex gap-2">
+      <button class="tab-btn active flex-1 px-4 py-2.5 rounded-xl bg-slate-800 border border-slate-700 text-xs font-bold" onclick="setTab('journal', this)">My Journal</button>
+      <button class="tab-btn flex-1 px-4 py-2.5 rounded-xl bg-slate-800 border border-slate-700 text-xs font-bold" onclick="setTab('wall', this)">Prayer Wall</button>
+    </div>
+
+    <!-- JOURNAL TAB -->
+    <div id="journalTab">
+      <div class="rounded-[24px] border border-slate-800 bg-slate-900/50 p-5 fade-in">
+        <p class="text-[10px] uppercase tracking-[0.25em] text-slate-500 font-bold mb-3">New Prayer</p>
+        <textarea id="newPrayerText" rows="3" placeholder="What's on your heart today?" class="w-full bg-slate-800/60 border border-slate-700 rounded-xl p-3 text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:border-amber-500/50"></textarea>
+        <button onclick="addPrayer()" class="w-full mt-3 bg-amber-500 text-slate-900 text-xs font-bold uppercase tracking-wider py-3 rounded-xl active:scale-95 transition">
+          Save Prayer
+        </button>
       </div>
-      <p class="text-[10px] text-slate-500 text-center uppercase tracking-[0.15em]">This journal is private and stays on your device</p>
-    </section>
+
+      <div class="mt-5 space-y-3" id="journalList"></div>
+    </div>
+
+    <!-- WALL TAB -->
+    <div id="wallTab" class="hidden">
+      <div class="rounded-[24px] border border-slate-800 bg-slate-900/50 p-5 fade-in">
+        <p class="text-[10px] uppercase tracking-[0.25em] text-slate-500 font-bold mb-2">Share anonymously</p>
+        <p class="text-xs text-slate-500 mb-3">Posts here are visible to everyone using Cymor Bible. No names are shown.</p>
+        <textarea id="wallPrayerText" rows="3" placeholder="Share a prayer request with the community…" class="w-full bg-slate-800/60 border border-slate-700 rounded-xl p-3 text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:border-amber-500/50"></textarea>
+        <button onclick="postToWall()" class="w-full mt-3 bg-blue-600 text-white text-xs font-bold uppercase tracking-wider py-3 rounded-xl active:scale-95 transition">
+          Post Anonymously
+        </button>
+      </div>
+      <div class="mt-5 space-y-3" id="wallList"></div>
+      <p class="text-[10px] text-slate-600 text-center mt-3 leading-relaxed">
+        The prayer wall needs a small backend endpoint to sync across devices — for now it's stored on this device only.
+        Point WALL_API below at your Express + MongoDB route when ready.
+      </p>
+    </div>
 
   </main>
 
-  <nav class="fixed bottom-0 left-0 right-0 glass border-t border-slate-800 px-8 py-4 flex justify-between items-center z-[100]">
+  <!-- NAV -->
+  <nav class="fixed bottom-0 left-0 right-0 glass border-t border-slate-800 px-6 py-4 flex justify-between items-center z-[100]">
     <a href="index.html" class="flex flex-col items-center gap-1 text-slate-500">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z"/></svg>
-        <span class="text-[10px]">Home</span>
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z"/></svg>
+      <span class="text-[10px]">Home</span>
     </a>
     <a href="bible.html" class="flex flex-col items-center gap-1 text-slate-500">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path d="M9 4.804A7.968 7.968 0 005.5 4c-1.255 0-2.443.29-3.5.804v10A7.969 7.969 0 015.5 14c1.669 0 3.218.51 4.5 1.385A7.962 7.962 0 0114.5 14c1.255 0 2.443.29 3.5.804v-10A7.968 7.968 0 0014.5 4c-1.255 0-2.443.29-3.5.804V12a1 1 0 11-2 0V4.804z"/></svg>
-        <span class="text-[10px]">Bible</span>
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path d="M9 4.804A7.968 7.968 0 005.5 4c-1.255 0-2.443.29-3.5.804v10A7.969 7.969 0 015.5 14c1.669 0 3.218.51 4.5 1.385A7.962 7.962 0 0114.5 14c1.255 0 2.443.29 3.5.804v-10A7.968 7.968 0 0014.5 4c-1.255 0-2.443.29-3.5.804V12a1 1 0 11-2 0V4.804z"/></svg>
+      <span class="text-[10px]">Bible</span>
     </a>
-    <a href="prayer.html" class="flex flex-col items-center gap-1 nav-active">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z" clip-rule="evenodd"/></svg>
-        <span class="text-[10px]">Prayers</span>
+    <a href="trivia.html" class="flex flex-col items-center gap-1 text-slate-500">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-8-3a1 1 0 00-.867.5 1 1 0 11-1.731-1A3 3 0 0113 8a3.001 3.001 0 01-2 2.83V11a1 1 0 11-2 0v-1a1 1 0 011-1 1 1 0 100-2zm0 8a1 1 0 100-2 1 1 0 000 2z" clip-rule="evenodd"/></svg>
+      <span class="text-[10px]">Trivia</span>
     </a>
-    <a href="favorites.html" class="flex flex-col items-center gap-1 text-slate-500">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path d="M5 4a2 2 0 012-2h6a2 2 0 012 2v14l-5-2.5L5 18V4z"/></svg>
-        <span class="text-[10px]">Saved</span>
+    <a href="prayer.html" class="flex flex-col items-center gap-1 text-amber-400">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd"/></svg>
+      <span class="text-[10px]">Prayer</span>
+    </a>
+    <a href="settings.html" class="flex flex-col items-center gap-1 text-slate-500">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M11.49 3.17c-.38-1.56-2.6-1.56-2.98 0a1.532 1.532 0 01-2.286.948c-1.372-.836-2.942.734-2.106 2.106.54.886.061 2.042-.947 2.287-1.561.379-1.561 2.6 0 2.978a1.532 1.532 0 01.947 2.287c-.836 1.372.734 2.942 2.106 2.106a1.532 1.532 0 012.287.947c.379 1.561 2.6 1.561 2.978 0a1.533 1.533 0 012.287-.947c1.372.836 2.942-.734 2.106-2.106a1.533 1.533 0 01.947-2.287c1.561-.379 1.561-2.6 0-2.978a1.532 1.532 0 01-.947-2.287c.836-1.372-.734-2.942-2.106-2.106a1.532 1.532 0 01-2.287-.947zM10 13a3 3 0 100-6 3 3 0 000 6z" clip-rule="evenodd"/></svg>
+      <span class="text-[10px]">Settings</span>
     </a>
   </nav>
 
-  <script type="module">
-    import { } from './app.js'; 
+  <script src="./cymor-shared.js"></script>
+  <script>
+    // Set this to your Express endpoint (e.g. "https://your-app.onrender.com/api/prayer-wall")
+    // to sync the wall across devices via MongoDB. Left null, the wall stays device-local.
+    const WALL_API = null;
 
-    const journal = document.getElementById('journalInput');
-    
-    // 1. Journal Logic
-    journal.value = localStorage.getItem('cymorJournal') || "";
-    journal.addEventListener('input', (e) => {
-      localStorage.setItem('cymorJournal', e.target.value);
-    });
+    function getPrayers() { return JSON.parse(localStorage.getItem('cymorPrayers') || '[]'); }
+    function savePrayers(list) { localStorage.setItem('cymorPrayers', JSON.stringify(list)); }
+    function getWallLocal() { return JSON.parse(localStorage.getItem('cymorWallLocal') || '[]'); }
+    function saveWallLocal(list) { localStorage.setItem('cymorWallLocal', JSON.stringify(list)); }
 
-    // 2. Daily Prayer Rotation (30 Day Pool)
-    const prayers = [
-      { title: "Strength for the Journey", content: "Heavenly Father, I come before You seeking the strength that only You can provide. When the world feels heavy and my energy fades, remind me that Your grace is sufficient and Your power is made perfect in my weakness. Guide my steps today. Amen." },
-      { title: "Peace in the Storm", content: "Lord, I surrender every worry and anxiety to Your care. Even when life feels chaotic, I choose to trust in Your unchanging nature. Calm the storms in my mind and replace my fear with a peace that surpasses all human understanding. Amen." },
-      { title: "Divine Wisdom", content: "Father, I ask for a spirit of wisdom and discernment. Help me to make choices that honor You and lead toward the purpose You have designed for my life. Open my ears to hear Your whispers. Amen." },
-      { title: "A Heart of Gratitude", content: "God, thank You for the breath in my lungs and the gift of a new day. Help me to notice the small blessings that I often overlook. Teach me to live with a heart of thanksgiving. Amen." },
-      { title: "Healing and Restoration", content: "Lord, I bring my brokenness and pain to You. You are the Great Physician, capable of healing what is shattered and restoring what has been lost. Touch my body, mind, and spirit today. Amen." },
-      { title: "Unwavering Faith", content: "Gracious God, increase my faith. When doubts creep in and the way forward seems unclear, help me to lean not on my own understanding but on Your eternal truth. Amen." },
-      { title: "Release from the Past", content: "Father, help me to let go of the mistakes and regrets that keep me tethered to yesterday. Your mercies are new every morning. Grant me the courage to forgive myself as You have forgiven me. Amen." },
-      { title: "Protection and Safety", content: "Lord, I ask for Your hedge of protection over my life and my loved ones today. Guard our coming and going, keep us safe from harm, and surround us with Your heavenly angels. Amen." },
-      { title: "Purpose and Vision", content: "God, I pray that You would clarify the vision You have for my life. Remove the distractions that blur my focus and give me the passion to pursue the work You've called me to do. Amen." },
-      { title: "Patience and Timing", content: "Lord, teaching me to wait is difficult, but I trust Your timing. Help me to be patient while You work behind the scenes. Remind me that Your delays are not Your denials. Amen." },
-      { title: "Joy in All Circumstances", content: "Father, Your Word says the joy of the Lord is my strength. I choose joy today, not based on my feelings, but on the fact that I am Your child. Let Your happiness bubble up within me. Amen." },
-      { title: "Courage to Lead", content: "Lord, give me the courage to stand for what is right, even when it is unpopular. Empower me to lead with integrity, humility, and love. Let my influence be used to build others up. Amen." },
-      { title: "Financial Provision", content: "God, You are Jehovah Jireh, my provider. I lift up my needs to You, trusting that You will supply all I require according to Your riches in glory. Give me wisdom to manage well. Amen." },
-      { title: "Rest for the Weary", content: "Father, I feel tired in my soul. I come to You to find true rest. Quiet my heart, settle my thoughts, and refresh my spirit. Help me to find a rhythm of grace. Amen." },
-      { title: "Clarity of Mind", content: "Lord, remove the fog of confusion. Grant me clarity as I navigate complex decisions and relationships. Let Your Word be a lamp unto my feet and a light unto my path. Amen." },
-      { title: "Gentleness and Love", content: "God, soften my heart. Help me to respond to others with the same grace and kindness You show me every day. Remove any bitterness and replace it with genuine love. Amen." },
-      { title: "Overcoming Temptation", content: "Father, give me the strength to resist the things that pull me away from Your will. Shield my heart from distraction and strengthen my resolve to walk in purity. Amen." },
-      { title: "Hope for Tomorrow", content: "Lord, when the future looks bleak, remind me that my hope is built on You. You are the God of the impossible, and You hold my tomorrow in Your hands. Let hope rise. Amen." },
-      { title: "Humility and Service", content: "God, keep me humble. Remind me that I am called to serve, not just to be served. Give me a heart that looks for opportunities to help others. Amen." },
-      { title: "Confidence in Identity", content: "Father, help me to remember who I am in You. I am loved, I am chosen, and I am Yours. Let my confidence come from Your approval alone. Amen." },
-      { title: "Steadfast Commitment", content: "Lord, help me to be consistent in my walk with You. Give me the discipline to seek You daily through Your Word and prayer. Amen." },
-      { title: "Grace for Growth", content: "God, I thank You that You aren't finished with me yet. Give me grace for the areas where I am still growing. Help me to be patient with the process of transformation. Amen." },
-      { title: "Family Harmony", content: "Father, I lift up my family to You. Bring peace to our home, heal any broken relationships, and help us to love one another deeply. Amen." },
-      { title: "A Spirit of Excellence", content: "Lord, help me to do everything today as if I am doing it for You. Whether the task is big or small, give me a spirit of excellence and a heart of integrity. Amen." },
-      { title: "Light in Darkness", content: "God, use me as an instrument of Your light. In a world that often feels dark and broken, let my words and actions offer hope and healing. Amen." },
-      { title: "Renewal of Passion", content: "Father, if my heart has grown cold or indifferent, stir up the fire within me again. Renew my first love for You and give me a fresh hunger for Your presence. Amen." },
-      { title: "Freedom from Fear", content: "Lord, You have not given me a spirit of fear, but of power, love, and a sound mind. I break agreement with fear today and walk in boldness. Amen." },
-      { title: "Overflow of Compassion", content: "God, break my heart for what breaks Yours. Give me a deep compassion for the lost, the poor, and the forgotten. Move me to action. Amen." },
-      { title: "Safe Haven", content: "Father, thank You for being my safe place. When I feel overwhelmed by the demands of life, I run to You. Hide me in the shadow of Your wings. Amen." },
-      { title: "The Finish Line", content: "Lord, give me the endurance to finish the race set before me. Help me to keep my eyes on the prize and to not grow weary in doing good. Amen." }
-    ];
+    function setTab(tab, btn) {
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      document.getElementById('journalTab').classList.toggle('hidden', tab !== 'journal');
+      document.getElementById('wallTab').classList.toggle('hidden', tab !== 'wall');
+      if (tab === 'wall') renderWall();
+    }
 
-    const dayOfMonth = new Date().getDate();
-    const prayerIndex = (dayOfMonth - 1) % prayers.length;
-    const active = prayers[prayerIndex];
-    
-    document.getElementById('prayerTitle').textContent = active.title;
-    document.getElementById('prayerText').textContent = active.content;
+    function addPrayer() {
+      const text = document.getElementById('newPrayerText').value.trim();
+      if (!text) return;
+      const list = getPrayers();
+      list.unshift({ id: Date.now(), text, answered: false, date: new Date().toISOString() });
+      savePrayers(list);
+      document.getElementById('newPrayerText').value = '';
+      CYMOR.bumpStreak('prayer');
+      document.getElementById('prayerStreak').textContent = CYMOR.getStreak('prayer') + ' days';
+      renderJournal();
+    }
 
-    // 3. Share Helper
-    window.CymorBibleDebugBridge = {
-      share: () => {
-        const text = `🙏 *Daily Prayer: ${active.title}*\n\n"${active.content}"\n\nShared via Cymor Bible App`;
-        if (navigator.share) navigator.share({ text });
-        else window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`);
+    function toggleAnswered(id) {
+      const list = getPrayers().map(p => p.id === id ? { ...p, answered: !p.answered } : p);
+      savePrayers(list);
+      renderJournal();
+    }
+
+    function deletePrayer(id) {
+      savePrayers(getPrayers().filter(p => p.id !== id));
+      renderJournal();
+    }
+
+    async function sharePrayer(text) {
+      await CYMOR.shareAsImage({
+        title: "A Prayer",
+        body: text,
+        reference: "Cymor Bible · Prayer Journal",
+        accent: "#38bdf8"
+      });
+    }
+
+    function renderJournal() {
+      const list = getPrayers();
+      const container = document.getElementById('journalList');
+      if (!list.length) {
+        container.innerHTML = '<p class="text-slate-600 text-xs text-center py-8">No prayers yet — write your first one above.</p>';
+        return;
       }
-    };
+      container.innerHTML = list.map(p => `
+        <div class="rounded-2xl border p-4 fade-in ${p.answered ? 'border-emerald-500/30 bg-emerald-500/5' : 'border-slate-800 bg-slate-900/50'}">
+          <p class="text-sm text-slate-100 leading-relaxed mb-3">${escapeHtml(p.text)}</p>
+          <div class="flex items-center justify-between text-[10px] text-slate-500">
+            <span>${new Date(p.date).toLocaleDateString()}</span>
+            <div class="flex gap-2">
+              <button onclick='sharePrayer(${JSON.stringify(p.text)})' class="text-blue-400 font-bold uppercase tracking-wider">Share</button>
+              <button onclick="toggleAnswered(${p.id})" class="font-bold uppercase tracking-wider ${p.answered ? 'text-emerald-400' : 'text-amber-400'}">
+                ${p.answered ? '✓ Answered' : 'Mark Answered'}
+              </button>
+              <button onclick="deletePrayer(${p.id})" class="text-red-400 font-bold uppercase tracking-wider">Delete</button>
+            </div>
+          </div>
+        </div>`).join('');
+    }
+
+    async function postToWall() {
+      const text = document.getElementById('wallPrayerText').value.trim();
+      if (!text) return;
+      const entry = { id: Date.now(), text, prayCount: 0, date: new Date().toISOString() };
+      if (WALL_API) {
+        try {
+          await fetch(WALL_API, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(entry) });
+        } catch (e) { console.warn('Wall API unavailable, saving locally instead.'); }
+      }
+      const list = getWallLocal();
+      list.unshift(entry);
+      saveWallLocal(list);
+      document.getElementById('wallPrayerText').value = '';
+      renderWall();
+    }
+
+    async function renderWall() {
+      let list = getWallLocal();
+      if (WALL_API) {
+        try {
+          const res = await fetch(WALL_API);
+          list = await res.json();
+        } catch (e) { /* fall back to local list */ }
+      }
+      const container = document.getElementById('wallList');
+      if (!list.length) {
+        container.innerHTML = '<p class="text-slate-600 text-xs text-center py-8">No community prayers yet — be the first to share.</p>';
+        return;
+      }
+      container.innerHTML = list.map(p => `
+        <div class="rounded-2xl border border-slate-800 bg-slate-900/50 p-4 fade-in">
+          <p class="text-sm text-slate-100 leading-relaxed mb-3">${escapeHtml(p.text)}</p>
+          <div class="flex items-center justify-between text-[10px] text-slate-500">
+            <span>${new Date(p.date).toLocaleDateString()}</span>
+            <button onclick="prayFor(${p.id})" class="text-amber-400 font-bold uppercase tracking-wider">🙏 Praying (${p.prayCount || 0})</button>
+          </div>
+        </div>`).join('');
+    }
+
+    function prayFor(id) {
+      const list = getWallLocal().map(p => p.id === id ? { ...p, prayCount: (p.prayCount || 0) + 1 } : p);
+      saveWallLocal(list);
+      renderWall();
+    }
+
+    function escapeHtml(str) {
+      const div = document.createElement('div');
+      div.textContent = str;
+      return div.innerHTML;
+    }
+
+    document.getElementById('prayerStreak').textContent = CYMOR.getStreak('prayer') + ' days';
+    renderJournal();
   </script>
 </body>
 </html>
