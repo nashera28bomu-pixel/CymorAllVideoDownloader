@@ -72,6 +72,168 @@ const CYMOR = (function () {
     return DAILY_REFS[seededDayIndex(DAILY_REFS.length)];
   }
 
+  // ---------- ENCOURAGEMENT OF THE DAY ----------
+  const ENCOURAGEMENTS = [
+    "God isn't finished with you yet. Keep showing up — grace meets you exactly where you are.",
+    "You don't have to carry today alone. Whatever it holds, He's already there in it with you.",
+    "Small, faithful steps still count. You're closer than you think.",
+    "Rest is not wasted time — even God rested. Give yourself permission today.",
+    "Your prayers aren't going unheard. Keep speaking, even when it's just a whisper.",
+    "The delay isn't denial. Trust the timing, not just the outcome.",
+    "You are not behind. You are exactly where you need to be to grow.",
+    "Peace isn't the absence of storms — it's His presence in the middle of them.",
+    "Someone needed the version of you that pushed through yesterday. Keep going.",
+    "You've survived every hard day so far. That's not luck — that's strength you carry.",
+    "It's okay to not have it all figured out today. Faith fills the gaps.",
+    "God's mercy is new this morning — whatever yesterday looked like, today is fresh.",
+    "You're allowed to ask for help. Even Jesus let others carry His cross.",
+    "The seed you planted in silence will still bear fruit in season.",
+    "Your weakness isn't disqualifying — it's exactly where His strength shows up best.",
+    "Nothing you're facing today is a surprise to God. Walk it out with confidence.",
+    "You are loved on your hardest day just as much as your best one.",
+    "Keep your hands open. What's meant for you won't pass you by.",
+    "Today doesn't have to be perfect to be purposeful.",
+    "Your patience is not being wasted — it's being refined into something stronger."
+  ];
+  function getTodayEncouragement() {
+    return ENCOURAGEMENTS[seededDayIndex(ENCOURAGEMENTS.length)];
+  }
+
+  // ---------- PRAYER OF THE DAY ----------
+  const PRAYERS_OF_DAY = [
+    "Lord, thank You for this new day. Guard my heart, guide my steps, and help me walk in peace no matter what I face. Amen.",
+    "Father, I bring my worries to You today. Replace my anxiety with Your peace that surpasses understanding. Amen.",
+    "Lord, give me strength for the tasks ahead and patience for the people around me. Let Your love flow through me today. Amen.",
+    "God, thank You for Your faithfulness. Help me trust Your timing even when I don't understand it. Amen.",
+    "Father, forgive me where I've fallen short. Renew a right spirit within me and help me extend grace to others. Amen.",
+    "Lord, watch over my family and loved ones today. Keep them safe and draw them closer to You. Amen.",
+    "God, I ask for wisdom in every decision I make today. Let Your Spirit guide my words and actions. Amen.",
+    "Lord, thank You for another day of life. Help me use it well, and let my life bring glory to Your name. Amen.",
+    "Father, heal what is broken in me and in those I love. You are the God who restores. Amen.",
+    "Lord, help me to be still and know that You are God, especially when today feels overwhelming. Amen.",
+    "God, thank You for Your unfailing love. Help me love others the way You've loved me. Amen.",
+    "Lord, give me courage to do what is right, even when it's hard. I trust You to go before me. Amen.",
+    "Father, thank You for hearing my prayers. I lay my burdens at Your feet and receive Your peace. Amen.",
+    "Lord, open my eyes to see the blessings around me today, even the small ones. Amen."
+  ];
+  function getTodayPrayer() {
+    return PRAYERS_OF_DAY[seededDayIndex(PRAYERS_OF_DAY.length)];
+  }
+
+  // ---------- NOTIFICATION SCHEDULING (client-side, while app is open/installed) ----------
+  // True background push (app fully closed) needs a server + VAPID keys; this covers the
+  // common case of a PWA left open/installed, checking every 45s against saved times.
+  function getNotifSchedule() {
+    return Object.assign(
+      { verseTime: "07:00", prayerTime: "18:00", triviaTime: "20:00", verseOn: false, prayerOn: false, triviaOn: false },
+      JSON.parse(localStorage.getItem("cymorNotifSchedule") || "{}")
+    );
+  }
+  function setNotifSchedule(patch) {
+    const merged = Object.assign(getNotifSchedule(), patch);
+    localStorage.setItem("cymorNotifSchedule", JSON.stringify(merged));
+    return merged;
+  }
+
+  function fireNotification(title, body) {
+    if (!("Notification" in window) || Notification.permission !== "granted") return;
+    if (navigator.serviceWorker) {
+      navigator.serviceWorker.ready.then(reg => {
+        if (reg) reg.showNotification(title, { body, icon: "./icons/icon-192.png" });
+        else new Notification(title, { body });
+      }).catch(() => new Notification(title, { body }));
+    } else {
+      new Notification(title, { body });
+    }
+  }
+
+  function checkScheduledNotifications() {
+    if (!("Notification" in window) || Notification.permission !== "granted") return;
+    const sched = getNotifSchedule();
+    const now = new Date();
+    const hhmm = String(now.getHours()).padStart(2, "0") + ":" + String(now.getMinutes()).padStart(2, "0");
+    const today = now.toDateString();
+    let fired = JSON.parse(localStorage.getItem("cymorNotifFired") || "{}");
+    if (fired.date !== today) fired = { date: today, verse: false, prayer: false, trivia: false };
+
+    if (sched.verseOn && sched.verseTime === hhmm && !fired.verse) {
+      fireNotification("Verse of the Day", "Your daily verse is ready in Cymor Bible.");
+      fired.verse = true;
+    }
+    if (sched.prayerOn && sched.prayerTime === hhmm && !fired.prayer) {
+      fireNotification("Prayer Time", "Take a moment to pray and reflect today.");
+      fired.prayer = true;
+    }
+    if (sched.triviaOn && sched.triviaTime === hhmm && !fired.trivia) {
+      fireNotification("Keep your streak alive!", "Play today's Bible trivia before it resets.");
+      fired.trivia = true;
+    }
+    localStorage.setItem("cymorNotifFired", JSON.stringify(fired));
+  }
+
+  function startNotificationScheduler() {
+    checkScheduledNotifications();
+    setInterval(checkScheduledNotifications, 45000);
+  }
+
+  // ---------- BACKGROUND MUSIC MINI-PLAYER ----------
+  // Persists across page navigation (flat multi-page app, full reloads) by storing the
+  // current track + playback position in localStorage and resuming on each page load.
+  // There will be a brief gap on navigation since there's no single-page app shell —
+  // that's the honest tradeoff for a no-build, flat-file architecture.
+  function getPlaylist() {
+    return JSON.parse(localStorage.getItem("cymorPlaylist") || "[]");
+  }
+  function savePlaylist(list) {
+    localStorage.setItem("cymorPlaylist", JSON.stringify(list));
+  }
+  function getPlayerState() {
+    return JSON.parse(localStorage.getItem("cymorPlayerState") || 'null');
+  }
+  function setPlayerState(patch) {
+    const merged = Object.assign(getPlayerState() || {}, patch);
+    localStorage.setItem("cymorPlayerState", JSON.stringify(merged));
+    return merged;
+  }
+
+  function renderMiniPlayer() {
+    const existing = document.getElementById('cymorMiniPlayer');
+    if (existing) existing.remove();
+    const state = getPlayerState();
+    if (!state || !state.url) return;
+
+    const bar = document.createElement('div');
+    bar.id = 'cymorMiniPlayer';
+    bar.style.cssText = 'position:fixed;left:12px;right:12px;bottom:82px;z-index:150;background:rgba(15,23,42,0.92);backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,0.08);border-radius:18px;padding:10px 14px;display:flex;align-items:center;gap:10px;box-shadow:0 8px 24px rgba(0,0,0,0.35);';
+    bar.innerHTML = `
+      <div style="width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,#f59e0b,#b45309);display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;">🎵</div>
+      <div style="flex:1;min-width:0;">
+        <p style="color:#f1f5f9;font-size:12px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin:0;">${state.title || 'Now Playing'}</p>
+        <p style="color:#94a3b8;font-size:10px;margin:0;">Playing while you read</p>
+      </div>
+      <button id="cymorMiniPlayToggle" style="width:34px;height:34px;border-radius:999px;background:#f59e0b;border:none;font-size:14px;flex-shrink:0;">${state.playing ? '⏸' : '▶'}</button>
+    `;
+    document.body.appendChild(bar);
+
+    let audio = document.getElementById('cymorAudioEl');
+    if (!audio) {
+      audio = document.createElement('audio');
+      audio.id = 'cymorAudioEl';
+      audio.src = state.url;
+      audio.currentTime = state.time || 0;
+      audio.loop = true;
+      document.body.appendChild(audio);
+      if (state.playing) audio.play().catch(() => {});
+      setInterval(() => { if (!audio.paused) setPlayerState({ time: audio.currentTime }); }, 3000);
+    }
+
+    document.getElementById('cymorMiniPlayToggle').onclick = () => {
+      if (audio.paused) { audio.play().catch(() => {}); setPlayerState({ playing: true }); }
+      else { audio.pause(); setPlayerState({ playing: false }); }
+      renderMiniPlayer();
+    };
+  }
+
   // ---------- FETCH LAYER (normalizes every source to { text, book, chapter, verse, version }) ----------
   async function fetchVerse(bookSlug, chapter, verse, versionCode) {
     const lang = LANGS[versionCode] || { source: "wldeh", id: versionCode };
@@ -241,9 +403,12 @@ const CYMOR = (function () {
 
   return {
     LANGS, EN_VERSIONS, BOOKS, DAILY_REFS,
-    getTodayVerseRef, fetchVerse, fetchChapter,
+    getTodayVerseRef, getTodayEncouragement, getTodayPrayer,
+    fetchVerse, fetchChapter,
     getSettings, setSettings,
     bumpStreak, getStreak,
-    shareAsImage, registerServiceWorker, scheduleLocalReminder
+    shareAsImage, registerServiceWorker, scheduleLocalReminder,
+    getNotifSchedule, setNotifSchedule, startNotificationScheduler,
+    getPlaylist, savePlaylist, getPlayerState, setPlayerState, renderMiniPlayer
   };
 })();
