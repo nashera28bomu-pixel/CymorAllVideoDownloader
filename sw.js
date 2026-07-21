@@ -12,6 +12,8 @@ const SHELL_FILES = [
   "./trivia.html",
   "./prayer.html",
   "./settings.html",
+  "./audio.html",
+  "./playlist.html",
   "./manifest.json",
   "./cymor-shared.js"
 ];
