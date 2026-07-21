@@ -130,25 +130,53 @@
       updateHeaderLabel();
 
       try {
-        const en = await CYMOR.fetchChapter(state.bookSlug, state.chapter, 'en');
-        let parallel = null;
+        const settings = CYMOR.getSettings();
+        const enVersion = settings.version === 'web' ? 'en-web' : 'en';
+        const en = await CYMOR.fetchChapter(state.bookSlug, state.chapter, enVersion === 'en-web' ? 'en' : 'en');
+        // (English default version toggle wires through here — both KJV/WEB use the 'en' entry
+        //  in LANGS today; see settings.html note if you want WEB to resolve separately.)
+
+        let parallelVerses = null;
+        let parallelError = false;
         if (state.parallelLang) {
-          parallel = await CYMOR.fetchChapter(state.bookSlug, state.chapter, state.parallelLang).catch(() => null);
+          // Whole-chapter convenience files aren't guaranteed for every translation on the CDN —
+          // only the single-verse endpoint is guaranteed — so fetch each parallel verse
+          // individually instead of relying on a chapter file that may not exist.
+          try {
+            const results = await Promise.all(
+              en.verses.map(v =>
+                CYMOR.fetchVerse(state.bookSlug, state.chapter, parseInt(v.verse), state.parallelLang)
+                  .then(r => r.text)
+                  .catch(() => null)
+              )
+            );
+            parallelVerses = results;
+            if (results.every(r => !r)) parallelError = true;
+          } catch (e) {
+            parallelError = true;
+          }
         }
 
         container.innerHTML = '';
-        en.verses.forEach((v) => {
+        if (parallelError) {
+          const notice = document.createElement('p');
+          notice.className = 'text-amber-400 text-xs text-center bg-amber-500/10 border border-amber-500/20 rounded-xl p-3 mb-4';
+          notice.textContent = "Couldn't load this language for this chapter — showing English only.";
+          container.appendChild(notice);
+        }
+
+        en.verses.forEach((v, i) => {
           const row = document.createElement('div');
           row.className = 'fade-in mb-4';
-          if (parallel && parallel.verses.length) {
-            const match = parallel.verses.find(pv => pv.verse === v.verse) || parallel.verses[v.verse - 1];
+          const parallelText = parallelVerses ? parallelVerses[i] : null;
+          if (state.parallelLang && !parallelError) {
             row.innerHTML = `
               <div class="grid grid-cols-2 gap-3">
                 <p class="verse-en verse-text text-slate-100 leading-relaxed text-[15px]" data-v="${v.verse}">
                   <span class="text-amber-400 text-xs font-bold align-super mr-1">${v.verse}</span>${v.text}
                 </p>
                 <p class="verse-text text-slate-400 leading-relaxed text-[15px] italic border-l border-slate-800 pl-3">
-                  ${match ? match.text : '—'}
+                  ${parallelText ? parallelText : '<span class="text-slate-600">— unavailable —</span>'}
                 </p>
               </div>`;
           } else {
@@ -228,6 +256,8 @@
 
     restoreLastRead();
     loadChapter();
+    CYMOR.startNotificationScheduler();
+    CYMOR.renderMiniPlayer();
   </script>
 </body>
 </html>
