@@ -66,6 +66,26 @@
       </div>
     </section>
 
+    <!-- ENCOURAGEMENT OF THE DAY -->
+    <section class="rounded-[24px] border border-blue-500/20 bg-blue-500/5 p-5 fade-in">
+      <p class="text-[10px] uppercase tracking-[0.25em] text-blue-300 font-bold mb-2">Encouragement for Today</p>
+      <p id="encouragementText" class="text-sm text-slate-200 leading-relaxed">Loading…</p>
+    </section>
+
+    <!-- PRAYER OF THE DAY -->
+    <section class="rounded-[24px] border border-slate-800 bg-slate-900/50 p-5 fade-in">
+      <p class="text-[10px] uppercase tracking-[0.25em] text-slate-500 font-bold mb-2">Prayer of the Day</p>
+      <p id="prayerOfDayText" class="serif italic text-sm text-slate-200 leading-relaxed mb-4">Loading…</p>
+      <div class="flex gap-3">
+        <button onclick="sharePrayerOfDay()" class="flex-1 bg-blue-500/10 border border-blue-500/30 text-blue-300 text-xs font-bold uppercase tracking-wider py-2.5 rounded-xl active:scale-95 transition">
+          Share ✦
+        </button>
+        <a href="prayer.html" class="flex-1 bg-slate-800 border border-slate-700 text-xs font-bold uppercase tracking-wider py-2.5 rounded-xl active:scale-95 transition text-center">
+          Add to Journal
+        </a>
+      </div>
+    </section>
+
     <!-- CONTINUE READING -->
     <section class="rounded-[24px] border border-slate-800 bg-slate-900/50 p-5 fade-in" id="continueCard">
       <p class="text-[10px] uppercase tracking-[0.25em] text-slate-500 font-bold mb-2">Continue Reading</p>
@@ -91,6 +111,18 @@
       <a href="bible.html" class="rounded-2xl bg-slate-900/60 border border-slate-800 p-4 flex flex-col items-center gap-2 active:scale-95 transition">
         <span class="text-2xl">🔖</span>
         <span class="text-[10px] uppercase tracking-wider text-slate-400 font-bold">Bookmarks</span>
+      </a>
+      <a href="audio.html" class="rounded-2xl bg-slate-900/60 border border-slate-800 p-4 flex flex-col items-center gap-2 active:scale-95 transition">
+        <span class="text-2xl">🎧</span>
+        <span class="text-[10px] uppercase tracking-wider text-slate-400 font-bold">Audio Bible</span>
+      </a>
+      <a href="playlist.html" class="rounded-2xl bg-slate-900/60 border border-slate-800 p-4 flex flex-col items-center gap-2 active:scale-95 transition">
+        <span class="text-2xl">🎵</span>
+        <span class="text-[10px] uppercase tracking-wider text-slate-400 font-bold">Music</span>
+      </a>
+      <a href="settings.html" class="rounded-2xl bg-slate-900/60 border border-slate-800 p-4 flex flex-col items-center gap-2 active:scale-95 transition">
+        <span class="text-2xl">⚙️</span>
+        <span class="text-[10px] uppercase tracking-wider text-slate-400 font-bold">Settings</span>
       </a>
     </section>
 
@@ -198,6 +230,20 @@
       });
     }
 
+    function loadEncouragementAndPrayer() {
+      document.getElementById('encouragementText').textContent = CYMOR.getTodayEncouragement();
+      document.getElementById('prayerOfDayText').textContent = CYMOR.getTodayPrayer();
+    }
+
+    async function sharePrayerOfDay() {
+      await CYMOR.shareAsImage({
+        title: "Prayer of the Day",
+        body: CYMOR.getTodayPrayer(),
+        reference: "Cymor Bible",
+        accent: "#38bdf8"
+      });
+    }
+
     function enableNotifications() {
       if (!("Notification" in window)) { alert("Notifications aren't supported on this browser."); return; }
       Notification.requestPermission().then(perm => {
@@ -219,8 +265,11 @@
     loadStreaks();
     loadContinue();
     loadDailyVerse();
+    loadEncouragementAndPrayer();
     checkNotifyNudge();
     CYMOR.registerServiceWorker();
+    CYMOR.startNotificationScheduler();
+    CYMOR.renderMiniPlayer();
   </script>
 </body>
 </html>
