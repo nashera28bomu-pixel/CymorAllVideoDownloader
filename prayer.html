@@ -71,8 +71,7 @@
       </div>
       <div class="mt-5 space-y-3" id="wallList"></div>
       <p class="text-[10px] text-slate-600 text-center mt-3 leading-relaxed">
-        The prayer wall needs a small backend endpoint to sync across devices — for now it's stored on this device only.
-        Point WALL_API below at your Express + MongoDB route when ready.
+        The prayer wall is not yet active. We are working on it.
       </p>
     </div>
 
@@ -229,6 +228,8 @@
 
     document.getElementById('prayerStreak').textContent = CYMOR.getStreak('prayer') + ' days';
     renderJournal();
+    CYMOR.startNotificationScheduler();
+    CYMOR.renderMiniPlayer();
   </script>
 </body>
 </html>
