@@ -83,16 +83,25 @@
     <section class="rounded-[24px] border border-slate-800 bg-slate-900/50 p-5 space-y-4">
       <p class="text-[10px] uppercase tracking-[0.25em] text-slate-500 font-bold">Notifications</p>
 
-      <div class="flex items-center justify-between">
-        <span class="text-sm text-slate-300">Verse of the day</span>
+      <div class="flex items-center justify-between gap-3">
+        <div class="flex-1">
+          <p class="text-sm text-slate-300">Verse of the day</p>
+          <input type="time" id="verseTimeInput" value="07:00" onchange="updateSchedule()" class="mt-1 bg-slate-800/60 border border-slate-700 rounded-lg px-2 py-1 text-xs text-slate-200 focus:outline-none focus:border-amber-500/50">
+        </div>
         <div class="toggle off" id="toggleVerse" onclick="toggleNotif('verse', this)"><div class="dot"></div></div>
       </div>
-      <div class="flex items-center justify-between">
-        <span class="text-sm text-slate-300">Prayer reminders</span>
+      <div class="flex items-center justify-between gap-3">
+        <div class="flex-1">
+          <p class="text-sm text-slate-300">Prayer reminder</p>
+          <input type="time" id="prayerTimeInput" value="18:00" onchange="updateSchedule()" class="mt-1 bg-slate-800/60 border border-slate-700 rounded-lg px-2 py-1 text-xs text-slate-200 focus:outline-none focus:border-amber-500/50">
+        </div>
         <div class="toggle off" id="togglePrayer" onclick="toggleNotif('prayer', this)"><div class="dot"></div></div>
       </div>
-      <div class="flex items-center justify-between">
-        <span class="text-sm text-slate-300">Trivia streak alerts</span>
+      <div class="flex items-center justify-between gap-3">
+        <div class="flex-1">
+          <p class="text-sm text-slate-300">Trivia streak alert</p>
+          <input type="time" id="triviaTimeInput" value="20:00" onchange="updateSchedule()" class="mt-1 bg-slate-800/60 border border-slate-700 rounded-lg px-2 py-1 text-xs text-slate-200 focus:outline-none focus:border-amber-500/50">
+        </div>
         <div class="toggle off" id="toggleTrivia" onclick="toggleNotif('trivia', this)"><div class="dot"></div></div>
       </div>
 
@@ -100,6 +109,9 @@
         Enable Notifications
       </button>
       <p class="text-[10px] text-slate-600 text-center leading-relaxed" id="notifStatus"></p>
+      <p class="text-[10px] text-slate-600 text-center leading-relaxed">
+        These fire while Cymor Bible is open or installed on your home screen. Notifications while the app is closed are coming soon.
+      </p>
     </section>
 
     <!-- OFFLINE DATA -->
@@ -165,11 +177,14 @@
       document.querySelectorAll('[onclick^="setVersion"]').forEach(b => b.classList.remove('active'));
       document.querySelector(`[onclick="setVersion('${s.version}', this)"]`)?.classList.add('active');
 
-      const notif = JSON.parse(localStorage.getItem('cymorNotifPrefs') || '{"verse":false,"prayer":false,"trivia":false}');
+      const notif = CYMOR.getNotifSchedule();
+      document.getElementById('verseTimeInput').value = notif.verseTime;
+      document.getElementById('prayerTimeInput').value = notif.prayerTime;
+      document.getElementById('triviaTimeInput').value = notif.triviaTime;
       ['verse','prayer','trivia'].forEach(k => {
         const el = document.getElementById('toggle' + k[0].toUpperCase() + k.slice(1));
-        el.classList.toggle('on', notif[k]);
-        el.classList.toggle('off', !notif[k]);
+        el.classList.toggle('on', notif[k + 'On']);
+        el.classList.toggle('off', !notif[k + 'On']);
       });
 
       updateCacheSize();
@@ -198,11 +213,23 @@
     }
 
     function toggleNotif(key, el) {
-      const notif = JSON.parse(localStorage.getItem('cymorNotifPrefs') || '{"verse":false,"prayer":false,"trivia":false}');
-      notif[key] = !notif[key];
-      localStorage.setItem('cymorNotifPrefs', JSON.stringify(notif));
-      el.classList.toggle('on', notif[key]);
-      el.classList.toggle('off', !notif[key]);
+      const notif = CYMOR.getNotifSchedule();
+      const onKey = key + 'On';
+      const patch = {}; patch[onKey] = !notif[onKey];
+      CYMOR.setNotifSchedule(patch);
+      el.classList.toggle('on', patch[onKey]);
+      el.classList.toggle('off', !patch[onKey]);
+      if (patch[onKey] && (!("Notification" in window) || Notification.permission !== 'granted')) {
+        requestNotifyPermission();
+      }
+    }
+
+    function updateSchedule() {
+      CYMOR.setNotifSchedule({
+        verseTime: document.getElementById('verseTimeInput').value,
+        prayerTime: document.getElementById('prayerTimeInput').value,
+        triviaTime: document.getElementById('triviaTimeInput').value
+      });
     }
 
     function requestNotifyPermission() {
@@ -234,6 +261,8 @@
     }
 
     loadSettingsUI();
+    CYMOR.startNotificationScheduler();
+    CYMOR.renderMiniPlayer();
   </script>
 </body>
 </html>
